@@ -1,0 +1,14 @@
+-- LEGACY / NO-OP
+-- ---------------------------------------------------------------------
+-- This file belonged to the incremental candidate CRM prototype.
+--
+-- ATS V2 is now a clean reset model with durable candidate documents,
+-- application document snapshots, tasks, notes, events and deterministic
+-- matching in supabase/schema.sql.
+--
+-- Do not run this legacy migration against the new database because it
+-- targets old tables such as public.submissions and public.documents.
+--
+-- Use these files instead:
+--   1. supabase/schema.sql
+--   2. supabase/seed.sql

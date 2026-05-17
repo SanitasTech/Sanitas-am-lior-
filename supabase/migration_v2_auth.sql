@@ -1,0 +1,14 @@
+-- LEGACY / NO-OP
+-- ---------------------------------------------------------------------
+-- This file belonged to the incremental V2 prototype.
+--
+-- ATS V2 is now a clean reset model. Do not run this legacy migration
+-- against the new database because it targets old tables such as
+-- public.submissions and public.documents.
+--
+-- Use these files instead:
+--   1. supabase/schema.sql
+--   2. supabase/seed.sql
+--
+-- Kept as a guardrail so an old instruction or bookmark does not apply
+-- obsolete SQL by accident.

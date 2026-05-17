@@ -1,0 +1,421 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  PROFESSIONS,
+  QUEBEC_REGIONS,
+  ALL_DEPARTMENTS,
+  SHIFTS,
+  MANDATE_TYPES,
+  URGENCY_LEVELS,
+  URGENCY_LABELS,
+  DOCUMENT_TYPES,
+} from '@/lib/constants';
+import type { Job, ExtraQuestion } from '@/types';
+
+interface JobFormProps {
+  initial?: Partial<Job> & { id?: string };
+  mode: 'create' | 'edit';
+}
+
+interface State {
+  title: string;
+  profession: string;
+  region: string;
+  city: string;
+  establishment: string;
+  department: string;
+  shift: string;
+  schedule: string;
+  mandate_type: string;
+  start_date: string;
+  duration: string;
+  salary: string;
+  urgency: 'normal' | 'high' | 'urgent';
+  requirements: string;
+  particularities: string;
+  required_documents: string[];
+  extra_questions: ExtraQuestion[];
+  status: 'active' | 'inactive' | 'draft';
+}
+
+function newQuestion(): ExtraQuestion {
+  const id =
+    typeof globalThis.crypto !== 'undefined' && 'randomUUID' in globalThis.crypto
+      ? globalThis.crypto.randomUUID().slice(0, 8)
+      : Math.random().toString(36).slice(2, 10);
+  return { id, label: '', type: 'yes_no', required: false };
+}
+
+export default function JobForm({ initial, mode }: JobFormProps) {
+  const router = useRouter();
+  const [form, setForm] = useState<State>({
+    title: initial?.title || '',
+    profession: initial?.profession || '',
+    region: initial?.region || '',
+    city: initial?.city || '',
+    establishment: initial?.establishment || '',
+    department: initial?.department || '',
+    shift: initial?.shift || '',
+    schedule: initial?.schedule || '',
+    mandate_type: initial?.mandate_type || '',
+    start_date: initial?.start_date || '',
+    duration: initial?.duration || '',
+    salary: initial?.salary || '',
+    urgency: (initial?.urgency as State['urgency']) ?? 'normal',
+    requirements: initial?.requirements || '',
+    particularities: initial?.particularities || '',
+    required_documents: initial?.required_documents || [],
+    extra_questions: initial?.extra_questions || [],
+    // Nullish coalescing : ne tombe sur 'active' que si le statut est absent.
+    // 'inactive' ou 'draft' sont conservés correctement.
+    status: (initial?.status as State['status']) ?? 'active',
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function set<K extends keyof State>(k: K, v: State[K]) {
+    setForm((f) => ({ ...f, [k]: v }));
+  }
+
+  function toggleDoc(doc: string) {
+    set(
+      'required_documents',
+      form.required_documents.includes(doc)
+        ? form.required_documents.filter((d) => d !== doc)
+        : [...form.required_documents, doc]
+    );
+  }
+
+  function updateQuestion(idx: number, patch: Partial<ExtraQuestion>) {
+    set(
+      'extra_questions',
+      form.extra_questions.map((q, i) => (i === idx ? { ...q, ...patch } : q))
+    );
+  }
+
+  function addQuestion() {
+    set('extra_questions', [...form.extra_questions, newQuestion()]);
+  }
+
+  function removeQuestion(idx: number) {
+    set('extra_questions', form.extra_questions.filter((_, i) => i !== idx));
+  }
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    if (!form.title.trim() || !form.profession || !form.region) {
+      setError('Titre, profession et région sont requis.');
+      return;
+    }
+    setSaving(true);
+    try {
+      const payload = {
+        ...(mode === 'edit' && initial?.id ? { id: initial.id } : {}),
+        title: form.title.trim(),
+        profession: form.profession,
+        region: form.region,
+        city: form.city || null,
+        establishment: form.establishment || null,
+        department: form.department || null,
+        shift: form.shift || null,
+        schedule: form.schedule || null,
+        mandate_type: form.mandate_type || null,
+        start_date: form.start_date || null,
+        duration: form.duration || null,
+        salary: form.salary || null,
+        urgency: form.urgency,
+        requirements: form.requirements || null,
+        particularities: form.particularities || null,
+        required_documents: form.required_documents,
+        extra_questions: form.extra_questions.filter((q) => q.label.trim()),
+        status: form.status,
+      };
+
+      const res = await fetch('/api/admin/jobs', {
+        method: mode === 'edit' ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.ok) throw new Error(json.error || 'Échec.');
+      router.push('/admin/postes');
+      router.refresh();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Erreur');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function deactivate() {
+    if (!initial?.id) return;
+    if (!confirm('Désactiver ce poste ? Il ne sera plus visible publiquement mais restera consultable dans l\'admin.')) return;
+    const res = await fetch(`/api/admin/jobs?id=${initial.id}`, { method: 'DELETE' });
+    const json = await res.json();
+    if (json.ok) {
+      router.push('/admin/postes');
+      router.refresh();
+    } else {
+      setError(json.error || 'Échec de la désactivation.');
+    }
+  }
+
+  async function hardDelete() {
+    if (!initial?.id) return;
+    if (
+      !confirm(
+        `Supprimer définitivement « ${initial.title || 'ce poste'} » ?\n\nCette action est irréversible. Les soumissions existantes seront conservées (job_id devient null, le posting_snapshot reste).`
+      )
+    )
+      return;
+    const res = await fetch(`/api/admin/jobs?id=${initial.id}&hard=true`, { method: 'DELETE' });
+    const json = await res.json();
+    if (json.ok) {
+      router.push('/admin/postes');
+      router.refresh();
+    } else {
+      setError(json.error || 'Échec de la suppression.');
+    }
+  }
+
+  return (
+    <form onSubmit={save} className="space-y-6">
+      <section className="card p-6 space-y-5">
+        <h2 className="text-[18px] font-semibold text-fg">Informations principales</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Titre" required>
+            <input className="input" value={form.title} onChange={(e) => set('title', e.target.value)} />
+          </Field>
+          <Field label="Profession" required>
+            <select className="input" value={form.profession} onChange={(e) => set('profession', e.target.value)}>
+              <option value="">Choisir</option>
+              {PROFESSIONS.map((p) => <option key={p} value={p}>{p}</option>)}
+            </select>
+          </Field>
+          <Field label="Région" required>
+            <select className="input" value={form.region} onChange={(e) => set('region', e.target.value)}>
+              <option value="">Choisir</option>
+              {QUEBEC_REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+            </select>
+          </Field>
+          <Field label="Ville">
+            <input className="input" value={form.city} onChange={(e) => set('city', e.target.value)} />
+          </Field>
+          <Field label="Établissement">
+            <input className="input" value={form.establishment} onChange={(e) => set('establishment', e.target.value)} />
+          </Field>
+          <Field label="Département">
+            <select className="input" value={form.department} onChange={(e) => set('department', e.target.value)}>
+              <option value="">Choisir</option>
+              {ALL_DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}
+            </select>
+          </Field>
+          <Field label="Quart">
+            <select className="input" value={form.shift} onChange={(e) => set('shift', e.target.value)}>
+              <option value="">Choisir</option>
+              {SHIFTS.map((s) => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </Field>
+          <Field label="Horaire détaillé">
+            <input className="input" value={form.schedule} onChange={(e) => set('schedule', e.target.value)} placeholder="Ex. 7h à 15h30" />
+          </Field>
+          <Field label="Type de mandat">
+            <select className="input" value={form.mandate_type} onChange={(e) => set('mandate_type', e.target.value)}>
+              <option value="">Choisir</option>
+              {MANDATE_TYPES.map((m) => <option key={m} value={m}>{m}</option>)}
+            </select>
+          </Field>
+          <Field label="Date de début">
+            <input className="input" type="date" value={form.start_date} onChange={(e) => set('start_date', e.target.value)} />
+          </Field>
+          <Field label="Durée">
+            <input className="input" value={form.duration} onChange={(e) => set('duration', e.target.value)} placeholder="Ex. 3 mois" />
+          </Field>
+          <Field label="Rémunération">
+            <input className="input" value={form.salary} onChange={(e) => set('salary', e.target.value)} placeholder="Ex. Selon convention + primes" />
+          </Field>
+          <Field label="Urgence">
+            <select className="input" value={form.urgency} onChange={(e) => set('urgency', e.target.value as State['urgency'])}>
+              {URGENCY_LEVELS.map((u) => <option key={u} value={u}>{URGENCY_LABELS[u]}</option>)}
+            </select>
+          </Field>
+          <Field label="Statut">
+            <select className="input" value={form.status} onChange={(e) => set('status', e.target.value as State['status'])}>
+              <option value="active">Actif</option>
+              <option value="draft">Brouillon</option>
+              <option value="inactive">Inactif</option>
+            </select>
+          </Field>
+        </div>
+
+        <Field label="Exigences">
+          <textarea className="textarea" rows={4} value={form.requirements} onChange={(e) => set('requirements', e.target.value)} />
+        </Field>
+        <Field label="Particularités">
+          <textarea className="textarea" rows={4} value={form.particularities} onChange={(e) => set('particularities', e.target.value)} />
+        </Field>
+      </section>
+
+      <section className="card p-6 space-y-4">
+        <h2 className="text-[18px] font-semibold text-fg">Documents demandés</h2>
+        <p className="helper">Cochez les documents nécessaires pour ce mandat. Le CV est toujours demandé.</p>
+        <div className="flex flex-wrap gap-2">
+          {DOCUMENT_TYPES.map((d) => {
+            const active = form.required_documents.includes(d);
+            return (
+              <button
+                key={d}
+                type="button"
+                onClick={() => toggleDoc(d)}
+                className={active ? 'chip chip-active' : 'chip'}
+                aria-pressed={active}
+              >
+                {d}
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="card p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-[18px] font-semibold text-fg">Questions supplémentaires</h2>
+          <button type="button" onClick={addQuestion} className="btn-secondary btn-sm">
+            Ajouter une question
+          </button>
+        </div>
+        <p className="helper">Ces questions apparaîtront dans l'entrevue lorsqu'un candidat postule à ce mandat.</p>
+
+        {form.extra_questions.length === 0 ? (
+          <p className="text-fg-muted text-[14px]">Aucune question pour le moment.</p>
+        ) : (
+          <div className="space-y-3">
+            {form.extra_questions.map((q, idx) => (
+              <div key={q.id} className="rounded-xl border border-border p-4 space-y-3">
+                <div className="grid gap-3 sm:grid-cols-[1fr_180px_auto]">
+                  <Field label="Libellé">
+                    <input className="input" value={q.label} onChange={(e) => updateQuestion(idx, { label: e.target.value })} />
+                  </Field>
+                  <Field label="Type">
+                    <select
+                      className="input"
+                      value={q.type}
+                      onChange={(e) => updateQuestion(idx, { type: e.target.value as ExtraQuestion['type'] })}
+                    >
+                      <option value="yes_no">Oui / Non</option>
+                      <option value="text">Texte court</option>
+                      <option value="textarea">Texte long</option>
+                      <option value="select">Liste de choix</option>
+                    </select>
+                  </Field>
+                  <div className="flex items-end">
+                    <button type="button" onClick={() => removeQuestion(idx)} className="btn-danger btn-sm">
+                      Retirer
+                    </button>
+                  </div>
+                </div>
+                {q.type === 'select' && (
+                  <Field label="Options" helper="Séparez par des virgules.">
+                    <input
+                      className="input"
+                      value={(q.options || []).join(', ')}
+                      onChange={(e) =>
+                        updateQuestion(idx, {
+                          options: e.target.value.split(',').map((s) => s.trim()).filter(Boolean),
+                        })
+                      }
+                    />
+                  </Field>
+                )}
+                <label className="inline-flex items-center gap-2 text-[14px] cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-border accent-fg"
+                    checked={q.required}
+                    onChange={(e) => updateQuestion(idx, { required: e.target.checked })}
+                  />
+                  Réponse obligatoire
+                </label>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {error && (
+        <div className="rounded-xl border border-danger/40 bg-danger-soft px-4 py-3 text-[14px] text-danger">
+          {error}
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-center gap-3">
+        <button type="submit" disabled={saving} className="btn-primary">
+          {saving ? 'Enregistrement…' : mode === 'edit' ? 'Mettre à jour' : 'Créer le poste'}
+        </button>
+        <button type="button" onClick={() => router.back()} className="btn-secondary">
+          Annuler
+        </button>
+      </div>
+
+      {mode === 'edit' && initial?.id && (
+        <section className="rounded-2xl border border-danger/30 bg-danger-soft/40 p-5 sm:p-6">
+          <h3 className="text-[15px] font-semibold text-danger">Zone de danger</h3>
+          <p className="mt-1 text-[13.5px] text-fg-muted">
+            Actions irréversibles. Choisis la bonne selon le besoin.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {form.status !== 'inactive' && (
+              <button
+                type="button"
+                onClick={deactivate}
+                className="inline-flex items-center rounded-full border border-warning/40 bg-surface px-4 py-2 text-[13.5px] font-medium text-warning hover:bg-warning hover:text-bg transition-colors"
+              >
+                Désactiver (retirer du site public)
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={hardDelete}
+              className="inline-flex items-center rounded-full border border-danger/40 bg-surface px-4 py-2 text-[13.5px] font-medium text-danger hover:bg-danger hover:text-bg transition-colors"
+            >
+              Supprimer définitivement
+            </button>
+          </div>
+          <p className="mt-3 text-[12.5px] text-fg-muted leading-relaxed">
+            <strong>Désactiver</strong> retire le poste des listes publiques mais le garde en
+            base.&nbsp;
+            <strong>Supprimer définitivement</strong> efface le poste. Les soumissions reçues
+            avant la suppression sont conservées (avec le snapshot du poste capturé au moment de
+            la candidature).
+          </p>
+        </section>
+      )}
+    </form>
+  );
+}
+
+function Field({
+  label,
+  required,
+  helper,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  helper?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <label className="label">
+        {label}
+        {required && <span className="ml-0.5 text-danger">*</span>}
+      </label>
+      {children}
+      {helper && <p className="helper mt-1.5">{helper}</p>}
+    </div>
+  );
+}
