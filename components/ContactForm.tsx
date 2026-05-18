@@ -2,8 +2,12 @@
 
 import { useState } from 'react';
 import { CONTACT_TYPES } from '@/lib/constants';
+import { displayValue, type Locale } from '@/lib/i18n';
+import { useLocale } from './I18nProvider';
 
-export default function ContactForm() {
+export default function ContactForm({ locale: localeProp }: { locale?: Locale }) {
+  const contextLocale = useLocale();
+  const locale = localeProp || contextLocale;
   const [form, setForm] = useState({
     request_type: '',
     name: '',
@@ -16,7 +20,7 @@ export default function ContactForm() {
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
-  function update<K extends keyof typeof form>(k: K, v: typeof form[K]) {
+  function update<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
     setForm((f) => ({ ...f, [k]: v }));
   }
 
@@ -24,15 +28,15 @@ export default function ContactForm() {
     e.preventDefault();
     setError(null);
     if (!form.name.trim() || !form.message.trim()) {
-      setError('Nom et message requis.');
+      setError(locale === 'en' ? 'Name and message are required.' : 'Nom et message requis.');
       return;
     }
     if (!form.phone.trim() && !form.email.trim()) {
-      setError('Téléphone ou courriel requis.');
+      setError(locale === 'en' ? 'Phone or email is required.' : 'Telephone ou courriel requis.');
       return;
     }
     if (!form.consent_contact) {
-      setError('Le consentement est obligatoire.');
+      setError(locale === 'en' ? 'Consent is required.' : 'Le consentement est obligatoire.');
       return;
     }
     setSubmitting(true);
@@ -43,10 +47,12 @@ export default function ContactForm() {
         body: JSON.stringify(form),
       });
       const json = await res.json();
-      if (!res.ok || !json.ok) throw new Error(json.error || 'Échec de l\'envoi.');
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || (locale === 'en' ? 'Message failed to send.' : "Echec de l'envoi."));
+      }
       setDone(true);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Erreur.');
+      setError(e instanceof Error ? e.message : locale === 'en' ? 'Error.' : 'Erreur.');
     } finally {
       setSubmitting(false);
     }
@@ -55,8 +61,12 @@ export default function ContactForm() {
   if (done) {
     return (
       <div className="card p-8 text-center">
-        <h3 className="text-display-md text-fg">Merci, votre message a été envoyé.</h3>
-        <p className="mt-3 text-fg-muted">Nous reviendrons vers vous rapidement.</p>
+        <h3 className="text-display-md text-fg">
+          {locale === 'en' ? 'Thank you, your message has been sent.' : 'Merci, votre message a ete envoye.'}
+        </h3>
+        <p className="mt-3 text-fg-muted">
+          {locale === 'en' ? 'We will get back to you quickly.' : 'Nous reviendrons vers vous rapidement.'}
+        </p>
       </div>
     );
   }
@@ -64,23 +74,29 @@ export default function ContactForm() {
   return (
     <form onSubmit={submit} className="card p-6 sm:p-8 space-y-5">
       <div>
-        <label className="label" htmlFor="c-type">Type de demande</label>
+        <label className="label" htmlFor="c-type">
+          {locale === 'en' ? 'Request type' : 'Type de demande'}
+        </label>
         <select
           id="c-type"
           className="input"
           value={form.request_type}
           onChange={(e) => update('request_type', e.target.value)}
         >
-          <option value="">Choisir</option>
+          <option value="">{locale === 'en' ? 'Select' : 'Choisir'}</option>
           {CONTACT_TYPES.map((t) => (
-            <option key={t} value={t}>{t}</option>
+            <option key={t} value={t}>
+              {displayValue(locale, t)}
+            </option>
           ))}
         </select>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="label" htmlFor="c-name">Nom *</label>
+          <label className="label" htmlFor="c-name">
+            {locale === 'en' ? 'Name' : 'Nom'} *
+          </label>
           <input
             id="c-name"
             className="input"
@@ -90,7 +106,9 @@ export default function ContactForm() {
           />
         </div>
         <div>
-          <label className="label" htmlFor="c-phone">Téléphone</label>
+          <label className="label" htmlFor="c-phone">
+            {locale === 'en' ? 'Phone' : 'Telephone'}
+          </label>
           <input
             id="c-phone"
             className="input"
@@ -100,7 +118,9 @@ export default function ContactForm() {
           />
         </div>
         <div className="sm:col-span-2">
-          <label className="label" htmlFor="c-email">Courriel</label>
+          <label className="label" htmlFor="c-email">
+            {locale === 'en' ? 'Email' : 'Courriel'}
+          </label>
           <input
             id="c-email"
             className="input"
@@ -112,7 +132,9 @@ export default function ContactForm() {
       </div>
 
       <div>
-        <label className="label" htmlFor="c-msg">Message *</label>
+        <label className="label" htmlFor="c-msg">
+          {locale === 'en' ? 'Message' : 'Message'} *
+        </label>
         <textarea
           id="c-msg"
           className="textarea"
@@ -131,7 +153,10 @@ export default function ContactForm() {
           onChange={(e) => update('consent_contact', e.target.checked)}
         />
         <span className="text-[14px] text-fg leading-relaxed">
-          J'accepte d'être contacté par Sanitas concernant cette demande. <span className="text-danger">*</span>
+          {locale === 'en'
+            ? 'I agree to be contacted by Sanitas about this request.'
+            : "J'accepte d'etre contacte par Sanitas concernant cette demande."}{' '}
+          <span className="text-danger">*</span>
         </span>
       </label>
 
@@ -142,7 +167,13 @@ export default function ContactForm() {
       )}
 
       <button type="submit" disabled={submitting} className="btn-primary">
-        {submitting ? 'Envoi…' : 'Envoyer le message'}
+        {submitting
+          ? locale === 'en'
+            ? 'Sending...'
+            : 'Envoi...'
+          : locale === 'en'
+            ? 'Send message'
+            : 'Envoyer le message'}
       </button>
     </form>
   );

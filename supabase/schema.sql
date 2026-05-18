@@ -78,6 +78,7 @@ create table public.job_titles (
 create table public.jobs (
   id uuid primary key default gen_random_uuid(),
   title text not null,
+  title_en text,
   profession text not null,
   job_title_id uuid references public.job_titles(id) on delete set null,
   region text not null,
@@ -92,7 +93,9 @@ create table public.jobs (
   salary text,
   urgency text not null default 'normal' check (urgency in ('normal', 'high', 'urgent')),
   requirements text,
+  requirements_en text,
   particularities text,
+  particularities_en text,
   required_documents text[] not null default '{}',
   extra_questions jsonb not null default '[]'::jsonb,
   status text not null default 'active' check (status in ('active', 'inactive', 'draft')),

@@ -55,6 +55,7 @@ export interface RegionChoice {
 export interface Job {
   id: string;
   title: string;
+  title_en?: string | null;
   profession: string;
   job_title_id?: string | null;
   region: string;
@@ -69,7 +70,9 @@ export interface Job {
   salary: string | null;
   urgency: Urgency;
   requirements: string | null;
+  requirements_en?: string | null;
   particularities: string | null;
+  particularities_en?: string | null;
   required_documents: string[];
   extra_questions: ExtraQuestion[];
   status: JobStatus;

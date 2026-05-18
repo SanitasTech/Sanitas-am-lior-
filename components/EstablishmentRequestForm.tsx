@@ -3,8 +3,12 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { QUEBEC_REGIONS, PROFESSIONS, ALL_DEPARTMENTS, SHIFTS, URGENCY_LEVELS, URGENCY_LABELS } from '@/lib/constants';
+import { displayValue, localizedPath, optionLabel, type Locale } from '@/lib/i18n';
+import { useLocale } from './I18nProvider';
 
-export default function EstablishmentRequestForm() {
+export default function EstablishmentRequestForm({ locale: localeProp }: { locale?: Locale }) {
+  const contextLocale = useLocale();
+  const locale = localeProp || contextLocale;
   const router = useRouter();
   const [form, setForm] = useState({
     establishment: '',
@@ -28,7 +32,7 @@ export default function EstablishmentRequestForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  function update<K extends keyof typeof form>(k: K, v: typeof form[K]) {
+  function update<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
     setForm((f) => ({ ...f, [k]: v }));
   }
 
@@ -36,15 +40,19 @@ export default function EstablishmentRequestForm() {
     e.preventDefault();
     setError(null);
     if (!form.establishment.trim() || !form.contact_name.trim() || !form.profession_requested) {
-      setError('Établissement, personne contact et profession sont requis.');
+      setError(
+        locale === 'en'
+          ? 'Facility, contact person and profession are required.'
+          : 'Etablissement, personne contact et profession sont requis.'
+      );
       return;
     }
     if (!form.phone.trim() && !form.email.trim()) {
-      setError('Téléphone ou courriel requis.');
+      setError(locale === 'en' ? 'Phone or email is required.' : 'Telephone ou courriel requis.');
       return;
     }
     if (!form.consent_contact) {
-      setError('Le consentement est obligatoire.');
+      setError(locale === 'en' ? 'Consent is required.' : 'Le consentement est obligatoire.');
       return;
     }
     setSubmitting(true);
@@ -59,11 +67,13 @@ export default function EstablishmentRequestForm() {
         body: JSON.stringify(payload),
       });
       const json = await res.json();
-      if (!res.ok || !json.ok) throw new Error(json.error || 'Échec de l\'envoi.');
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || (locale === 'en' ? 'Request failed to send.' : "Echec de l'envoi."));
+      }
       setSuccess(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Erreur inconnue.');
+      setError(e instanceof Error ? e.message : locale === 'en' ? 'Unknown error.' : 'Erreur inconnue.');
     } finally {
       setSubmitting(false);
     }
@@ -72,17 +82,16 @@ export default function EstablishmentRequestForm() {
   if (success) {
     return (
       <div className="card p-8 text-center">
-        <h3 className="text-display-md text-fg">Votre demande a bien été reçue.</h3>
+        <h3 className="text-display-md text-fg">
+          {locale === 'en' ? 'Your request has been received.' : 'Votre demande a bien ete recue.'}
+        </h3>
         <p className="mt-3 text-fg-muted max-w-prose mx-auto leading-relaxed">
-          Un membre de l'équipe Sanitas vous contactera rapidement pour analyser votre besoin et
-          proposer des profils adaptés.
+          {locale === 'en'
+            ? 'A Sanitas team member will contact you quickly to review your need and suggest suitable profiles.'
+            : "Un membre de l'equipe Sanitas vous contactera rapidement pour analyser votre besoin et proposer des profils adaptes."}
         </p>
-        <button
-          type="button"
-          onClick={() => router.push('/')}
-          className="btn-primary mt-6"
-        >
-          Retour à l'accueil
+        <button type="button" onClick={() => router.push(localizedPath(locale, 'home'))} className="btn-primary mt-6">
+          {locale === 'en' ? 'Back to home' : "Retour a l'accueil"}
         </button>
       </div>
     );
@@ -91,90 +100,60 @@ export default function EstablishmentRequestForm() {
   return (
     <form onSubmit={submit} className="card p-6 sm:p-8 space-y-5">
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Nom de l'établissement" required>
-          <input
-            className="input"
-            value={form.establishment}
-            onChange={(e) => update('establishment', e.target.value)}
-            required
-          />
+        <Field label={locale === 'en' ? 'Facility name' : "Nom de l'etablissement"} required>
+          <input className="input" value={form.establishment} onChange={(e) => update('establishment', e.target.value)} required />
         </Field>
-        <Field label="Personne contact" required>
-          <input
-            className="input"
-            value={form.contact_name}
-            onChange={(e) => update('contact_name', e.target.value)}
-            required
-          />
+        <Field label={locale === 'en' ? 'Contact person' : 'Personne contact'} required>
+          <input className="input" value={form.contact_name} onChange={(e) => update('contact_name', e.target.value)} required />
         </Field>
-        <Field label="Fonction">
-          <input
-            className="input"
-            value={form.function_title}
-            onChange={(e) => update('function_title', e.target.value)}
-          />
+        <Field label={locale === 'en' ? 'Role' : 'Fonction'}>
+          <input className="input" value={form.function_title} onChange={(e) => update('function_title', e.target.value)} />
         </Field>
-        <Field label="Téléphone">
-          <input
-            className="input"
-            type="tel"
-            value={form.phone}
-            onChange={(e) => update('phone', e.target.value)}
-          />
+        <Field label={locale === 'en' ? 'Phone' : 'Telephone'}>
+          <input className="input" type="tel" value={form.phone} onChange={(e) => update('phone', e.target.value)} />
         </Field>
-        <Field label="Courriel">
-          <input
-            className="input"
-            type="email"
-            value={form.email}
-            onChange={(e) => update('email', e.target.value)}
-          />
+        <Field label={locale === 'en' ? 'Email' : 'Courriel'}>
+          <input className="input" type="email" value={form.email} onChange={(e) => update('email', e.target.value)} />
         </Field>
-        <Field label="Région">
-          <select
-            className="input"
-            value={form.region}
-            onChange={(e) => update('region', e.target.value)}
-          >
-            <option value="">Choisir</option>
+        <Field label={locale === 'en' ? 'Region' : 'Region'}>
+          <select className="input" value={form.region} onChange={(e) => update('region', e.target.value)}>
+            <option value="">{locale === 'en' ? 'Select' : 'Choisir'}</option>
             {QUEBEC_REGIONS.map((r) => (
-              <option key={r} value={r}>{r}</option>
+              <option key={r} value={r}>
+                {r}
+              </option>
             ))}
           </select>
         </Field>
-        <Field label="Ville">
-          <input
-            className="input"
-            value={form.city}
-            onChange={(e) => update('city', e.target.value)}
-          />
+        <Field label={locale === 'en' ? 'City' : 'Ville'}>
+          <input className="input" value={form.city} onChange={(e) => update('city', e.target.value)} />
         </Field>
-        <Field label="Département">
-          <select
-            className="input"
-            value={form.department}
-            onChange={(e) => update('department', e.target.value)}
-          >
-            <option value="">Choisir</option>
+        <Field label={locale === 'en' ? 'Department' : 'Departement'}>
+          <select className="input" value={form.department} onChange={(e) => update('department', e.target.value)}>
+            <option value="">{locale === 'en' ? 'Select' : 'Choisir'}</option>
             {ALL_DEPARTMENTS.map((d) => (
-              <option key={d} value={d}>{d}</option>
+              <option key={d} value={d}>
+                {displayValue(locale, d)}
+              </option>
             ))}
           </select>
         </Field>
-        <Field label="Profession recherchée" required>
+        <Field label={locale === 'en' ? 'Profession requested' : 'Profession recherchee'} required>
           <select
             className="input"
             value={form.profession_requested}
             onChange={(e) => update('profession_requested', e.target.value)}
             required
           >
-            <option value="">Choisir une profession</option>
+            <option value="">{locale === 'en' ? 'Select a profession' : 'Choisir une profession'}</option>
             {PROFESSIONS.map((p) => (
-              <option key={p} value={p}>{p}</option>
+              <option key={p} value={p}>
+                {optionLabel(locale, p)}
+              </option>
             ))}
           </select>
         </Field>
-        <Field label="Nombre de ressources">
+        <Field label={locale === 'en' ? 'Number of resources' : 'Nombre de ressources'}>
           <input
             className="input"
             type="number"
@@ -183,54 +162,45 @@ export default function EstablishmentRequestForm() {
             onChange={(e) => update('number_of_resources', e.target.value)}
           />
         </Field>
-        <Field label="Quart">
-          <select
-            className="input"
-            value={form.shift}
-            onChange={(e) => update('shift', e.target.value)}
-          >
-            <option value="">Choisir</option>
+        <Field label={locale === 'en' ? 'Shift' : 'Quart'}>
+          <select className="input" value={form.shift} onChange={(e) => update('shift', e.target.value)}>
+            <option value="">{locale === 'en' ? 'Select' : 'Choisir'}</option>
             {SHIFTS.map((s) => (
-              <option key={s} value={s}>{s}</option>
+              <option key={s} value={s}>
+                {displayValue(locale, s)}
+              </option>
             ))}
           </select>
         </Field>
-        <Field label="Date de début">
-          <input
-            className="input"
-            type="date"
-            value={form.start_date}
-            onChange={(e) => update('start_date', e.target.value)}
-          />
+        <Field label={locale === 'en' ? 'Start date' : 'Date de debut'}>
+          <input className="input" type="date" value={form.start_date} onChange={(e) => update('start_date', e.target.value)} />
         </Field>
-        <Field label="Durée estimée">
+        <Field label={locale === 'en' ? 'Estimated duration' : 'Duree estimee'}>
           <input
             className="input"
-            placeholder="Ex. 3 mois"
+            placeholder={locale === 'en' ? 'Ex. 3 months' : 'Ex. 3 mois'}
             value={form.duration}
             onChange={(e) => update('duration', e.target.value)}
           />
         </Field>
-        <Field label="Niveau d'urgence">
-          <select
-            className="input"
-            value={form.urgency}
-            onChange={(e) => update('urgency', e.target.value)}
-          >
+        <Field label={locale === 'en' ? 'Urgency level' : "Niveau d'urgence"}>
+          <select className="input" value={form.urgency} onChange={(e) => update('urgency', e.target.value)}>
             {URGENCY_LEVELS.map((u) => (
-              <option key={u} value={u}>{URGENCY_LABELS[u]}</option>
+              <option key={u} value={u}>
+                {locale === 'en' ? (u === 'high' ? 'Priority' : u === 'normal' ? 'Regular' : 'Urgent') : URGENCY_LABELS[u]}
+              </option>
             ))}
           </select>
         </Field>
       </div>
 
-      <Field label="Détails du besoin">
+      <Field label={locale === 'en' ? 'Need details' : 'Details du besoin'}>
         <textarea
           className="textarea"
           rows={4}
           value={form.details}
           onChange={(e) => update('details', e.target.value)}
-          placeholder="Particularités, contexte, exigences..."
+          placeholder={locale === 'en' ? 'Notes, context, requirements...' : 'Particularites, contexte, exigences...'}
         />
       </Field>
 
@@ -242,8 +212,10 @@ export default function EstablishmentRequestForm() {
           onChange={(e) => update('consent_contact', e.target.checked)}
         />
         <span className="text-[14px] text-fg leading-relaxed">
-          J'accepte que Sanitas utilise mes informations pour traiter cette demande et nous
-          contacter. <span className="text-danger">*</span>
+          {locale === 'en'
+            ? 'I agree that Sanitas may use this information to process the request and contact us.'
+            : "J'accepte que Sanitas utilise mes informations pour traiter cette demande et nous contacter."}{' '}
+          <span className="text-danger">*</span>
         </span>
       </label>
 
@@ -254,7 +226,13 @@ export default function EstablishmentRequestForm() {
       )}
 
       <button type="submit" disabled={submitting} className="btn-primary">
-        {submitting ? 'Envoi…' : 'Envoyer ma demande'}
+        {submitting
+          ? locale === 'en'
+            ? 'Sending...'
+            : 'Envoi...'
+          : locale === 'en'
+            ? 'Send request'
+            : 'Envoyer ma demande'}
       </button>
     </form>
   );

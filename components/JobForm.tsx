@@ -21,6 +21,7 @@ interface JobFormProps {
 
 interface State {
   title: string;
+  title_en: string;
   profession: string;
   region: string;
   city: string;
@@ -34,7 +35,9 @@ interface State {
   salary: string;
   urgency: 'normal' | 'high' | 'urgent';
   requirements: string;
+  requirements_en: string;
   particularities: string;
+  particularities_en: string;
   required_documents: string[];
   extra_questions: ExtraQuestion[];
   status: 'active' | 'inactive' | 'draft';
@@ -52,6 +55,7 @@ export default function JobForm({ initial, mode }: JobFormProps) {
   const router = useRouter();
   const [form, setForm] = useState<State>({
     title: initial?.title || '',
+    title_en: initial?.title_en || '',
     profession: initial?.profession || '',
     region: initial?.region || '',
     city: initial?.city || '',
@@ -65,7 +69,9 @@ export default function JobForm({ initial, mode }: JobFormProps) {
     salary: initial?.salary || '',
     urgency: (initial?.urgency as State['urgency']) ?? 'normal',
     requirements: initial?.requirements || '',
+    requirements_en: initial?.requirements_en || '',
     particularities: initial?.particularities || '',
+    particularities_en: initial?.particularities_en || '',
     required_documents: initial?.required_documents || [],
     extra_questions: initial?.extra_questions || [],
     // Nullish coalescing : ne tombe sur 'active' que si le statut est absent.
@@ -115,6 +121,7 @@ export default function JobForm({ initial, mode }: JobFormProps) {
       const payload = {
         ...(mode === 'edit' && initial?.id ? { id: initial.id } : {}),
         title: form.title.trim(),
+        title_en: form.title_en || null,
         profession: form.profession,
         region: form.region,
         city: form.city || null,
@@ -128,7 +135,9 @@ export default function JobForm({ initial, mode }: JobFormProps) {
         salary: form.salary || null,
         urgency: form.urgency,
         requirements: form.requirements || null,
+        requirements_en: form.requirements_en || null,
         particularities: form.particularities || null,
+        particularities_en: form.particularities_en || null,
         required_documents: form.required_documents,
         extra_questions: form.extra_questions.filter((q) => q.label.trim()),
         status: form.status,
@@ -188,6 +197,9 @@ export default function JobForm({ initial, mode }: JobFormProps) {
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Titre" required>
             <input className="input" value={form.title} onChange={(e) => set('title', e.target.value)} />
+          </Field>
+          <Field label="Titre anglais">
+            <input className="input" value={form.title_en} onChange={(e) => set('title_en', e.target.value)} />
           </Field>
           <Field label="Profession" required>
             <select className="input" value={form.profession} onChange={(e) => set('profession', e.target.value)}>
@@ -254,8 +266,14 @@ export default function JobForm({ initial, mode }: JobFormProps) {
         <Field label="Exigences">
           <textarea className="textarea" rows={4} value={form.requirements} onChange={(e) => set('requirements', e.target.value)} />
         </Field>
+        <Field label="Exigences anglaises">
+          <textarea className="textarea" rows={4} value={form.requirements_en} onChange={(e) => set('requirements_en', e.target.value)} />
+        </Field>
         <Field label="Particularités">
           <textarea className="textarea" rows={4} value={form.particularities} onChange={(e) => set('particularities', e.target.value)} />
+        </Field>
+        <Field label="Particularites anglaises">
+          <textarea className="textarea" rows={4} value={form.particularities_en} onChange={(e) => set('particularities_en', e.target.value)} />
         </Field>
       </section>
 

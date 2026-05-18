@@ -3,13 +3,18 @@
 import { useState } from 'react';
 import DocumentUploadChoice from '@/components/DocumentUploadChoice';
 import type { CandidateDocument } from '@/types';
+import type { Locale } from '@/lib/i18n';
+import { useLocale } from '@/components/I18nProvider';
 
 interface Props {
   requiredDocuments: string[];
   initialDocuments: CandidateDocument[];
+  locale?: Locale;
 }
 
-export default function DocumentsManager({ requiredDocuments, initialDocuments }: Props) {
+export default function DocumentsManager({ requiredDocuments, initialDocuments, locale: localeProp }: Props) {
+  const contextLocale = useLocale();
+  const locale = localeProp || contextLocale;
   const [documents, setDocuments] = useState<Record<string, CandidateDocument | undefined>>(() => {
     const byType: Record<string, CandidateDocument | undefined> = {};
     for (const doc of initialDocuments) {
@@ -27,6 +32,7 @@ export default function DocumentsManager({ requiredDocuments, initialDocuments }
             key={type}
             documentType={type}
             required={type === 'CV'}
+            locale={locale}
             value={
               current
                 ? {

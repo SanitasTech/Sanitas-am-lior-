@@ -1,14 +1,16 @@
 import { cn } from '@/lib/utils';
+import { URGENCY_DISPLAY, type Locale } from '@/lib/i18n';
 
 interface UrgencyBadgeProps {
   urgency?: string | null;
   className?: string;
+  locale?: Locale;
 }
 
-export default function UrgencyBadge({ urgency, className }: UrgencyBadgeProps) {
+export default function UrgencyBadge({ urgency, className, locale = 'fr' }: UrgencyBadgeProps) {
   if (!urgency || urgency === 'normal') return null;
   const isUrgent = urgency === 'urgent';
-  const label = isUrgent ? 'Urgent' : 'Prioritaire';
+  const label = URGENCY_DISPLAY[urgency]?.[locale] || (isUrgent ? 'Urgent' : 'Prioritaire');
   return (
     <span
       className={cn(

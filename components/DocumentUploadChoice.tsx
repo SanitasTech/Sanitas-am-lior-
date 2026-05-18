@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { displayValue, type Locale } from '@/lib/i18n';
+import { useLocale } from './I18nProvider';
 
 interface DocumentUploadChoiceProps {
   documentType: string;
@@ -9,30 +11,29 @@ interface DocumentUploadChoiceProps {
   requestedByPosting?: boolean;
   value?: { document_id?: string | null; status: string; file_name?: string | null; file_path?: string | null };
   onChange: (next: { document_id?: string | null; status: string; file_name?: string | null; file_path?: string | null }) => void;
+  locale?: Locale;
 }
 
-/**
- * Mode MVP : on enregistre le statut (Reçu / À recevoir).
- * L'upload effectif passe par /api/documents avec multipart. Pour rester simple
- * et fiable dans la première version, on stocke le nom du fichier choisi côté
- * client ; le file_path est rempli après upload réussi.
- */
 export default function DocumentUploadChoice({
   documentType,
   required = false,
   requestedByPosting = false,
   value,
   onChange,
+  locale: localeProp,
 }: DocumentUploadChoiceProps) {
+  const contextLocale = useLocale();
+  const locale = localeProp || contextLocale;
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const current = value || { status: 'À recevoir' };
+  const received = current.status === 'Recu' || current.status === 'Reçu' || current.status === 'ReÃ§u';
 
   async function handleFile(file: File) {
     if (file.size > 8 * 1024 * 1024) {
-      setError('Fichier trop volumineux (max 8 Mo).');
+      setError(locale === 'en' ? 'File is too large (max 8 MB).' : 'Fichier trop volumineux (max 8 Mo).');
       return;
     }
     setError(null);
@@ -44,7 +45,7 @@ export default function DocumentUploadChoice({
       const res = await fetch('/api/documents', { method: 'POST', body: fd });
       const json = await res.json();
       if (!res.ok || !json.ok) {
-        throw new Error(json.error || 'Échec du téléversement.');
+        throw new Error(json.error || (locale === 'en' ? 'Upload failed.' : 'Echec du televersement.'));
       }
       onChange({
         document_id: json.document_id || null,
@@ -53,7 +54,7 @@ export default function DocumentUploadChoice({
         file_path: json.file_path || null,
       });
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Erreur de téléversement.';
+      const msg = e instanceof Error ? e.message : locale === 'en' ? 'Upload error.' : 'Erreur de televersement.';
       setError(msg);
     } finally {
       setUploading(false);
@@ -65,22 +66,22 @@ export default function DocumentUploadChoice({
   }
 
   return (
-    <div className={cn('rounded-xl border bg-surface p-4', current.status === 'Reçu' ? 'border-success/40' : 'border-border')}>
+    <div className={cn('rounded-xl border bg-surface p-4', received ? 'border-success/40' : 'border-border')}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-[14.5px] font-medium text-fg">
-            {documentType}
+            {displayValue(locale, documentType)}
             {required && <span className="ml-1 text-danger">*</span>}
           </p>
           {requestedByPosting && (
             <span className="mt-1 inline-flex items-center rounded-full bg-accent-soft px-2 py-0.5 text-[11.5px] font-medium text-accent">
-              Demandé pour ce mandat
+              {locale === 'en' ? 'Requested for this assignment' : 'Demande pour ce mandat'}
             </span>
           )}
         </div>
-        {current.status === 'Reçu' && (
+        {received && (
           <span className="inline-flex items-center rounded-full bg-success-soft px-2.5 py-0.5 text-[12px] font-medium text-success">
-            Reçu
+            {locale === 'en' ? 'Received' : 'Recu'}
           </span>
         )}
       </div>
@@ -92,16 +93,24 @@ export default function DocumentUploadChoice({
           disabled={uploading}
           className="btn-secondary btn-sm"
         >
-          {uploading ? 'Téléversement…' : current.status === 'Reçu' ? 'Remplacer' : 'Glisser-déposer ou cliquer'}
+          {uploading
+            ? locale === 'en'
+              ? 'Uploading...'
+              : 'Televersement...'
+            : received
+              ? locale === 'en'
+                ? 'Replace'
+                : 'Remplacer'
+              : locale === 'en'
+                ? 'Upload or click'
+                : 'Glisser-deposer ou cliquer'}
         </button>
-        {!required && current.status !== 'Reçu' && (
+        {!required && !received && (
           <button type="button" onClick={markLater} className="btn-ghost btn-sm">
-            Je l'enverrai plus tard
+            {locale === 'en' ? 'I will send it later' : "Je l'enverrai plus tard"}
           </button>
         )}
-        {current.file_name && (
-          <span className="text-[13px] text-fg-muted truncate">{current.file_name}</span>
-        )}
+        {current.file_name && <span className="text-[13px] text-fg-muted truncate">{current.file_name}</span>}
       </div>
 
       <input

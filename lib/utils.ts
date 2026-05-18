@@ -6,12 +6,12 @@ export function cn(...classes: Array<string | false | null | undefined>): string
   return classes.filter(Boolean).join(' ');
 }
 
-export function formatDate(iso?: string | null): string {
+export function formatDate(iso?: string | null, locale = 'fr-CA'): string {
   if (!iso) return '';
   try {
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return iso;
-    return d.toLocaleDateString('fr-CA', {
+    return d.toLocaleDateString(locale, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -21,12 +21,12 @@ export function formatDate(iso?: string | null): string {
   }
 }
 
-export function formatDateTime(iso?: string | null): string {
+export function formatDateTime(iso?: string | null, locale = 'fr-CA'): string {
   if (!iso) return '';
   try {
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return iso;
-    return d.toLocaleString('fr-CA', {
+    return d.toLocaleString(locale, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',

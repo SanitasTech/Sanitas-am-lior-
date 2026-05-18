@@ -41,6 +41,11 @@ candidat, executer ensuite `supabase/migration_v4_candidate_qualified_profession
 Cette migration ajoute `candidate_profiles.qualified_professions` sans effacer
 les donnees existantes.
 
+Pour ajouter les textes anglais publics des postes, executer ensuite
+`supabase/migration_v5_public_i18n_jobs.sql`. Cette migration ajoute
+`jobs.title_en`, `jobs.requirements_en` et `jobs.particularities_en` sans
+effacer les donnees existantes.
+
 ## 2. Storage documents
 
 Dans Supabase Storage:

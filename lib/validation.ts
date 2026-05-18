@@ -55,6 +55,7 @@ export const extraQuestionSchema = z.object({
 // ---------------------------------------------------------------------
 export const jobSchema = z.object({
   title: nonEmpty('Titre'),
+  title_en: optionalString,
   profession: nonEmpty('Profession'),
   job_title_id: z.string().uuid().optional().nullable(),
   region: nonEmpty('Région'),
@@ -69,7 +70,9 @@ export const jobSchema = z.object({
   salary: optionalString,
   urgency: z.enum(['normal', 'high', 'urgent']).default('normal'),
   requirements: optionalString,
+  requirements_en: optionalString,
   particularities: optionalString,
+  particularities_en: optionalString,
   required_documents: z.array(z.string()).default([]),
   extra_questions: z.array(extraQuestionSchema).default([]),
   status: z.enum(['active', 'inactive', 'draft']).default('active'),

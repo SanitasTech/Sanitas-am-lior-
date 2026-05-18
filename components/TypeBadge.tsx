@@ -1,12 +1,14 @@
 import { cn } from '@/lib/utils';
 import type { SubmissionType } from '@/types';
+import type { Locale } from '@/lib/i18n';
 
 interface TypeBadgeProps {
   type: SubmissionType;
   className?: string;
+  locale?: Locale;
 }
 
-export default function TypeBadge({ type, className }: TypeBadgeProps) {
+export default function TypeBadge({ type, className, locale = 'fr' }: TypeBadgeProps) {
   if (type === 'posting') {
     return (
       <span
@@ -15,7 +17,7 @@ export default function TypeBadge({ type, className }: TypeBadgeProps) {
           className
         )}
       >
-        Mandat précis
+        {locale === 'en' ? 'Specific assignment' : 'Mandat precis'}
       </span>
     );
   }
@@ -26,7 +28,7 @@ export default function TypeBadge({ type, className }: TypeBadgeProps) {
         className
       )}
     >
-      Spontanée
+      {locale === 'en' ? 'Spontaneous' : 'Spontanee'}
     </span>
   );
 }

@@ -1,6 +1,8 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import { displayValue, type Locale } from '@/lib/i18n';
+import { useLocale } from './I18nProvider';
 
 interface SegmentedChoicesProps {
   options: readonly string[] | string[];
@@ -8,6 +10,7 @@ interface SegmentedChoicesProps {
   onChange: (next: string | string[]) => void;
   multi?: boolean;
   ariaLabel?: string;
+  locale?: Locale;
 }
 
 export default function SegmentedChoices({
@@ -16,7 +19,10 @@ export default function SegmentedChoices({
   onChange,
   multi = false,
   ariaLabel,
+  locale: localeProp,
 }: SegmentedChoicesProps) {
+  const contextLocale = useLocale();
+  const locale = localeProp || contextLocale;
   const selected = multi
     ? new Set<string>(Array.isArray(value) ? value : value ? [value] : [])
     : new Set<string>(typeof value === 'string' ? [value] : []);
@@ -44,7 +50,7 @@ export default function SegmentedChoices({
             onClick={() => toggle(opt)}
             className={cn('chip', active && 'chip-active')}
           >
-            {opt}
+            {displayValue(locale, opt)}
           </button>
         );
       })}

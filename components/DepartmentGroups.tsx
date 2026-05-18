@@ -3,14 +3,19 @@
 import { useState } from 'react';
 import { DEPARTMENT_GROUPS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
+import { displayValue, type Locale } from '@/lib/i18n';
+import { useLocale } from './I18nProvider';
 
 interface DepartmentGroupsProps {
   value: string[];
   onChange: (next: string[]) => void;
   label?: string;
+  locale?: Locale;
 }
 
-export default function DepartmentGroups({ value, onChange, label }: DepartmentGroupsProps) {
+export default function DepartmentGroups({ value, onChange, label, locale: localeProp }: DepartmentGroupsProps) {
+  const contextLocale = useLocale();
+  const locale = localeProp || contextLocale;
   const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
     // Ouvrir le premier groupe par défaut, plus tout groupe ayant des items sélectionnés.
     const initial = new Set<string>([DEPARTMENT_GROUPS[0].label]);
@@ -50,7 +55,7 @@ export default function DepartmentGroups({ value, onChange, label }: DepartmentG
                 className="flex w-full items-center justify-between px-4 py-3 text-left"
               >
                 <span className="flex items-center gap-2.5">
-                  <span className="text-[14.5px] font-medium text-fg">{group.label}</span>
+                  <span className="text-[14.5px] font-medium text-fg">{displayValue(locale, group.label)}</span>
                   {groupCount > 0 && (
                     <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[12px] font-medium text-accent">
                       {groupCount}
@@ -82,7 +87,7 @@ export default function DepartmentGroups({ value, onChange, label }: DepartmentG
                           aria-pressed={active}
                           className={cn('chip', active && 'chip-active')}
                         >
-                          {item}
+                          {displayValue(locale, item)}
                         </button>
                       );
                     })}

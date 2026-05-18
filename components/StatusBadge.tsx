@@ -1,8 +1,10 @@
 import { cn } from '@/lib/utils';
+import { displayValue, type Locale } from '@/lib/i18n';
 
 interface StatusBadgeProps {
   status: string;
   className?: string;
+  locale?: Locale;
 }
 
 const STYLES: Record<string, string> = {
@@ -23,7 +25,7 @@ const STYLES: Record<string, string> = {
   'Fermée': 'bg-muted text-fg-muted',
 };
 
-export default function StatusBadge({ status, className }: StatusBadgeProps) {
+export default function StatusBadge({ status, className, locale = 'fr' }: StatusBadgeProps) {
   const style = STYLES[status] || 'bg-muted text-fg-muted';
   return (
     <span
@@ -33,7 +35,7 @@ export default function StatusBadge({ status, className }: StatusBadgeProps) {
         className
       )}
     >
-      {status}
+      {displayValue(locale, status)}
     </span>
   );
 }

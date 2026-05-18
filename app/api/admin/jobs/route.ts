@@ -47,6 +47,7 @@ export async function POST(req: Request) {
     .from('jobs')
     .insert({
       title: input.title,
+      title_en: input.title_en || null,
       profession: input.profession,
       job_title_id: input.job_title_id || null,
       region: input.region,
@@ -61,7 +62,9 @@ export async function POST(req: Request) {
       salary: input.salary || null,
       urgency: input.urgency,
       requirements: input.requirements || null,
+      requirements_en: input.requirements_en || null,
       particularities: input.particularities || null,
+      particularities_en: input.particularities_en || null,
       required_documents: input.required_documents,
       extra_questions: input.extra_questions,
       status: input.status,
@@ -110,6 +113,7 @@ export async function PUT(req: Request) {
     .from('jobs')
     .update({
       title: input.title,
+      title_en: input.title_en || null,
       profession: input.profession,
       job_title_id: input.job_title_id || null,
       region: input.region,
@@ -124,7 +128,9 @@ export async function PUT(req: Request) {
       salary: input.salary || null,
       urgency: input.urgency,
       requirements: input.requirements || null,
+      requirements_en: input.requirements_en || null,
       particularities: input.particularities || null,
+      particularities_en: input.particularities_en || null,
       required_documents: input.required_documents,
       extra_questions: input.extra_questions,
       status: input.status,

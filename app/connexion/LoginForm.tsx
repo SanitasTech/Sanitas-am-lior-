@@ -3,12 +3,17 @@
 import { useState } from 'react';
 import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 import { COMPANY } from '@/lib/constants';
+import { ROUTES, type Locale } from '@/lib/i18n';
+import { useLocale } from '@/components/I18nProvider';
 
 interface Props {
   redirectTo?: string;
+  locale?: Locale;
 }
 
-export default function LoginForm({ redirectTo }: Props) {
+export default function LoginForm({ redirectTo, locale: localeProp }: Props) {
+  const contextLocale = useLocale();
+  const locale = localeProp || contextLocale;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,7 +35,7 @@ export default function LoginForm({ redirectTo }: Props) {
       });
       if (error) throw error;
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Connexion Google indisponible.');
+      setError(e instanceof Error ? e.message : locale === 'en' ? 'Google sign-in is unavailable.' : 'Connexion Google indisponible.');
       setLoading(false);
     }
   }
@@ -44,18 +49,20 @@ export default function LoginForm({ redirectTo }: Props) {
         className="w-full inline-flex items-center justify-center gap-3 rounded-full border border-border bg-surface px-5 py-3 text-[16px] font-medium text-fg hover:bg-muted transition-colors disabled:opacity-50"
       >
         <GoogleIcon />
-        {loading ? 'Connexion...' : 'Continuer avec Google'}
+        {loading ? (locale === 'en' ? 'Signing in...' : 'Connexion...') : locale === 'en' ? 'Continue with Google' : 'Continuer avec Google'}
       </button>
 
       <div className="rounded-xl border border-border bg-muted/40 p-4">
         <p className="text-[14.5px] font-medium text-fg">
-          Vous préférez ne pas postuler en ligne ?
+          {locale === 'en' ? 'Prefer not to apply online?' : 'Vous preferez ne pas postuler en ligne ?'}
         </p>
         <p className="mt-1 text-[13.5px] leading-relaxed text-fg-muted">
-          Appelez-nous et notre équipe prendra vos informations directement.
+          {locale === 'en'
+            ? 'Call us and our team will collect your information directly.'
+            : 'Appelez-nous et notre equipe prendra vos informations directement.'}
         </p>
         <a href={COMPANY.phoneHref} className="btn-secondary btn-sm mt-3">
-          Appeler {COMPANY.phone}
+          {locale === 'en' ? 'Call' : 'Appeler'} {COMPANY.phone}
         </a>
       </div>
 
@@ -66,8 +73,11 @@ export default function LoginForm({ redirectTo }: Props) {
       )}
 
       <p className="text-[12.5px] text-fg-subtle text-center">
-        En vous connectant, vous acceptez notre{' '}
-        <a href="/politique-confidentialite" className="underline">politique de confidentialité</a>.
+        {locale === 'en' ? 'By signing in, you accept our ' : 'En vous connectant, vous acceptez notre '}
+        <a href={ROUTES.privacy[locale]} className="underline">
+          {locale === 'en' ? 'privacy policy' : 'politique de confidentialite'}
+        </a>
+        .
       </p>
     </div>
   );
