@@ -1,7 +1,7 @@
 import Header from './Header';
 import Footer from './Footer';
 import { I18nProvider } from './I18nProvider';
-import { getCurrentCandidate } from '@/lib/auth';
+import { getCurrentCandidate, getCurrentUser } from '@/lib/auth';
 import type { Locale } from '@/lib/i18n';
 
 export default async function PublicLayout({
@@ -11,13 +11,14 @@ export default async function PublicLayout({
   children: React.ReactNode;
   locale?: Locale;
 }) {
-  const candidate = await getCurrentCandidate();
-  const initialUser = candidate?.auth_user_id
+  const user = await getCurrentUser();
+  const candidate = user ? await getCurrentCandidate() : null;
+  const initialUser = user
     ? {
-        id: candidate.auth_user_id,
-        email: candidate.email,
-        firstName: candidate.first_name,
-        lastName: candidate.last_name,
+        id: user.id,
+        email: user.email || null,
+        firstName: candidate?.first_name,
+        lastName: candidate?.last_name,
       }
     : null;
 

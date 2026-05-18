@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { getCanonicalSiteUrl, getSafeRedirectPath } from '@/lib/auth-redirects';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -22,17 +23,6 @@ function clearAuthCookies(response: NextResponse, names: string[]) {
   }
 }
 
-function getSafeRedirectPath(value: string | null, fallback: string) {
-  if (!value) return fallback;
-
-  try {
-    const parsed = new URL(value, 'https://sanitas.local');
-    return `${parsed.pathname}${parsed.search}${parsed.hash}`;
-  } catch {
-    return fallback;
-  }
-}
-
 async function signOutResponse(req: Request, redirectFallback = '/') {
   const cookieNames = authCookieNames();
   const supabase = createSupabaseServerClient();
@@ -46,7 +36,7 @@ async function signOutResponse(req: Request, redirectFallback = '/') {
   const redirectTo = getSafeRedirectPath(url.searchParams.get('redirect'), redirectFallback);
   const response =
     req.method === 'GET'
-      ? NextResponse.redirect(new URL(redirectTo, url.origin))
+      ? NextResponse.redirect(new URL(redirectTo, getCanonicalSiteUrl(url.origin)))
       : NextResponse.json({ ok: true });
 
   clearAuthCookies(response, cookieNames);

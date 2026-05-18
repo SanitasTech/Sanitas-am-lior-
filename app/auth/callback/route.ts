@@ -1,31 +1,17 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { getOrCreateCandidate } from '@/lib/auth';
+import { getOrCreateCandidateForUser } from '@/lib/auth';
+import { getCanonicalSiteUrl, getSafeRedirectPath } from '@/lib/auth-redirects';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-function getPublicOrigin(callbackOrigin: string) {
-  return process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || callbackOrigin;
-}
-
-function getSafeRedirectPath(value: string | null) {
-  if (!value) return '/mon-profil';
-
-  try {
-    const parsed = new URL(value, 'https://sanitas.local');
-    return `${parsed.pathname}${parsed.search}${parsed.hash}`;
-  } catch {
-    return '/mon-profil';
-  }
-}
-
 /**
  * Callback OAuth (Google) + magic link.
  *
- * Supabase redirige ici après authentification réussie avec un code dans
- * l'URL. On l'échange contre une session, puis on s'assure qu'un row
- * candidates existe pour ce user, et on redirige vers la destination.
+ * Supabase redirects here after successful authentication with a code in the
+ * URL. We exchange it for a session, ensure the candidate row exists, then
+ * redirect to a safe internal destination on the canonical public site.
  */
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -34,10 +20,11 @@ export async function GET(req: Request) {
 
   if (code) {
     const supabase = createSupabaseServerClient();
-    await supabase.auth.exchangeCodeForSession(code);
-    // Crée le candidat lié si premier login
-    await getOrCreateCandidate();
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error && data.user) {
+      await getOrCreateCandidateForUser(data.user);
+    }
   }
 
-  return NextResponse.redirect(new URL(redirectTo, getPublicOrigin(url.origin)));
+  return NextResponse.redirect(new URL(redirectTo, getCanonicalSiteUrl(url.origin)));
 }

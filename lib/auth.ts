@@ -3,6 +3,7 @@
 // =====================================================================
 
 import 'server-only';
+import type { User } from '@supabase/supabase-js';
 import { createSupabaseServerClient } from './supabase/server';
 import { createSupabaseAdminClient } from './supabase/admin';
 import { hydrateCandidate } from '@/lib/ats';
@@ -50,7 +51,10 @@ export async function requireAdmin() {
 export async function getOrCreateCandidate(): Promise<Candidate | null> {
   const user = await getCurrentUser();
   if (!user) return null;
+  return getOrCreateCandidateForUser(user);
+}
 
+export async function getOrCreateCandidateForUser(user: User): Promise<Candidate | null> {
   const admin = createSupabaseAdminClient();
   const { data: existing, error: existingError } = await admin
     .from('candidates')

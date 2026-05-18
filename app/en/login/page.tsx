@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import PublicLayout from '@/components/PublicLayout';
 import LoginForm from '@/app/connexion/LoginForm';
 import { getCurrentUser } from '@/lib/auth';
+import { getSafeRedirectPath } from '@/lib/auth-redirects';
 import { DecorativeBlob } from '@/components/Icons';
 
 export const metadata: Metadata = {
@@ -20,7 +21,7 @@ interface Props {
 export default async function EnglishLoginPage({ searchParams }: Props) {
   const user = await getCurrentUser();
   if (user) {
-    redirect(searchParams.redirect || '/en/my-profile');
+    redirect(getSafeRedirectPath(searchParams.redirect, '/en/my-profile'));
   }
 
   return (
