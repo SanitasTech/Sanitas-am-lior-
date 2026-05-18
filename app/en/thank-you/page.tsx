@@ -1,7 +1,12 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import PublicLayout from '@/components/PublicLayout';
-import { DecorativeBlob, CheckCircleIcon } from '@/components/Icons';
+import {
+  CheckCircleIcon,
+  ChatIcon,
+  ChecklistIcon,
+  DecorativeBlob,
+} from '@/components/Icons';
 
 export const metadata: Metadata = {
   title: 'Thank you',
@@ -18,32 +23,102 @@ export default function EnglishThankYouPage({ searchParams }: Props) {
 
   return (
     <PublicLayout locale="en">
-      <section className="relative section pt-24 pb-24 overflow-hidden">
+      <section className="relative section pt-16 pb-24 overflow-hidden">
         <DecorativeBlob className="absolute -top-40 left-1/2 -translate-x-1/2 h-[600px] w-[600px] text-accent pointer-events-none" />
-        <div className="container-page max-w-2xl text-center relative">
-          <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-success-soft text-success mb-6">
-            <CheckCircleIcon className="h-8 w-8" />
+        <div className="container-page max-w-2xl relative">
+          <div className="text-center">
+            <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-success-soft text-success mb-6">
+              <CheckCircleIcon className="h-8 w-8" />
+            </div>
+            <h1 className="text-display-lg text-fg">
+              {isPosting ? 'Application sent!' : 'Profile activated!'}
+            </h1>
+            <p className="mt-4 text-[17px] leading-relaxed text-fg-muted max-w-prose mx-auto">
+              {isPosting
+                ? 'Your interest in this assignment is with us. Here is what happens next:'
+                : 'Your profile is in our database. Here is what happens next:'}
+            </p>
           </div>
-          <h1 className="text-display-lg text-fg">
-            {isPosting ? 'Your interest in this assignment has been received.' : 'Your profile has been received.'}
-          </h1>
-          <p className="mt-5 text-[17px] leading-relaxed text-fg-muted max-w-prose mx-auto">
-            {isPosting
-              ? 'A member of the Sanitas team may contact you if your profile matches the assignment needs.'
-              : 'We will contact you when an assignment compatible with your profile becomes available.'}
-          </p>
+
+          <ol className="mt-10 space-y-4">
+            <NextStep
+              number="1"
+              icon={<CheckCircleIcon className="h-5 w-5" />}
+              title="We review your file"
+              body={
+                isPosting
+                  ? 'A recruiter checks that your profile fits the assignment requirements (often within an hour).'
+                  : 'A recruiter reviews your file and identifies assignments matching your preferences.'
+              }
+            />
+            <NextStep
+              number="2"
+              icon={<ChatIcon className="h-5 w-5" />}
+              title="We contact you within 24 to 48 business hours"
+              body="By your preferred method (phone or email). Feel free to call us first if you want to speed things up."
+            />
+            <NextStep
+              number="3"
+              icon={<ChecklistIcon className="h-5 w-5" />}
+              title={isPosting ? 'Follow your application live' : 'You receive matching assignments'}
+              body={
+                isPosting
+                  ? 'In your candidate portal, you will see every update: received, contacted, presented, placed.'
+                  : 'As soon as an assignment fits, we send it to you. You decide if you want to apply.'
+              }
+            />
+          </ol>
 
           <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <Link href="/en/jobs" className="btn-primary">View open jobs</Link>
-            <Link href="/en" className="btn-secondary">Back to home</Link>
+            <Link href="/en/my-applications" className="btn-primary">
+              View my applications
+            </Link>
+            <Link href="/en/jobs" className="btn-secondary">
+              Browse more jobs
+            </Link>
           </div>
 
-          <p className="mt-12 text-[13.5px] text-fg-muted">
-            Urgent question? Call us at{' '}
-            <a href="tel:+14509739696" className="text-fg hover:underline">450 973-9696</a>.
-          </p>
+          <div className="mt-12 rounded-xl border border-border bg-muted/30 px-5 py-4 text-center">
+            <p className="text-[13.5px] text-fg-muted">
+              Urgent question or want to speak with someone right away?
+            </p>
+            <a
+              href="tel:+14509739696"
+              className="mt-1 inline-block text-[15.5px] font-semibold text-fg hover:underline"
+            >
+              450 973-9696
+            </a>
+            <p className="mt-0.5 text-[12px] text-fg-subtle">Monday to Friday, 8 AM to 5 PM</p>
+          </div>
         </div>
       </section>
     </PublicLayout>
+  );
+}
+
+function NextStep({
+  number,
+  icon,
+  title,
+  body,
+}: {
+  number: string;
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+}) {
+  return (
+    <li className="flex items-start gap-4 rounded-xl border border-border bg-surface p-4 sm:p-5">
+      <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent">
+        {icon}
+        <span className="absolute -bottom-1 -right-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[11px] font-semibold text-accent-fg">
+          {number}
+        </span>
+      </div>
+      <div className="min-w-0">
+        <p className="text-[15.5px] font-semibold text-fg">{title}</p>
+        <p className="mt-1 text-[14px] leading-relaxed text-fg-muted">{body}</p>
+      </div>
+    </li>
   );
 }

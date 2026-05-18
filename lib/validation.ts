@@ -89,11 +89,26 @@ export const regionChoiceSchema = z.object({
   cities: z.array(z.string().max(200)).default([]),
 });
 
+export const trackingSchema = z
+  .object({
+    utm_source: optionalString,
+    utm_medium: optionalString,
+    utm_campaign: optionalString,
+    utm_term: optionalString,
+    utm_content: optionalString,
+    referrer: optionalString,
+    landing_url: optionalString,
+  })
+  .partial();
+
+export type TrackingInput = z.infer<typeof trackingSchema>;
+
 export const submissionAnswersSchema = z.object({
   preferred_contact: optionalString,
   best_contact_time: optionalString,
   languages: z.array(z.string()).optional(),
   work_authorization: optionalString,
+  tracking: trackingSchema.optional(),
   city_residence: optionalString,
   region_residence: optionalString,
   postal_code: optionalString,
@@ -119,6 +134,12 @@ export const submissionAnswersSchema = z.object({
   constraints: optionalString,
   recruiter_comment: optionalString,
   extra_answers: z.record(z.union([z.string(), z.boolean()])).optional(),
+  /**
+   * Créneaux date+heure proposés par le candidat pour être rappelé.
+   * Strings au format datetime-local (YYYY-MM-DDTHH:MM, fuseau local du
+   * candidat — Sanitas opère America/Montréal). Vides ignorés côté admin.
+   */
+  interview_slots: z.array(z.string().max(40)).max(5).optional(),
 });
 
 export const submissionSchema = z
@@ -276,3 +297,94 @@ export const contactMessageSchema = z
   });
 
 export type ContactMessageInput = z.infer<typeof contactMessageSchema>;
+
+// ---------------------------------------------------------------------
+// Validation par étape du wizard candidat (UX-side, pas API).
+// Retourne un map { champ -> message d'erreur } pour affichage inline.
+// La validation finale au moment de l'envoi passe toujours par
+// `submissionSchema` côté API.
+// ---------------------------------------------------------------------
+
+export interface StepInput {
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  email?: string;
+  city_residence?: string;
+  region_residence?: string;
+  qualified_professions?: string[];
+  years_experience?: string;
+  languages?: string[];
+  work_authorization?: string;
+  start_availability?: string;
+  shifts_accepted?: string[];
+  region_choices?: Array<{ region: string }>;
+  cvReady?: boolean;
+  consent_data?: boolean;
+  extra_answers?: Record<string, string | boolean>;
+  required_extra_question_ids?: string[];
+}
+
+type StepErrors = Record<string, string>;
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export function validateIdentityStep(input: StepInput): StepErrors {
+  const errors: StepErrors = {};
+  if (!input.first_name?.trim()) errors.first_name = 'Ton prénom est requis';
+  if (!input.last_name?.trim()) errors.last_name = 'Ton nom est requis';
+  const hasPhone = !!input.phone?.trim();
+  const hasEmail = !!input.email?.trim();
+  if (!hasPhone && !hasEmail) errors.phone = 'Téléphone ou courriel — au moins un des deux';
+  if (hasEmail && !EMAIL_RE.test(input.email!.trim())) errors.email = 'Courriel invalide';
+  if (!input.city_residence?.trim()) errors.city_residence = 'Ta ville est requise';
+  if (!input.region_residence) errors.region_residence = 'Ta région est requise';
+  return errors;
+}
+
+export function validateWorkStep(input: StepInput, mode: 'posting' | 'spontaneous'): StepErrors {
+  const errors: StepErrors = {};
+  if (!input.qualified_professions || input.qualified_professions.length === 0) {
+    errors.qualified_professions = mode === 'posting'
+      ? 'Confirme le ou les titres pour lesquels tu es qualifié(e)'
+      : 'Choisis au moins un titre pour lequel tu es qualifié(e)';
+  }
+  if (!input.years_experience) errors.years_experience = 'Indique ton expérience';
+  if (!input.work_authorization) errors.work_authorization = 'Précise ton autorisation de travail';
+  if (!input.languages || input.languages.length === 0) {
+    errors.languages = 'Choisis au moins une langue de travail';
+  }
+  return errors;
+}
+
+export function validateAvailabilityStep(
+  input: StepInput,
+  mode: 'posting' | 'spontaneous'
+): StepErrors {
+  const errors: StepErrors = {};
+  if (!input.start_availability) errors.start_availability = 'Indique quand tu peux commencer';
+  if (!input.shifts_accepted || input.shifts_accepted.length === 0) {
+    errors.shifts_accepted = 'Choisis au moins un quart de travail';
+  }
+  if (mode === 'spontaneous') {
+    const hasRegion = (input.region_choices || []).some((r) => r.region);
+    if (!hasRegion) errors.region_choices = 'Choisis au moins une région où tu veux travailler';
+  }
+  return errors;
+}
+
+export function validateDocumentsStep(input: StepInput): StepErrors {
+  const errors: StepErrors = {};
+  if (!input.cvReady) errors.cv = 'Téléverse ton CV pour continuer';
+  for (const id of input.required_extra_question_ids || []) {
+    const value = input.extra_answers?.[id];
+    if (value == null || value === '') errors[`q_${id}`] = 'Cette réponse est requise';
+  }
+  return errors;
+}
+
+export function validateReviewStep(input: StepInput): StepErrors {
+  const errors: StepErrors = {};
+  if (!input.consent_data) errors.consent_data = 'Le consentement est obligatoire pour envoyer';
+  return errors;
+}

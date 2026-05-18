@@ -9,6 +9,8 @@ interface DocumentUploadChoiceProps {
   documentType: string;
   required?: boolean;
   requestedByPosting?: boolean;
+  /** Vrai si ce document provient d'une candidature précédente. */
+  reused?: boolean;
   value?: { document_id?: string | null; status: string; file_name?: string | null; file_path?: string | null };
   onChange: (next: { document_id?: string | null; status: string; file_name?: string | null; file_path?: string | null }) => void;
   locale?: Locale;
@@ -18,6 +20,7 @@ export default function DocumentUploadChoice({
   documentType,
   required = false,
   requestedByPosting = false,
+  reused = false,
   value,
   onChange,
   locale: localeProp,
@@ -27,9 +30,13 @@ export default function DocumentUploadChoice({
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Tracé localement : vrai si l'utilisateur a téléversé un nouveau fichier
+  // pendant cette session (pour différencier d'un doc réutilisé du dossier).
+  const [replacedThisSession, setReplacedThisSession] = useState(false);
 
   const current = value || { status: 'À recevoir' };
   const received = current.status === 'Recu' || current.status === 'Reçu' || current.status === 'ReÃ§u';
+  const fromExistingFile = reused && received && !replacedThisSession;
 
   async function handleFile(file: File) {
     if (file.size > 8 * 1024 * 1024) {
@@ -47,6 +54,7 @@ export default function DocumentUploadChoice({
       if (!res.ok || !json.ok) {
         throw new Error(json.error || (locale === 'en' ? 'Upload failed.' : 'Echec du televersement.'));
       }
+      setReplacedThisSession(true);
       onChange({
         document_id: json.document_id || null,
         status: 'Reçu',
@@ -80,8 +88,23 @@ export default function DocumentUploadChoice({
           )}
         </div>
         {received && (
-          <span className="inline-flex items-center rounded-full bg-success-soft px-2.5 py-0.5 text-[12px] font-medium text-success">
-            {locale === 'en' ? 'Received' : 'Recu'}
+          <span className="inline-flex items-center gap-1 rounded-full bg-success-soft px-2.5 py-0.5 text-[12px] font-medium text-success">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path
+                d="m5 12 5 5L20 7"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            {fromExistingFile
+              ? locale === 'en'
+                ? 'From your file'
+                : 'Déjà dans ton dossier'
+              : locale === 'en'
+                ? 'Received'
+                : 'Reçu'}
           </span>
         )}
       </div>
@@ -95,19 +118,27 @@ export default function DocumentUploadChoice({
         >
           {uploading
             ? locale === 'en'
-              ? 'Uploading...'
-              : 'Televersement...'
+              ? 'Uploading…'
+              : 'Téléversement…'
             : received
               ? locale === 'en'
                 ? 'Replace'
                 : 'Remplacer'
               : locale === 'en'
-                ? 'Upload or click'
-                : 'Glisser-deposer ou cliquer'}
+                ? 'Choose file'
+                : 'Choisir un fichier'}
         </button>
         {!required && !received && (
-          <button type="button" onClick={markLater} className="btn-ghost btn-sm">
-            {locale === 'en' ? 'I will send it later' : "Je l'enverrai plus tard"}
+          <button
+            type="button"
+            onClick={markLater}
+            className="btn-secondary btn-sm inline-flex items-center gap-1.5"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
+              <path d="M12 7v5l3 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+            {locale === 'en' ? 'Send later' : 'Envoyer plus tard'}
           </button>
         )}
         {current.file_name && <span className="text-[13px] text-fg-muted truncate">{current.file_name}</span>}

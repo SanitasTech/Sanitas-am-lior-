@@ -4,12 +4,11 @@ import { redirect } from 'next/navigation';
 import PublicLayout from '@/components/PublicLayout';
 import CandidateApplicationFlow from '@/components/CandidateApplicationFlow';
 import StatusBadge from '@/components/StatusBadge';
-import { DecorativeBlob } from '@/components/Icons';
 import { getCurrentUser, getOrCreateCandidate } from '@/lib/auth';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { COMPANY } from '@/lib/constants';
 import { formatDateTime } from '@/lib/utils';
-import { applicationTitle, dateLocale, jobTitle, localizedPath } from '@/lib/i18n';
+import { dateLocale, jobTitle, localizedPath } from '@/lib/i18n';
 import type { Candidate, DocumentRecord, Job, Submission } from '@/types';
 
 export const metadata: Metadata = {
@@ -127,34 +126,13 @@ export default async function EnglishApplyPage({ searchParams }: Props) {
 
   return (
     <PublicLayout locale="en">
-      <section className="relative section pt-12 pb-24 overflow-hidden">
-        <DecorativeBlob className="absolute -top-40 -right-40 h-[500px] w-[500px] text-accent pointer-events-none" />
-        <div className="container-page relative">
-          <div className="mb-8 max-w-3xl">
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">Single candidate file</p>
-            <h1 className="mt-2 text-display-lg text-fg">
-              {selectedJob ? 'Confirm my interest in this assignment' : 'Activate my Sanitas profile'}
-            </h1>
-            <p className="mt-4 text-[16px] leading-relaxed text-fg-muted max-w-prose">
-              {selectedJob
-                ? 'Your information is reused from your file. Confirm only what is missing or what changed for this assignment.'
-                : 'Complete your file once. The Sanitas team can then match you with compatible assignments.'}
-            </p>
-          </div>
-
-          {selectedJob && (
-            <div className="mb-6 rounded-xl border border-border bg-muted/40 p-5">
-              <p className="text-[12.5px] font-semibold uppercase tracking-wider text-fg-subtle">Selected assignment</p>
-              <h2 className="mt-1 text-[18px] font-semibold text-fg">{jobTitle(selectedJob, 'en')}</h2>
-              <p className="mt-1 text-[14px] text-fg-muted">
-                {[selectedJob.establishment, selectedJob.city, selectedJob.department, selectedJob.shift].filter(Boolean).join(' · ')}
-              </p>
-            </div>
-          )}
-
-          <CandidateApplicationFlow mode={mode} job={selectedJob} initial={candidate} initialDocuments={documents} locale="en" />
-        </div>
-      </section>
+      <CandidateApplicationFlow
+        mode={mode}
+        job={selectedJob}
+        initial={candidate}
+        initialDocuments={documents}
+        locale="en"
+      />
     </PublicLayout>
   );
 }

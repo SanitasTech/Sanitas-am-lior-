@@ -4,7 +4,6 @@ import { redirect } from 'next/navigation';
 import PublicLayout from '@/components/PublicLayout';
 import CandidateApplicationFlow from '@/components/CandidateApplicationFlow';
 import StatusBadge from '@/components/StatusBadge';
-import { DecorativeBlob } from '@/components/Icons';
 import { getCurrentUser, getOrCreateCandidate } from '@/lib/auth';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { COMPANY } from '@/lib/constants';
@@ -129,45 +128,12 @@ export default async function PostulerPage({ searchParams }: Props) {
 
   return (
     <PublicLayout>
-      <section className="relative section pt-12 pb-24 overflow-hidden">
-        <DecorativeBlob className="absolute -top-40 -right-40 h-[500px] w-[500px] text-accent pointer-events-none" />
-        <div className="container-page relative">
-          <div className="mb-8 max-w-3xl">
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
-              Dossier candidat unique
-            </p>
-            <h1 className="mt-2 text-display-lg text-fg">
-              {selectedJob ? 'Confirmer mon intérêt pour ce mandat' : 'Activer mon profil Sanitas'}
-            </h1>
-            <p className="mt-4 text-[16px] leading-relaxed text-fg-muted max-w-prose">
-              {selectedJob
-                ? "Vos informations sont réutilisées depuis votre dossier. Confirmez seulement ce qui manque ou ce qui a changé pour ce mandat."
-                : "Complétez votre dossier une fois. L'équipe Sanitas pourra ensuite vous proposer les mandats compatibles."}
-            </p>
-          </div>
-
-          {selectedJob && (
-            <div className="mb-6 rounded-xl border border-border bg-muted/40 p-5">
-              <p className="text-[12.5px] font-semibold uppercase tracking-wider text-fg-subtle">
-                Mandat sélectionné
-              </p>
-              <h2 className="mt-1 text-[18px] font-semibold text-fg">{selectedJob.title}</h2>
-              <p className="mt-1 text-[14px] text-fg-muted">
-                {[selectedJob.establishment, selectedJob.city, selectedJob.department, selectedJob.shift]
-                  .filter(Boolean)
-                  .join(' · ')}
-              </p>
-            </div>
-          )}
-
-          <CandidateApplicationFlow
-            mode={mode}
-            job={selectedJob}
-            initial={candidate}
-            initialDocuments={documents}
-          />
-        </div>
-      </section>
+      <CandidateApplicationFlow
+        mode={mode}
+        job={selectedJob}
+        initial={candidate}
+        initialDocuments={documents}
+      />
     </PublicLayout>
   );
 }
