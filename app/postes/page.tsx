@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { unstable_noStore as noStore } from 'next/cache';
 import PublicLayout from '@/components/PublicLayout';
 import JobFilters from '@/components/JobFilters';
 import JobCard from '@/components/JobCard';
@@ -26,6 +27,7 @@ function param(sp: Props['searchParams'], k: string): string {
 }
 
 async function fetchJobs(sp: Props['searchParams']): Promise<Job[]> {
+  noStore();
   try {
     const supabase = createSupabaseAdminClient();
     let q = supabase.from('jobs').select('*').eq('status', 'active');

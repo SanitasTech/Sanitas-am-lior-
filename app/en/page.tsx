@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { unstable_noStore as noStore } from 'next/cache';
 import PublicLayout from '@/components/PublicLayout';
 import HomeSearch from '@/components/HomeSearch';
 import JobCard from '@/components/JobCard';
@@ -64,6 +65,7 @@ const PARTNERS = [
 ];
 
 async function fetchUrgentJobs(): Promise<Job[]> {
+  noStore();
   try {
     const supabase = createSupabaseAdminClient();
     const { data } = await supabase
