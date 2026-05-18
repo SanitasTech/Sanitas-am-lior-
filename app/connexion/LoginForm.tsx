@@ -17,10 +17,9 @@ export default function LoginForm({ redirectTo, locale: localeProp }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const siteUrl =
-    typeof window !== 'undefined'
-      ? window.location.origin
-      : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '');
+  const runtimeOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+  const siteUrl = configuredSiteUrl || runtimeOrigin || 'http://localhost:3000';
   const redirect = redirectTo ? `&redirect=${encodeURIComponent(redirectTo)}` : '';
   const callbackUrl = `${siteUrl}/auth/callback?next=1${redirect}`;
 
