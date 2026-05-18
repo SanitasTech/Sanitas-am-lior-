@@ -19,7 +19,11 @@ export default function LoginForm({ redirectTo, locale: localeProp }: Props) {
 
   const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '');
   const runtimeOrigin = typeof window !== 'undefined' ? window.location.origin : '';
-  const siteUrl = configuredSiteUrl || runtimeOrigin || 'http://localhost:3000';
+  const runtimeIsLocal =
+    /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(runtimeOrigin);
+  const productionFallback =
+    process.env.NODE_ENV === 'production' ? 'https://www.agencesanitas.com' : 'http://localhost:3000';
+  const siteUrl = configuredSiteUrl || (!runtimeIsLocal ? runtimeOrigin : '') || productionFallback;
   const redirect = redirectTo ? `&redirect=${encodeURIComponent(redirectTo)}` : '';
   const callbackUrl = `${siteUrl}/auth/callback?next=1${redirect}`;
 

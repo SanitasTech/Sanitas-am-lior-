@@ -22,6 +22,17 @@ function clearAuthCookies(response: NextResponse, names: string[]) {
   }
 }
 
+function getSafeRedirectPath(value: string | null, fallback: string) {
+  if (!value) return fallback;
+
+  try {
+    const parsed = new URL(value, 'https://sanitas.local');
+    return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+  } catch {
+    return fallback;
+  }
+}
+
 async function signOutResponse(req: Request, redirectFallback = '/') {
   const cookieNames = authCookieNames();
   const supabase = createSupabaseServerClient();
@@ -32,7 +43,7 @@ async function signOutResponse(req: Request, redirectFallback = '/') {
   }
 
   const url = new URL(req.url);
-  const redirectTo = url.searchParams.get('redirect') || redirectFallback;
+  const redirectTo = getSafeRedirectPath(url.searchParams.get('redirect'), redirectFallback);
   const response =
     req.method === 'GET'
       ? NextResponse.redirect(new URL(redirectTo, url.origin))
