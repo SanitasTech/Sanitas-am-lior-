@@ -146,6 +146,20 @@ export function breadcrumbJsonLd(items: Array<{ name: string; url: string }>) {
   };
 }
 
+export function faqPageJsonLd(questions: Array<{ question: string; answer: string }>) {
+  return {
+    '@type': 'FAQPage',
+    mainEntity: questions.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  };
+}
+
 export function jobMetaDescription(job: Job, locale: Locale): string {
   const profession = displayValue(locale, job.profession);
   const department = displayValue(locale, job.department);

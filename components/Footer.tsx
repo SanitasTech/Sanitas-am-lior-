@@ -15,18 +15,26 @@ export default function Footer({ locale = 'fr' }: { locale?: Locale }) {
     locale === 'en'
       ? [
           { href: '/en/nursing-agency-jobs-quebec', label: 'Nursing jobs Quebec' },
+          { href: '/en/licensed-practical-nurse-jobs-quebec', label: 'LPN jobs Quebec' },
           { href: '/en/pab-jobs-quebec', label: 'PAB jobs Quebec' },
+          { href: '/en/asss-jobs-quebec', label: 'ASSS jobs Quebec' },
           { href: '/en/remote-region-nursing-assignments-quebec', label: 'Remote nursing assignments' },
           { href: '/en/healthcare-staffing-laval', label: 'Healthcare staffing Laval' },
           { href: '/en/healthcare-staffing-agency-quebec', label: 'Healthcare staffing Quebec' },
           { href: '/en/healthcare-recruitment-quebec', label: 'Healthcare recruitment Quebec' },
+          { href: '/en/candidate-faq', label: 'Candidate FAQ' },
+          { href: '/en/facility-faq', label: 'Facility FAQ' },
         ]
       : [
           { href: '/emplois-infirmieres-quebec', label: 'Emplois infirmières Québec' },
+          { href: '/emplois-infirmieres-auxiliaires-quebec', label: 'Emplois infirmières auxiliaires' },
           { href: '/emplois-pab-quebec', label: 'Emplois PAB Québec' },
+          { href: '/emplois-asss-quebec', label: 'Emplois ASSS Québec' },
           { href: '/mandats-infirmiers-region-eloignee', label: 'Mandats en région éloignée' },
           { href: '/agence-placement-sante-laval', label: 'Agence placement santé Laval' },
           { href: '/recrutement-personnel-sante-quebec', label: 'Recrutement personnel santé' },
+          { href: '/faq-candidats', label: 'FAQ candidats' },
+          { href: '/faq-etablissements', label: 'FAQ établissements' },
         ];
   const linksRight = [
     { href: ROUTES.about.fr, label: copy.nav.about },
