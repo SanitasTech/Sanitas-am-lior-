@@ -145,12 +145,17 @@ export default function Image() {
               <div
                 style={{
                   display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 242,
+                  height: 72,
                   borderRadius: 999,
                   background: '#14252d',
                   color: '#f7fbfc',
-                  padding: '18px 28px',
-                  fontSize: 27,
+                  padding: '0 30px',
+                  fontSize: 26,
                   fontWeight: 850,
+                  lineHeight: 1,
                   whiteSpace: 'nowrap',
                 }}
               >
