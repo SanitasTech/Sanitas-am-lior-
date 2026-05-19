@@ -216,14 +216,18 @@ export const statusUpdateSchema = z.object({
   submission_id: z.string().uuid().optional(),
   status: z.enum([
     'Nouveau',
-    'À rappeler',
-    'Contacté',
+    'À appeler',
+    'Qualifié',
     'Documents manquants',
     'Prêt à présenter',
     'Présenté',
     'Placé',
-    'Non disponible',
     'Refusé',
+    'Inactif',
+    // Legacy values accepted so old links/forms do not fail while data is migrated.
+    'À rappeler',
+    'Contacté',
+    'Non disponible',
   ]),
   status_reason: z.string().max(1000).optional().nullable(),
 }).refine((v) => !!(v.application_id || v.submission_id), {

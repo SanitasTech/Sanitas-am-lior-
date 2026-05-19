@@ -11,7 +11,8 @@ import {
   computeMatchScore,
   hydrateCandidate,
 } from '@/lib/ats';
-import type { Candidate, CandidateDocument, Job, SubmissionAnswers } from '@/types';
+import { buildAutoTaskRecommendations } from '@/lib/ats-operating-model';
+import type { Application, Candidate, CandidateDocument, Job, RecruiterTask, SubmissionAnswers } from '@/types';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -424,6 +425,63 @@ export async function POST(req: Request) {
       completion_score: completion,
     },
   });
+
+  const { data: existingTaskRows } = await supabase
+    .from('recruiter_tasks')
+    .select('*')
+    .eq('application_id', applicationId)
+    .eq('status', 'open');
+
+  const applicationForAction = {
+    id: applicationId,
+    candidate_id: candidateId,
+    application_type: input.submission_type,
+    job_id: jobId,
+    posting_snapshot: postingSnapshot,
+    answers: input.answers,
+    completion_score: completion,
+    status: 'Nouveau',
+    status_reason: null,
+    source: input.source || 'web',
+    submitted_at: now,
+    created_at: now,
+    updated_at: now,
+    job,
+  } as Application;
+  const taskRecommendations = buildAutoTaskRecommendations({
+    application: applicationForAction,
+    candidate,
+    documents: docs,
+    job,
+    existingTasks: (existingTaskRows || []) as RecruiterTask[],
+  });
+  if (taskRecommendations.length > 0) {
+    const { data: createdTasks } = await supabase
+      .from('recruiter_tasks')
+      .insert(taskRecommendations.map((action) => ({
+        candidate_id: candidateId,
+        application_id: applicationId,
+        job_id: jobId,
+        assigned_to: null,
+        task_type: action.taskType,
+        title: action.taskTitle,
+        details: action.detail,
+        due_at: action.dueAt,
+        status: 'open',
+      })))
+      .select('id, task_type, title');
+
+    if (createdTasks && createdTasks.length > 0) {
+      await supabase.from('activity_events').insert(createdTasks.map((task) => ({
+        candidate_id: candidateId,
+        application_id: applicationId,
+        job_id: jobId,
+        actor_id: null,
+        event_type: 'task_auto_created',
+        event_payload: { task_id: task.id, task_type: task.task_type, title: task.title },
+      })));
+    }
+  }
 
   const candidateFullName = `${input.candidate.first_name} ${input.candidate.last_name}`;
   const isPosting = input.submission_type === 'posting';

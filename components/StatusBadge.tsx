@@ -9,14 +9,17 @@ interface StatusBadgeProps {
 
 const STYLES: Record<string, string> = {
   'Nouveau': 'bg-accent-soft text-accent',
-  'À rappeler': 'bg-warning-soft text-warning',
-  'Contacté': 'bg-muted text-fg',
+  'À appeler': 'bg-warning-soft text-warning',
+  'Qualifié': 'bg-muted text-fg',
   'Documents manquants': 'bg-warning-soft text-warning',
   'Prêt à présenter': 'bg-success-soft text-success',
   'Présenté': 'bg-accent-soft text-accent',
   'Placé': 'bg-success-soft text-success',
-  'Non disponible': 'bg-muted text-fg-muted',
   'Refusé': 'bg-danger-soft text-danger',
+  'Inactif': 'bg-muted text-fg-muted',
+  'À rappeler': 'bg-warning-soft text-warning',
+  'Contacté': 'bg-muted text-fg',
+  'Non disponible': 'bg-muted text-fg-muted',
   // Establishment request
   'Nouvelle': 'bg-accent-soft text-accent',
   'À analyser': 'bg-warning-soft text-warning',

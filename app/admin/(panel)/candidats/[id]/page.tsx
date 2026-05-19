@@ -11,7 +11,17 @@ import StatusUpdater from './StatusUpdater';
 import NoteForm from './NoteForm';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { hydrateCandidate, missingRequiredDocuments, requiredDocumentsForProfessions } from '@/lib/ats';
-import { formatDateTime } from '@/lib/utils';
+import {
+  applicationObjectLabel,
+  getApplicationNextAction,
+  getMatchDecision,
+  matchDecisionClass,
+  priorityClass,
+  priorityLabel,
+  RECRUITER_MESSAGE_TEMPLATES,
+  laneForStatus,
+} from '@/lib/ats-operating-model';
+import { cn, formatDateTime } from '@/lib/utils';
 import type {
   ActivityEvent,
   Application,
@@ -32,7 +42,7 @@ interface CandidateDetailData {
   notes: InternalNote[];
   tasks: RecruiterTask[];
   events: ActivityEvent[];
-  matches: Array<MatchScore & { job?: { title?: string; establishment?: string; region?: string; shift?: string } }>;
+  matches: Array<MatchScore & { job?: { id?: string; title?: string; establishment?: string; region?: string; shift?: string } }>;
 }
 
 async function resolveCandidateId(id: string) {
@@ -95,7 +105,7 @@ async function fetchCandidate(id: string): Promise<CandidateDetailData | null> {
       .limit(80),
     supabase
       .from('match_scores')
-      .select('*, job:jobs(title, establishment, region, shift)')
+      .select('*, job:jobs(id, title, establishment, region, shift)')
       .eq('candidate_id', candidateId)
       .order('score', { ascending: false })
       .limit(10),
@@ -132,6 +142,15 @@ export default async function CandidateDetail({ params }: { params: { id: string
       : [candidate.profession]
   );
   const openTasks = tasks.filter((task) => task.status === 'open');
+  const activeApplication = applications.find((application) => laneForStatus(application.status).id !== 'closed');
+  const recommendedAction = activeApplication
+    ? getApplicationNextAction({
+        application: activeApplication,
+        candidate,
+        documents: currentDocs,
+        job: activeApplication.job || null,
+      })
+    : null;
 
   const checklistItems = [
     { label: 'Contact joignable', state: candidate.phone || candidate.email ? 'ok' : 'warn' },
@@ -205,6 +224,11 @@ export default async function CandidateDetail({ params }: { params: { id: string
                         <p className="mt-1 text-[13px] text-fg-muted">
                           {formatDateTime(application.created_at)}
                         </p>
+                        <ApplicationActionLine
+                          application={application}
+                          candidate={candidate}
+                          documents={currentDocs}
+                        />
                       </div>
                       <div className="min-w-[260px]">
                         <StatusUpdater applicationId={application.id} currentStatus={application.status} />
@@ -322,6 +346,30 @@ export default async function CandidateDetail({ params }: { params: { id: string
         </div>
 
         <aside className="xl:sticky xl:top-20 xl:self-start space-y-5">
+          {recommendedAction && (
+            <section className="card p-5">
+              <p className="text-[12.5px] font-semibold uppercase tracking-wider text-fg-subtle">
+                Action recommandee
+              </p>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className={cn('tag', priorityClass(recommendedAction.priority))}>
+                  {priorityLabel(recommendedAction.priority)}
+                </span>
+                <span className={cn('text-[12.5px]', recommendedAction.overdue ? 'text-danger' : 'text-fg-subtle')}>
+                  {recommendedAction.dueLabel}
+                </span>
+              </div>
+              <h2 className="mt-3 text-[18px] font-semibold text-fg">{recommendedAction.label}</h2>
+              <p className="mt-2 text-[13.5px] leading-relaxed text-fg-muted">{recommendedAction.detail}</p>
+              <TaskQuickCreate
+                candidateId={candidate.id}
+                applicationId={activeApplication?.id}
+                jobId={activeApplication?.job_id}
+                compact
+              />
+            </section>
+          )}
+
           <section className="card p-5">
             <p className="text-[12.5px] font-semibold uppercase tracking-wider text-fg-subtle">
               Santé du dossier
@@ -370,15 +418,47 @@ export default async function CandidateDetail({ params }: { params: { id: string
                 matches.map((match) => (
                   <div key={match.id} className="rounded-lg border border-border bg-surface p-3">
                     <div className="flex items-center justify-between gap-3">
-                      <p className="text-[14px] font-medium text-fg">{match.job?.title || 'Mandat'}</p>
+                      {match.job?.id ? (
+                        <Link href={`/admin/postes/${match.job.id}`} className="text-[14px] font-medium text-fg hover:text-accent">
+                          {match.job?.title || 'Mandat'}
+                        </Link>
+                      ) : (
+                        <p className="text-[14px] font-medium text-fg">{match.job?.title || 'Mandat'}</p>
+                      )}
                       <span className="tabular-nums text-[14px] font-semibold text-fg">{match.score}%</span>
                     </div>
                     <p className="mt-1 text-[12.5px] text-fg-muted">
                       {[match.job?.establishment, match.job?.region, match.job?.shift].filter(Boolean).join(' · ')}
                     </p>
+                    <MatchDecisionLine match={match} />
                   </div>
                 ))
               )}
+            </div>
+          </section>
+
+          <section className="card p-5">
+            <p className="text-[12.5px] font-semibold uppercase tracking-wider text-fg-subtle">
+              Modeles rapides
+            </p>
+            <div className="mt-4 space-y-2">
+              {RECRUITER_MESSAGE_TEMPLATES.slice(0, 4).map((template) => (
+                <details key={template.code} className="rounded-lg border border-border bg-surface">
+                  <summary className="cursor-pointer px-3 py-2 text-[13.5px] font-medium text-fg">
+                    {template.title}
+                  </summary>
+                  <div className="border-t border-border p-3">
+                    {template.subject && <p className="mb-2 text-[12.5px] font-medium text-fg">{template.subject}</p>}
+                    <textarea
+                      readOnly
+                      className="min-h-[110px] w-full resize-none rounded-md border border-border bg-muted/30 p-2 text-[12.5px] text-fg"
+                      value={template.body
+                        .replaceAll('{{first_name}}', candidate.first_name || '')
+                        .replaceAll('{{last_name}}', candidate.last_name || '')}
+                    />
+                  </div>
+                </details>
+              ))}
             </div>
           </section>
 
@@ -410,6 +490,56 @@ function Info({ label, value }: { label: string; value?: string | null }) {
     <div className="min-w-0">
       <dt className="text-[12.5px] text-fg-subtle">{label}</dt>
       <dd className="text-fg break-words">{value || '—'}</dd>
+    </div>
+  );
+}
+
+function ApplicationActionLine({
+  application,
+  candidate,
+  documents,
+}: {
+  application: Application;
+  candidate: Candidate;
+  documents: CandidateDocument[];
+}) {
+  const action = getApplicationNextAction({
+    application,
+    candidate,
+    documents,
+    job: application.job || null,
+  });
+  return (
+    <div className="mt-3 rounded-lg border border-border bg-muted/30 px-3 py-2">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className={cn('tag', priorityClass(action.priority))}>{priorityLabel(action.priority)}</span>
+        <span className={cn('text-[12.5px]', action.overdue ? 'text-danger' : 'text-fg-subtle')}>
+          {action.dueLabel}
+        </span>
+      </div>
+      <p className="mt-1 text-[13px] font-medium text-fg">{action.label}</p>
+      <p className="text-[12.5px] text-fg-muted">{applicationObjectLabel(application)}</p>
+    </div>
+  );
+}
+
+function MatchDecisionLine({ match }: { match: MatchScore }) {
+  const decision = getMatchDecision(match);
+  const visibleReasons = [...(match.blockers || []), ...(match.reasons || []).filter((reason) => reason.state !== 'ok')]
+    .slice(0, 2);
+  return (
+    <div className="mt-3">
+      <span className={cn('tag', matchDecisionClass(decision.decision))}>{decision.label}</span>
+      <p className="mt-2 text-[12.5px] leading-snug text-fg-muted">{decision.detail}</p>
+      {visibleReasons.length > 0 && (
+        <ul className="mt-2 space-y-1">
+          {visibleReasons.map((reason) => (
+            <li key={`${reason.label}-${reason.detail}`} className="text-[12px] text-fg-subtle">
+              {reason.label}: {reason.detail}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

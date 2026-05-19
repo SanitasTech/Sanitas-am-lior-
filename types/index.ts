@@ -7,14 +7,18 @@ export type SubmissionType = ApplicationType;
 
 export type ApplicationStatus =
   | 'Nouveau'
-  | 'À rappeler'
-  | 'Contacté'
+  | 'À appeler'
+  | 'Qualifié'
   | 'Documents manquants'
   | 'Prêt à présenter'
   | 'Présenté'
   | 'Placé'
-  | 'Non disponible'
-  | 'Refusé';
+  | 'Refusé'
+  | 'Inactif'
+  // Legacy values kept readable while existing rows are migrated.
+  | 'À rappeler'
+  | 'Contacté'
+  | 'Non disponible';
 export type SubmissionStatus = ApplicationStatus;
 
 export type EstablishmentRequestStatus =

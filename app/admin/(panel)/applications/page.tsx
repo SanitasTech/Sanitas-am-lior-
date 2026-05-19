@@ -4,15 +4,18 @@ import StatusBadge from '@/components/StatusBadge';
 import TypeBadge from '@/components/TypeBadge';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { SUBMISSION_STATUSES } from '@/lib/constants';
+import { hydrateCandidate } from '@/lib/ats';
 import {
   ATS_PIPELINE_LANES,
   applicationObjectLabel,
   candidateDisplayName,
+  getApplicationNextAction,
   laneForStatus,
-  recruiterNextAction,
+  priorityClass,
+  priorityLabel,
 } from '@/lib/ats-operating-model';
-import { formatDateTime } from '@/lib/utils';
-import type { Application, Candidate } from '@/types';
+import { cn, formatDateTime } from '@/lib/utils';
+import type { Application, Candidate, CandidateDocument, Job } from '@/types';
 
 export const metadata: Metadata = { title: 'Pipeline ATS', robots: { index: false, follow: false } };
 export const dynamic = 'force-dynamic';
@@ -28,6 +31,8 @@ function param(sp: Props['searchParams'], key: string) {
 
 interface ApplicationRow extends Application {
   candidate: Candidate;
+  job?: Job | null;
+  candidate_documents?: CandidateDocument[];
 }
 
 async function fetchApplications(sp: Props['searchParams']) {
@@ -38,7 +43,9 @@ async function fetchApplications(sp: Props['searchParams']) {
 
   let query = supabase
     .from('applications')
-    .select('*, candidate:candidates(*)')
+    .select(
+      '*, candidate:candidates(*, profile:candidate_profiles(*), availability:candidate_availability(*), documents:candidate_documents(*)), job:jobs(*)'
+    )
     .order('created_at', { ascending: false })
     .limit(300);
 
@@ -46,7 +53,20 @@ async function fetchApplications(sp: Props['searchParams']) {
   if (type === 'posting' || type === 'spontaneous') query = query.eq('application_type', type);
 
   const { data } = await query;
-  let rows = (data || []) as unknown as ApplicationRow[];
+  let rows = ((data || []) as Array<Record<string, unknown>>).map((row) => {
+    const candidateRow = row.candidate as Record<string, unknown> | undefined;
+    const candidate = hydrateCandidate(
+      candidateRow,
+      candidateRow?.profile as Record<string, unknown>,
+      candidateRow?.availability as Record<string, unknown>
+    ) || (candidateRow as unknown as Candidate);
+    return {
+      ...(row as unknown as Application),
+      candidate,
+      job: (row.job as Job | null) || null,
+      candidate_documents: (candidateRow?.documents as CandidateDocument[] | undefined) || [],
+    } as ApplicationRow;
+  });
 
   if (search) {
     rows = rows.filter((row) =>
@@ -126,29 +146,41 @@ export default async function ApplicationsPage({ searchParams }: Props) {
                 {columnRows.length === 0 ? (
                   <p className="p-5 text-[13.5px] text-fg-muted">Aucun dossier.</p>
                 ) : (
-                  columnRows.slice(0, 8).map((application) => (
-                    <Link
-                      key={application.id}
-                      href={`/admin/candidats/${application.candidate_id}`}
-                      className="block p-4 hover:bg-muted/60"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="font-medium text-fg truncate">
-                            {candidateDisplayName(application.candidate)}
-                          </p>
-                          <p className="mt-1 text-[13px] text-fg-muted truncate">
-                            {applicationObjectLabel(application)}
-                          </p>
+                  columnRows.slice(0, 8).map((application) => {
+                    const action = getApplicationNextAction({
+                      application,
+                      candidate: application.candidate,
+                      documents: application.candidate_documents || [],
+                      job: application.job || null,
+                    });
+                    return (
+                      <Link
+                        key={application.id}
+                        href={`/admin/candidats/${application.candidate_id}`}
+                        className="block p-4 hover:bg-muted/60"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="font-medium text-fg truncate">
+                              {candidateDisplayName(application.candidate)}
+                            </p>
+                            <p className="mt-1 text-[13px] text-fg-muted truncate">
+                              {applicationObjectLabel(application)}
+                            </p>
+                          </div>
+                          <TypeBadge type={application.application_type} />
                         </div>
-                        <TypeBadge type={application.application_type} />
-                      </div>
-                      <p className="mt-2 text-[12.5px] font-medium text-fg">
-                        {recruiterNextAction(application)}
-                      </p>
-                      <p className="mt-1 text-[12px] text-fg-subtle">{formatDateTime(application.created_at)}</p>
-                    </Link>
-                  ))
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          <span className={cn('tag', priorityClass(action.priority))}>{priorityLabel(action.priority)}</span>
+                          <span className={cn('text-[12px]', action.overdue ? 'text-danger' : 'text-fg-subtle')}>
+                            {action.dueLabel}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-[12.5px] font-medium text-fg">{action.label}</p>
+                        <p className="mt-1 text-[12px] text-fg-subtle">{formatDateTime(application.created_at)}</p>
+                      </Link>
+                    );
+                  })
                 )}
               </div>
             </div>
@@ -193,7 +225,7 @@ export default async function ApplicationsPage({ searchParams }: Props) {
                     </Td>
                     <Td><span className="tag">{laneForStatus(application.status).label}</span></Td>
                     <Td><div className="max-w-[320px] truncate">{applicationObjectLabel(application)}</div></Td>
-                    <Td className="text-fg">{recruiterNextAction(application)}</Td>
+                    <Td><ActionSummary application={application} /></Td>
                     <Td><StatusBadge status={application.status} /></Td>
                     <Td className="text-fg-muted whitespace-nowrap">{formatDateTime(application.created_at)}</Td>
                     <Td className="text-right">
@@ -218,4 +250,25 @@ function Th({ children }: { children?: React.ReactNode }) {
 
 function Td({ children, className }: { children: React.ReactNode; className?: string }) {
   return <td className={`px-4 py-3 align-top ${className || ''}`}>{children}</td>;
+}
+
+function ActionSummary({ application }: { application: ApplicationRow }) {
+  const action = getApplicationNextAction({
+    application,
+    candidate: application.candidate,
+    documents: application.candidate_documents || [],
+    job: application.job || null,
+  });
+  return (
+    <div className="min-w-[220px]">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className={cn('tag', priorityClass(action.priority))}>{priorityLabel(action.priority)}</span>
+        <span className={cn('text-[12.5px]', action.overdue ? 'text-danger' : 'text-fg-subtle')}>
+          {action.dueLabel}
+        </span>
+      </div>
+      <p className="mt-1 font-medium text-fg">{action.label}</p>
+      <p className="mt-0.5 text-[12.5px] text-fg-muted">{action.detail}</p>
+    </div>
+  );
 }

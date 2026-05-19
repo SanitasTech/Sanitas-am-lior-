@@ -4,7 +4,8 @@ import KpiCard from '@/components/KpiCard';
 import StatusBadge from '@/components/StatusBadge';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { hydrateCandidate, missingRequiredDocuments } from '@/lib/ats';
-import { formatDateTime } from '@/lib/utils';
+import { getApplicationNextAction, priorityClass, priorityLabel } from '@/lib/ats-operating-model';
+import { cn, formatDateTime } from '@/lib/utils';
 import type { Application, Candidate, CandidateDocument } from '@/types';
 
 export const metadata: Metadata = { title: 'Candidats', robots: { index: false, follow: false } };
@@ -197,7 +198,12 @@ export default async function AdminCandidatesPage({ searchParams }: Props) {
                       </Td>
                       <Td>
                         <p className="tabular-nums text-fg">{candidate.applications?.length || 0}</p>
-                        {latestApplication && <StatusBadge status={latestApplication.status} />}
+                        {latestApplication && (
+                          <div className="mt-1 space-y-1">
+                            <StatusBadge status={latestApplication.status} />
+                            <CandidateNextAction application={latestApplication} candidate={candidate} docs={docs} />
+                          </div>
+                        )}
                       </Td>
                       <Td className="text-fg-muted whitespace-nowrap">
                         {formatDateTime(candidate.last_active_at || candidate.updated_at || candidate.created_at)}
@@ -225,4 +231,22 @@ function Th({ children }: { children?: React.ReactNode }) {
 
 function Td({ children, className }: { children: React.ReactNode; className?: string }) {
   return <td className={`px-4 py-3 align-top ${className || ''}`}>{children}</td>;
+}
+
+function CandidateNextAction({
+  application,
+  candidate,
+  docs,
+}: {
+  application: Application;
+  candidate: Candidate;
+  docs: CandidateDocument[];
+}) {
+  const action = getApplicationNextAction({ application, candidate, documents: docs, job: application.job || null });
+  return (
+    <div>
+      <span className={cn('tag', priorityClass(action.priority))}>{priorityLabel(action.priority)}</span>
+      <p className="mt-1 text-[12px] text-fg-muted">{action.label}</p>
+    </div>
+  );
 }

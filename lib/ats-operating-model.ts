@@ -1,7 +1,13 @@
-import type { Application, Candidate, CandidateDocument, Job } from '@/types';
 import { hasCurrentDocument, missingRequiredDocuments } from '@/lib/ats';
+import type { Application, Candidate, CandidateDocument, Job, MatchReason, RecruiterTask } from '@/types';
 
-export type AtsLaneId = 'intake' | 'blocked' | 'ready' | 'client' | 'closed';
+export type AtsLaneId = 'intake' | 'qualified' | 'blocked' | 'ready' | 'client' | 'closed';
+export type AtsActionPriority = 'urgent' | 'high' | 'normal' | 'low';
+export type MatchDecision =
+  | 'present_now'
+  | 'call_to_validate'
+  | 'request_document'
+  | 'do_not_propose';
 
 export interface AtsPipelineLane {
   id: AtsLaneId;
@@ -10,44 +16,75 @@ export interface AtsPipelineLane {
   statuses: string[];
 }
 
+export interface AtsNextAction {
+  code:
+    | 'call_candidate'
+    | 'qualify_candidate'
+    | 'request_documents'
+    | 'validate_availability'
+    | 'present_candidate'
+    | 'follow_client'
+    | 'close_file'
+    | 'reactivate_candidate'
+    | 'monitor';
+  label: string;
+  detail: string;
+  priority: AtsActionPriority;
+  dueAt: string | null;
+  dueLabel: string;
+  overdue: boolean;
+  taskType: string;
+  taskTitle: string;
+}
+
 export const ATS_PIPELINE_LANES: AtsPipelineLane[] = [
   {
     id: 'intake',
-    label: 'A qualifier',
-    intent: 'Verifier contact, disponibilite et admissibilite.',
-    statuses: ['Nouveau', 'A rappeler', 'Contacte'],
+    label: 'A appeler',
+    intent: 'Joindre sous 24 h et confirmer l interet.',
+    statuses: ['Nouveau', 'A appeler'],
+  },
+  {
+    id: 'qualified',
+    label: 'Qualifie',
+    intent: 'Dossier humainement valide, reste a produire une action.',
+    statuses: ['Qualifie'],
   },
   {
     id: 'blocked',
-    label: 'Bloque',
+    label: 'Documents',
     intent: 'Debloquer CV, permis, RCR ou information manquante.',
     statuses: ['Documents manquants'],
   },
   {
     id: 'ready',
-    label: 'Pret client',
-    intent: 'Dossier assez complet pour presentation.',
+    label: 'Pret a presenter',
+    intent: 'Dossier presentable au client maintenant.',
     statuses: ['Pret a presenter'],
   },
   {
     id: 'client',
-    label: 'Presente',
-    intent: 'Suivre la decision client et la disponibilite.',
+    label: 'Presente client',
+    intent: 'Suivre la decision client dans les 24 a 48 h.',
     statuses: ['Presente'],
   },
   {
     id: 'closed',
     label: 'Ferme',
-    intent: 'Historique conserve, pas d’action active.',
-    statuses: ['Place', 'Non disponible', 'Refuse'],
+    intent: 'Historique conserve, pas d action active.',
+    statuses: ['Place', 'Refuse', 'Inactif'],
   },
 ];
 
 const NORMALIZED_STATUS: Record<string, string> = {
-  'A rappeler': 'A rappeler',
-  'À rappeler': 'A rappeler',
-  Contacte: 'Contacte',
-  'Contacté': 'Contacte',
+  'A rappeler': 'A appeler',
+  'À rappeler': 'A appeler',
+  'A appeler': 'A appeler',
+  'À appeler': 'A appeler',
+  Contacte: 'Qualifie',
+  'Contacté': 'Qualifie',
+  Qualifie: 'Qualifie',
+  'Qualifié': 'Qualifie',
   'Pret a presenter': 'Pret a presenter',
   'Prêt à présenter': 'Pret a presenter',
   Presente: 'Presente',
@@ -56,6 +93,8 @@ const NORMALIZED_STATUS: Record<string, string> = {
   'Placé': 'Place',
   Refuse: 'Refuse',
   'Refusé': 'Refuse',
+  'Non disponible': 'Inactif',
+  Inactif: 'Inactif',
 };
 
 export function normalizeApplicationStatus(status?: string | null): string {
@@ -85,18 +124,293 @@ export function candidateDisplayName(candidate?: Candidate | null): string {
 }
 
 export function recruiterNextAction(application: Application): string {
-  const status = normalizeApplicationStatus(application.status);
-  if (status === 'Nouveau') return 'Qualifier le dossier';
-  if (status === 'A rappeler') return 'Appeler le candidat';
-  if (status === 'Contacte') return 'Valider disponibilite';
-  if (status === 'Documents manquants') return 'Relancer les documents';
-  if (status === 'Pret a presenter') return 'Presenter au client';
-  if (status === 'Presente') return 'Suivre la decision';
-  if (status === 'Place') return 'Archiver le placement';
-  if (status === 'Non disponible') return 'Garder en vivier';
-  if (status === 'Refuse') return 'Fermer avec raison';
-  return 'Traiter';
+  return getApplicationNextAction({ application }).label;
 }
+
+function addHours(input: string | null | undefined, hours: number): string | null {
+  if (!input) return null;
+  const date = new Date(input);
+  if (Number.isNaN(date.getTime())) return null;
+  date.setHours(date.getHours() + hours);
+  return date.toISOString();
+}
+
+function formatDueLabel(dueAt: string | null, now = new Date()): string {
+  if (!dueAt) return 'Pas d echeance';
+  const due = new Date(dueAt);
+  if (Number.isNaN(due.getTime())) return 'Echeance a verifier';
+  const diffHours = Math.round((due.getTime() - now.getTime()) / 36e5);
+  if (diffHours < -48) return `En retard de ${Math.abs(Math.round(diffHours / 24))} j`;
+  if (diffHours < 0) return `En retard de ${Math.abs(diffHours)} h`;
+  if (diffHours === 0) return 'A faire maintenant';
+  if (diffHours < 24) return `Dans ${diffHours} h`;
+  return `Dans ${Math.round(diffHours / 24)} j`;
+}
+
+function isOverdue(dueAt: string | null, now = new Date()): boolean {
+  if (!dueAt) return false;
+  const due = new Date(dueAt);
+  return !Number.isNaN(due.getTime()) && due.getTime() < now.getTime();
+}
+
+function priorityFromDue(base: AtsActionPriority, dueAt: string | null, now = new Date()): AtsActionPriority {
+  if (isOverdue(dueAt, now)) return base === 'low' ? 'high' : 'urgent';
+  return base;
+}
+
+function buildAction(input: Omit<AtsNextAction, 'dueLabel' | 'overdue'>, now = new Date()): AtsNextAction {
+  return {
+    ...input,
+    priority: priorityFromDue(input.priority, input.dueAt, now),
+    dueLabel: formatDueLabel(input.dueAt, now),
+    overdue: isOverdue(input.dueAt, now),
+  };
+}
+
+export function getApplicationNextAction(args: {
+  application: Application;
+  candidate?: Candidate | null;
+  documents?: CandidateDocument[];
+  job?: Job | null;
+  now?: Date;
+}): AtsNextAction {
+  const { application, candidate, documents = [], job = application.job || null, now = new Date() } = args;
+  const status = normalizeApplicationStatus(application.status);
+  const createdAt = application.submitted_at || application.created_at;
+  const updatedAt = application.updated_at || application.created_at;
+  const missingDocs = candidate ? missingRequiredDocuments(candidate, documents) : [];
+  const missingCv = candidate ? missingDocs.includes('CV') || !hasCurrentDocument(documents, 'CV') : false;
+  const missingAvailability = !!candidate && (
+    !candidate.start_availability ||
+    (candidate.preferred_shifts || []).length === 0
+  );
+
+  if (status === 'Place') {
+    return buildAction({
+      code: 'close_file',
+      label: 'Placement confirme',
+      detail: 'Conserver l historique et verifier les prochaines disponibilites plus tard.',
+      priority: 'low',
+      dueAt: null,
+      taskType: 'placement_archive',
+      taskTitle: 'Archiver le placement',
+    }, now);
+  }
+
+  if (status === 'Refuse') {
+    return buildAction({
+      code: 'close_file',
+      label: 'Fermer avec raison',
+      detail: application.status_reason || 'Noter la raison pour eviter une relance incoherente.',
+      priority: 'low',
+      dueAt: null,
+      taskType: 'close_reason',
+      taskTitle: 'Fermer le dossier avec raison',
+    }, now);
+  }
+
+  if (status === 'Inactif') {
+    return buildAction({
+      code: 'reactivate_candidate',
+      label: 'Garder en vivier',
+      detail: 'Aucune action immediate. Reactiver si un mandat compatible arrive.',
+      priority: 'low',
+      dueAt: null,
+      taskType: 'reactivation',
+      taskTitle: 'Revoir le candidat plus tard',
+    }, now);
+  }
+
+  if (status === 'Presente') {
+    return buildAction({
+      code: 'follow_client',
+      label: 'Suivre la decision client',
+      detail: 'Relancer le client et confirmer que le candidat reste disponible.',
+      priority: job?.urgency === 'urgent' ? 'high' : 'normal',
+      dueAt: addHours(updatedAt, job?.urgency === 'urgent' ? 24 : 48),
+      taskType: 'client_follow_up',
+      taskTitle: 'Suivre la decision client',
+    }, now);
+  }
+
+  if (status === 'Pret a presenter') {
+    return buildAction({
+      code: 'present_candidate',
+      label: 'Presenter maintenant',
+      detail: job
+        ? `Dossier assez complet pour ${job.title}.`
+        : 'Dossier complet: choisir un mandat compatible ou envoyer au client.',
+      priority: job?.urgency === 'urgent' ? 'urgent' : 'high',
+      dueAt: addHours(updatedAt, job?.urgency === 'urgent' ? 8 : 24),
+      taskType: 'present',
+      taskTitle: 'Presenter le candidat au client',
+    }, now);
+  }
+
+  if (status === 'Documents manquants' || missingCv || missingDocs.length > 0) {
+    const docs = missingDocs.length > 0 ? missingDocs.join(', ') : 'documents obligatoires';
+    return buildAction({
+      code: 'request_documents',
+      label: missingCv ? 'Relancer le CV' : 'Relancer les documents',
+      detail: `Manquant: ${docs}. Relance recommandee apres 48 h sans reception.`,
+      priority: missingCv ? 'high' : 'normal',
+      dueAt: addHours(updatedAt, 48),
+      taskType: missingCv ? 'missing_cv' : 'missing_documents',
+      taskTitle: missingCv ? 'Relancer le CV' : `Relancer documents: ${docs}`,
+    }, now);
+  }
+
+  if (status === 'Qualifie' || missingAvailability) {
+    return buildAction({
+      code: 'validate_availability',
+      label: 'Valider disponibilite et mandat cible',
+      detail: 'Confirmer date de depart, quarts, regions et contraintes avant presentation.',
+      priority: 'normal',
+      dueAt: addHours(updatedAt, 24),
+      taskType: 'availability',
+      taskTitle: 'Valider disponibilite et mandat cible',
+    }, now);
+  }
+
+  return buildAction({
+    code: 'call_candidate',
+    label: 'Appeler sous 24 h',
+    detail: 'Nouveau dossier actif. Premier contact requis pour transformer en candidature qualifiee.',
+    priority: 'high',
+    dueAt: addHours(createdAt, 24),
+    taskType: 'call',
+    taskTitle: 'Appeler le candidat',
+  }, now);
+}
+
+export function priorityLabel(priority: AtsActionPriority): string {
+  if (priority === 'urgent') return 'Urgent';
+  if (priority === 'high') return 'Prioritaire';
+  if (priority === 'normal') return 'Normal';
+  return 'Faible';
+}
+
+export function priorityClass(priority: AtsActionPriority): string {
+  if (priority === 'urgent') return 'bg-danger-soft text-danger';
+  if (priority === 'high') return 'bg-warning-soft text-warning';
+  if (priority === 'normal') return 'bg-accent-soft text-accent';
+  return 'bg-muted text-fg-muted';
+}
+
+export function matchDecisionLabel(decision: MatchDecision): string {
+  if (decision === 'present_now') return 'Presenter maintenant';
+  if (decision === 'call_to_validate') return 'Appeler pour valider';
+  if (decision === 'request_document') return 'Demander document';
+  return 'Ne pas proposer';
+}
+
+export function matchDecisionClass(decision: MatchDecision): string {
+  if (decision === 'present_now') return 'bg-success-soft text-success';
+  if (decision === 'call_to_validate') return 'bg-accent-soft text-accent';
+  if (decision === 'request_document') return 'bg-warning-soft text-warning';
+  return 'bg-muted text-fg-muted';
+}
+
+export function getMatchDecision(args: {
+  score: number;
+  reasons?: MatchReason[];
+  blockers?: MatchReason[];
+}): { decision: MatchDecision; label: string; detail: string } {
+  const { score, reasons = [], blockers = [] } = args;
+  const hasProfessionBlock = blockers.some((reason) => reason.label.toLowerCase().includes('profession'));
+  const documentWarn = reasons.some((reason) =>
+    ['CV', 'Permis', 'Documents'].includes(reason.label) && reason.state !== 'ok'
+  );
+  const hasHardBlock = blockers.length > 0;
+  const hasAvailabilityWarn = reasons.some((reason) =>
+    ['Region', 'Région', 'Quart', 'Disponibilite', 'Disponibilité'].includes(reason.label) &&
+    reason.state !== 'ok'
+  );
+
+  if (hasProfessionBlock || score < 45) {
+    return {
+      decision: 'do_not_propose',
+      label: matchDecisionLabel('do_not_propose'),
+      detail: hasProfessionBlock ? 'Titre non admissible pour ce mandat.' : 'Compatibilite trop faible pour presentation.',
+    };
+  }
+  if (documentWarn) {
+    return {
+      decision: 'request_document',
+      label: matchDecisionLabel('request_document'),
+      detail: 'Le candidat peut etre interessant, mais un document bloque la presentation.',
+    };
+  }
+  if (score >= 75 && !hasHardBlock && !hasAvailabilityWarn) {
+    return {
+      decision: 'present_now',
+      label: matchDecisionLabel('present_now'),
+      detail: 'Score fort et aucun blocage operationnel majeur.',
+    };
+  }
+  return {
+    decision: 'call_to_validate',
+    label: matchDecisionLabel('call_to_validate'),
+    detail: 'Bon potentiel, mais disponibilite, territoire ou details du mandat doivent etre confirmes.',
+  };
+}
+
+export function buildAutoTaskRecommendations(args: {
+  application: Application;
+  candidate?: Candidate | null;
+  documents?: CandidateDocument[];
+  job?: Job | null;
+  existingTasks?: RecruiterTask[];
+  now?: Date;
+}): AtsNextAction[] {
+  const action = getApplicationNextAction(args);
+  const existingOpen = (args.existingTasks || []).some(
+    (task) => task.status === 'open' && task.task_type === action.taskType
+  );
+  if (existingOpen || action.priority === 'low') return [];
+  return [action];
+}
+
+export const RECRUITER_MESSAGE_TEMPLATES = [
+  {
+    code: 'call_candidate',
+    title: 'Appel candidat',
+    channel: 'telephone',
+    body:
+      'Bonjour {{first_name}}, ici Sanitas. Je vous appelle pour confirmer vos disponibilites, vos regions et les mandats qui pourraient vous convenir cette semaine.',
+  },
+  {
+    code: 'missing_cv',
+    title: 'Relance CV',
+    channel: 'email',
+    subject: 'Votre CV est requis pour completer votre dossier Sanitas',
+    body:
+      'Bonjour {{first_name}}, il nous manque votre CV pour finaliser votre dossier et vous proposer aux bons mandats. Vous pouvez l ajouter dans votre espace candidat ou nous appeler au 450 973-9696.',
+  },
+  {
+    code: 'availability_check',
+    title: 'Validation disponibilite',
+    channel: 'telephone',
+    body:
+      'Valider: date de depart, quarts acceptes, regions, departements, contraintes, hebergement, transport et meilleur moment pour etre joint.',
+  },
+  {
+    code: 'client_presentation',
+    title: 'Presentation client',
+    channel: 'email',
+    subject: 'Candidat a presenter: {{first_name}} {{last_name}}',
+    body:
+      'Profil a presenter: titre admissible, experience, disponibilite, regions acceptees, documents recus et points a valider. Ajouter les forces pertinentes pour ce mandat.',
+  },
+  {
+    code: 'clean_refusal',
+    title: 'Refus propre',
+    channel: 'email',
+    subject: 'Suivi de votre dossier Sanitas',
+    body:
+      'Bonjour {{first_name}}, merci pour votre interet. Pour ce mandat precis, nous ne pouvons pas avancer votre dossier. Nous conservons votre profil pour les opportunites compatibles.',
+  },
+];
 
 export interface CandidateReadinessBlock {
   id: 'identity' | 'work' | 'availability' | 'documents' | 'mandate' | 'consent';
@@ -151,8 +465,8 @@ export function buildCandidateReadiness(args: {
       ),
       blocking: true,
       missing: [
-        qualifiedProfessions.length === 0 ? 'métier admissible' : null,
-        !jobProfessionOk && job ? `admissibilité ${job.profession}` : null,
+        qualifiedProfessions.length === 0 ? 'metier admissible' : null,
+        !jobProfessionOk && job ? `admissibilite ${job.profession}` : null,
         !candidate.years_experience ? 'experience' : null,
         !candidate.work_authorization ? 'autorisation de travail' : null,
         (candidate.languages || []).length === 0 ? 'langues' : null,

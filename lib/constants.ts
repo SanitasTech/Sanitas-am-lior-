@@ -110,14 +110,14 @@ export const URGENCY_LABELS: Record<string, string> = {
 
 export const SUBMISSION_STATUSES = [
   'Nouveau',
-  'À rappeler',
-  'Contacté',
+  'À appeler',
+  'Qualifié',
   'Documents manquants',
   'Prêt à présenter',
   'Présenté',
   'Placé',
-  'Non disponible',
   'Refusé',
+  'Inactif',
 ] as const;
 
 export const ESTABLISHMENT_REQUEST_STATUSES = [
