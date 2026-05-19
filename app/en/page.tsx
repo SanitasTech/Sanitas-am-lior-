@@ -33,6 +33,20 @@ export const metadata: Metadata = {
     description: 'Healthcare staffing in Quebec for professionals and facilities.',
     locale: 'en_CA',
     type: 'website',
+    images: [
+      {
+        url: '/opengraph-image',
+        width: 1200,
+        height: 630,
+        alt: 'Agence Sanitas - Healthcare assignments in Quebec',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Agence Sanitas',
+    description: 'Healthcare assignments in Quebec for healthcare professionals.',
+    images: ['/opengraph-image'],
   },
 };
 
