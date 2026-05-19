@@ -11,6 +11,7 @@ const playfair = Playfair_Display({
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const facebookAppId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID;
 const socialImage = '/opengraph-image';
 
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ export const metadata: Metadata = {
     title: 'Agence Sanitas',
     description:
       'Mandats en sant\u00e9 au Qu\u00e9bec. Choisissez vos r\u00e9gions, vos quarts et le type de mandat qui vous convient.',
+    url: siteUrl,
     locale: 'fr_CA',
     type: 'website',
     siteName: 'Agence Sanitas',
@@ -43,6 +45,7 @@ export const metadata: Metadata = {
     description: 'Mandats en sant\u00e9 au Qu\u00e9bec pour les professionnels de la sant\u00e9.',
     images: [socialImage],
   },
+  facebook: facebookAppId ? { appId: facebookAppId } : undefined,
   robots: { index: true, follow: true },
 };
 
