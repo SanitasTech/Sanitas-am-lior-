@@ -19,6 +19,7 @@ drop table if exists public.activity_events cascade;
 drop table if exists public.internal_notes cascade;
 drop table if exists public.applications cascade;
 drop table if exists public.candidate_documents cascade;
+drop table if exists public.candidate_preference_sets cascade;
 drop table if exists public.candidate_availability cascade;
 drop table if exists public.candidate_profiles cascade;
 drop table if exists public.submission_documents cascade;
@@ -186,6 +187,36 @@ create table public.candidate_availability (
 create trigger trg_candidate_availability_updated_at before update on public.candidate_availability
 for each row execute function public.set_updated_at();
 
+create table public.candidate_preference_sets (
+  id uuid primary key default gen_random_uuid(),
+  candidate_id uuid not null references public.candidates(id) on delete cascade,
+  label text not null default 'Choix principal',
+  priority integer not null default 1,
+  professions text[] not null default '{}',
+  regions jsonb not null default '[]'::jsonb,
+  departments text[] not null default '{}',
+  shifts text[] not null default '{}',
+  mandate_types text[] not null default '{}',
+  start_date text,
+  mobility text,
+  salary_floor text,
+  constraints text,
+  active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index idx_candidate_preference_sets_candidate_priority
+  on public.candidate_preference_sets(candidate_id, active, priority);
+create index idx_candidate_preference_sets_professions
+  on public.candidate_preference_sets using gin (professions);
+create index idx_candidate_preference_sets_regions
+  on public.candidate_preference_sets using gin (regions);
+create index idx_candidate_preference_sets_departments
+  on public.candidate_preference_sets using gin (departments);
+create trigger trg_candidate_preference_sets_updated_at before update on public.candidate_preference_sets
+for each row execute function public.set_updated_at();
+
 create table public.candidate_documents (
   id uuid primary key default gen_random_uuid(),
   candidate_id uuid not null references public.candidates(id) on delete cascade,
@@ -215,6 +246,7 @@ create table public.applications (
   candidate_id uuid not null references public.candidates(id) on delete cascade,
   application_type text not null check (application_type in ('posting', 'spontaneous')),
   job_id uuid references public.jobs(id) on delete set null,
+  preference_set_id uuid references public.candidate_preference_sets(id) on delete set null,
   posting_snapshot jsonb,
   answers jsonb not null default '{}'::jsonb,
   completion_score integer not null default 0,
@@ -257,9 +289,13 @@ create table public.match_scores (
   id uuid primary key default gen_random_uuid(),
   candidate_id uuid not null references public.candidates(id) on delete cascade,
   job_id uuid not null references public.jobs(id) on delete cascade,
+  preference_set_id uuid references public.candidate_preference_sets(id) on delete set null,
   score integer not null default 0,
   reasons jsonb not null default '[]'::jsonb,
   blockers jsonb not null default '[]'::jsonb,
+  fit_level text,
+  decision text,
+  validation_questions jsonb not null default '[]'::jsonb,
   calculated_at timestamptz not null default now(),
   unique(candidate_id, job_id)
 );
@@ -384,6 +420,7 @@ alter table public.jobs enable row level security;
 alter table public.candidates enable row level security;
 alter table public.candidate_profiles enable row level security;
 alter table public.candidate_availability enable row level security;
+alter table public.candidate_preference_sets enable row level security;
 alter table public.candidate_documents enable row level security;
 alter table public.applications enable row level security;
 alter table public.application_documents enable row level security;
@@ -402,6 +439,7 @@ grant all on public.profiles_admin to authenticated;
 grant all on public.candidates to authenticated;
 grant all on public.candidate_profiles to authenticated;
 grant all on public.candidate_availability to authenticated;
+grant all on public.candidate_preference_sets to authenticated;
 grant all on public.candidate_documents to authenticated;
 grant all on public.applications to authenticated;
 grant all on public.application_documents to authenticated;
@@ -444,6 +482,10 @@ create policy "admin manage candidate profiles" on public.candidate_profiles for
 
 drop policy if exists "admin manage candidate availability" on public.candidate_availability;
 create policy "admin manage candidate availability" on public.candidate_availability for all to authenticated
+  using (public.is_admin(auth.uid())) with check (public.is_admin(auth.uid()));
+
+drop policy if exists "admin manage candidate preference sets" on public.candidate_preference_sets;
+create policy "admin manage candidate preference sets" on public.candidate_preference_sets for all to authenticated
   using (public.is_admin(auth.uid())) with check (public.is_admin(auth.uid()));
 
 drop policy if exists "admin manage candidate documents" on public.candidate_documents;
@@ -499,6 +541,12 @@ create policy "candidate reads own profile" on public.candidate_profiles
 
 drop policy if exists "candidate reads own availability" on public.candidate_availability;
 create policy "candidate reads own availability" on public.candidate_availability
+  for select to authenticated using (
+    candidate_id in (select id from public.candidates where auth_user_id = auth.uid())
+  );
+
+drop policy if exists "candidate reads own preference sets" on public.candidate_preference_sets;
+create policy "candidate reads own preference sets" on public.candidate_preference_sets
   for select to authenticated using (
     candidate_id in (select id from public.candidates where auth_user_id = auth.uid())
   );

@@ -42,7 +42,7 @@ interface CandidateDetailData {
   notes: InternalNote[];
   tasks: RecruiterTask[];
   events: ActivityEvent[];
-  matches: Array<MatchScore & { job?: { id?: string; title?: string; establishment?: string; region?: string; shift?: string } }>;
+  matches: Array<MatchScore & { job?: { id?: string; title?: string; establishment?: string; region?: string; shift?: string; department?: string } }>;
 }
 
 async function resolveCandidateId(id: string) {
@@ -72,7 +72,7 @@ async function fetchCandidate(id: string): Promise<CandidateDetailData | null> {
   ] = await Promise.all([
     supabase
       .from('candidates')
-      .select('*, profile:candidate_profiles(*), availability:candidate_availability(*)')
+      .select('*, profile:candidate_profiles(*), availability:candidate_availability(*), preference_sets:candidate_preference_sets(*)')
       .eq('id', candidateId)
       .maybeSingle(),
     supabase
@@ -105,7 +105,7 @@ async function fetchCandidate(id: string): Promise<CandidateDetailData | null> {
       .limit(80),
     supabase
       .from('match_scores')
-      .select('*, job:jobs(id, title, establishment, region, shift)')
+      .select('*, job:jobs(id, title, establishment, region, shift, department)')
       .eq('candidate_id', candidateId)
       .order('score', { ascending: false })
       .limit(10),
@@ -115,7 +115,8 @@ async function fetchCandidate(id: string): Promise<CandidateDetailData | null> {
   const candidate = hydrateCandidate(
     row,
     row?.profile as Record<string, unknown>,
-    row?.availability as Record<string, unknown>
+    row?.availability as Record<string, unknown>,
+    row?.preference_sets as Record<string, unknown>[]
   );
   if (!candidate) return null;
 
@@ -308,6 +309,42 @@ export default async function CandidateDetail({ params }: { params: { id: string
               <Info label="Transport" value={candidate.transport_available} />
               <Info label="Contraintes" value={candidate.constraints} />
             </dl>
+          </section>
+
+          <section className="card p-6">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 className="text-[18px] font-semibold text-fg">Choix de mandats</h2>
+                <p className="mt-1 text-[13.5px] text-fg-muted">
+                  Le matching utilise chaque groupe separement pour eviter les fausses combinaisons.
+                </p>
+              </div>
+              <span className="tag">{(candidate.preference_sets || []).length} groupe(s)</span>
+            </div>
+            <div className="mt-4 space-y-3">
+              {(candidate.preference_sets || []).length === 0 ? (
+                <p className="rounded-lg bg-muted/40 p-4 text-[13.5px] text-fg-muted">
+                  Aucun groupe explicite. Le systeme utilise les preferences generales en fallback.
+                </p>
+              ) : (
+                (candidate.preference_sets || []).map((set) => (
+                  <div key={set.id || set.label} className="rounded-lg border border-border bg-surface p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <h3 className="font-semibold text-fg">{set.label}</h3>
+                      <span className="tag">Priorite {set.priority}</span>
+                    </div>
+                    <dl className="mt-3 grid gap-x-5 gap-y-2 sm:grid-cols-2 text-[13.5px]">
+                      <Info label="Titres" value={set.professions.join(', ')} />
+                      <Info label="Regions" value={set.regions.map((region) => region.region).join(', ')} />
+                      <Info label="Departements" value={set.departments.join(', ')} />
+                      <Info label="Quarts" value={set.shifts.join(', ')} />
+                      <Info label="Types" value={set.mandate_types.join(', ')} />
+                      <Info label="Contraintes" value={set.constraints} />
+                    </dl>
+                  </div>
+                ))
+              )}
+            </div>
           </section>
 
           <section className="card p-6">
@@ -531,6 +568,11 @@ function MatchDecisionLine({ match }: { match: MatchScore }) {
     <div className="mt-3">
       <span className={cn('tag', matchDecisionClass(decision.decision))}>{decision.label}</span>
       <p className="mt-2 text-[12.5px] leading-snug text-fg-muted">{decision.detail}</p>
+      {(match.preference_set_id || match.fit_level) && (
+        <p className="mt-1 text-[12px] text-fg-subtle">
+          Groupe {match.preference_set_id ? match.preference_set_id.slice(0, 8) : 'fallback'} | {match.fit_level || 'n/a'}
+        </p>
+      )}
       {visibleReasons.length > 0 && (
         <ul className="mt-2 space-y-1">
           {visibleReasons.map((reason) => (

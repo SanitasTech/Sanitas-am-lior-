@@ -2,7 +2,6 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { formatDate } from '@/lib/utils';
-import StatusBadge from '@/components/StatusBadge';
 import UrgencyBadge from '@/components/UrgencyBadge';
 import type { Job } from '@/types';
 
@@ -40,9 +39,12 @@ export default async function AdminJobsPage({ searchParams }: Props) {
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-display-md text-fg">Postes</h1>
-          <p className="mt-2 text-fg-muted">Créez, modifiez et désactivez les mandats publiés.</p>
+          <p className="mt-2 text-fg-muted">Creez, modifiez et desactivez les mandats publies.</p>
         </div>
-        <Link href="/admin/postes/nouveau" className="btn-primary">Créer un poste</Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/admin/recherche-mandat" className="btn-secondary">Recherche mandat</Link>
+          <Link href="/admin/postes/nouveau" className="btn-primary">Creer un poste</Link>
+        </div>
       </header>
 
       <form className="card p-4 sm:p-5">
@@ -52,7 +54,7 @@ export default async function AdminJobsPage({ searchParams }: Props) {
             <input id="profession" name="profession" defaultValue={param(searchParams, 'profession')} className="input" />
           </div>
           <div>
-            <label className="label" htmlFor="region">Région</label>
+            <label className="label" htmlFor="region">Region</label>
             <input id="region" name="region" defaultValue={param(searchParams, 'region')} className="input" />
           </div>
           <div>
@@ -66,7 +68,7 @@ export default async function AdminJobsPage({ searchParams }: Props) {
           </div>
           <div className="flex items-end gap-2">
             <button type="submit" className="btn-primary">Filtrer</button>
-            <Link href="/admin/postes" className="btn-secondary">Réinitialiser</Link>
+            <Link href="/admin/postes" className="btn-secondary">Reinitialiser</Link>
           </div>
         </div>
       </form>
@@ -79,11 +81,11 @@ export default async function AdminJobsPage({ searchParams }: Props) {
                 <Th>Poste</Th>
                 <Th>Profession</Th>
                 <Th>Lieu</Th>
-                <Th>Département</Th>
+                <Th>Departement</Th>
                 <Th>Quart</Th>
                 <Th>Urgence</Th>
                 <Th>Statut</Th>
-                <Th>Début</Th>
+                <Th>Debut</Th>
                 <Th>Soumissions</Th>
                 <Th></Th>
               </tr>
@@ -92,38 +94,43 @@ export default async function AdminJobsPage({ searchParams }: Props) {
               {jobs.length === 0 && (
                 <tr><td colSpan={10} className="p-10 text-center text-fg-muted">Aucun poste.</td></tr>
               )}
-              {jobs.map((j) => (
-                <tr key={j.id} className="hover:bg-muted/40">
+              {jobs.map((job) => (
+                <tr key={job.id} className="hover:bg-muted/40">
                   <td className="px-4 py-3 align-top">
-                    <p className="font-medium text-fg">{j.title}</p>
-                    <p className="text-fg-muted">{j.establishment || '—'}</p>
+                    <p className="font-medium text-fg">{job.title}</p>
+                    <p className="text-fg-muted">{job.establishment || '-'}</p>
                   </td>
-                  <td className="px-4 py-3 align-top text-fg">{j.profession}</td>
+                  <td className="px-4 py-3 align-top text-fg">{job.profession}</td>
                   <td className="px-4 py-3 align-top text-fg">
-                    {[j.city, j.region].filter(Boolean).join(', ')}
+                    {[job.city, job.region].filter(Boolean).join(', ')}
                   </td>
-                  <td className="px-4 py-3 align-top text-fg-muted">{j.department || '—'}</td>
-                  <td className="px-4 py-3 align-top text-fg-muted">{j.shift || '—'}</td>
-                  <td className="px-4 py-3 align-top"><UrgencyBadge urgency={j.urgency} /></td>
+                  <td className="px-4 py-3 align-top text-fg-muted">{job.department || '-'}</td>
+                  <td className="px-4 py-3 align-top text-fg-muted">{job.shift || '-'}</td>
+                  <td className="px-4 py-3 align-top"><UrgencyBadge urgency={job.urgency} /></td>
                   <td className="px-4 py-3 align-top">
                     <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[12px] font-medium ${
-                      j.status === 'active'
+                      job.status === 'active'
                         ? 'bg-success-soft text-success'
-                        : j.status === 'draft'
+                        : job.status === 'draft'
                         ? 'bg-warning-soft text-warning'
                         : 'bg-muted text-fg-muted'
                     }`}>
-                      {j.status === 'active' ? 'Actif' : j.status === 'draft' ? 'Brouillon' : 'Inactif'}
+                      {job.status === 'active' ? 'Actif' : job.status === 'draft' ? 'Brouillon' : 'Inactif'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 align-top text-fg-muted">{formatDate(j.start_date)}</td>
+                  <td className="px-4 py-3 align-top text-fg-muted">{formatDate(job.start_date)}</td>
                   <td className="px-4 py-3 align-top text-fg tabular-nums">
-                    {Array.isArray(j.applications) ? j.applications[0]?.count || 0 : 0}
+                    {Array.isArray(job.applications) ? job.applications[0]?.count || 0 : 0}
                   </td>
                   <td className="px-4 py-3 align-top text-right">
-                    <Link href={`/admin/postes/${j.id}`} className="text-accent hover:underline">
-                      Modifier
-                    </Link>
+                    <div className="flex justify-end gap-3">
+                      <Link href={`/admin/recherche-mandat?job_id=${job.id}`} className="text-accent hover:underline">
+                        Chercher
+                      </Link>
+                      <Link href={`/admin/postes/${job.id}`} className="text-accent hover:underline">
+                        Modifier
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -136,5 +143,5 @@ export default async function AdminJobsPage({ searchParams }: Props) {
 }
 
 function Th({ children }: { children?: React.ReactNode }) {
-  return <th className="text-left font-medium uppercase tracking-wider text-[11.5px] px-4 py-3">{children}</th>;
+  return <th className="px-4 py-3 text-left text-[11.5px] font-medium uppercase tracking-wider">{children}</th>;
 }

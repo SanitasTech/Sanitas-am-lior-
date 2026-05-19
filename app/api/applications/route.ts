@@ -10,8 +10,11 @@ import {
   computeAtsProfileCompletion,
   computeMatchScore,
   hydrateCandidate,
+  makePreferenceSetForJob,
+  normalizeCandidatePreferenceSets,
 } from '@/lib/ats';
 import { buildAutoTaskRecommendations } from '@/lib/ats-operating-model';
+import { syncCandidatePreferenceSets } from '@/lib/preference-sets';
 import type { Application, Candidate, CandidateDocument, Job, RecruiterTask, SubmissionAnswers } from '@/types';
 
 export const runtime = 'nodejs';
@@ -240,6 +243,52 @@ export async function POST(req: Request) {
     }),
   ]);
 
+  const qualifiedProfessionsForPreferences = (
+    input.candidate.qualified_professions && input.candidate.qualified_professions.length > 0
+      ? input.candidate.qualified_professions
+      : input.answers.qualified_professions && input.answers.qualified_professions.length > 0
+        ? input.answers.qualified_professions
+        : input.candidate.profession || input.answers.profession
+          ? [input.candidate.profession || input.answers.profession]
+          : []
+  ).filter((value): value is string => !!value);
+
+  const fallbackForPreferences = {
+    id: candidateId,
+    profession: input.candidate.profession || input.answers.profession || null,
+    qualified_professions: qualifiedProfessionsForPreferences,
+    mobility: input.answers.mobility || null,
+    preferred_mandate_types: job?.mandate_type
+      ? [job.mandate_type, ...((input.answers as SubmissionAnswers).preference_sets?.flatMap((set) => set.mandate_types) || [])]
+      : [],
+    preferred_establishments: input.answers.preferred_establishments || null,
+    avoided_establishments: input.answers.avoided_establishments || null,
+    salary_expectations: input.answers.salary_expectations || null,
+    start_availability: input.answers.start_availability || null,
+    preferred_hours: input.answers.preferred_hours || null,
+    preferred_shifts: input.answers.shifts_accepted || [],
+    preferred_regions: input.answers.region_choices || [],
+    preferred_departments: input.answers.preferred_departments || [],
+    housing_required: input.answers.housing_required || null,
+    transport_available: input.answers.transport_available || null,
+    constraints: input.answers.constraints || null,
+  };
+  const incomingPreferenceSets = normalizeCandidatePreferenceSets(
+    input.answers.preference_sets,
+    fallbackForPreferences
+  );
+  const preferenceSetsForSave =
+    job && incomingPreferenceSets.length === 0
+      ? [makePreferenceSetForJob(fallbackForPreferences, job, 'Choix confirme pour ce mandat')]
+      : incomingPreferenceSets;
+  const savedPreferenceSets = await syncCandidatePreferenceSets(supabase, {
+    candidateId,
+    preferenceSets: preferenceSetsForSave,
+    fallback: fallbackForPreferences,
+    replaceExisting: false,
+  });
+  const defaultPreferenceSetId = savedPreferenceSets[0]?.id || null;
+
   let applicationId: string;
   let eventType: 'application_created' | 'application_updated' = 'application_created';
   if (input.submission_type === 'posting' && jobId) {
@@ -272,6 +321,7 @@ export async function POST(req: Request) {
         completion_score: input.completion_score,
         status: 'Nouveau',
         source: input.source || 'web',
+        preference_set_id: input.answers.preference_set_id || defaultPreferenceSetId,
       })
       .select('id')
       .single();
@@ -294,6 +344,7 @@ export async function POST(req: Request) {
           answers: input.answers,
           completion_score: input.completion_score,
           source: input.source || 'web',
+          preference_set_id: input.answers.preference_set_id || defaultPreferenceSetId,
           submitted_at: now,
         })
         .eq('id', existing.id);
@@ -315,6 +366,7 @@ export async function POST(req: Request) {
           completion_score: input.completion_score,
           status: 'Nouveau',
           source: input.source || 'web',
+          preference_set_id: input.answers.preference_set_id || defaultPreferenceSetId,
         })
         .select('id')
         .single();
@@ -390,7 +442,8 @@ export async function POST(req: Request) {
         preferred_departments: input.answers.preferred_departments || [],
         housing_required: input.answers.housing_required || null,
         transport_available: input.answers.transport_available || null,
-      }
+      },
+      savedPreferenceSets as unknown as Record<string, unknown>[]
     ) as Candidate,
     input.answers as SubmissionAnswers
   );
@@ -411,12 +464,20 @@ export async function POST(req: Request) {
       .eq('job_id', job.id);
 
     const match = computeMatchScore(candidate, job, docs);
+    await supabase
+      .from('applications')
+      .update({ preference_set_id: match.preference_set_id || null })
+      .eq('id', applicationId);
     await supabase.from('match_scores').upsert({
       candidate_id: candidateId,
       job_id: job.id,
+      preference_set_id: match.preference_set_id || null,
       score: match.score,
       reasons: match.reasons,
       blockers: match.blockers,
+      fit_level: match.fit_level || null,
+      decision: match.decision || null,
+      validation_questions: match.validation_questions || [],
       calculated_at: now,
     });
   }

@@ -6,7 +6,7 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { computeMatchScore, hydrateCandidate } from '@/lib/ats';
 import { getMatchDecision, isCandidateEligibleForMatching, matchDecisionClass } from '@/lib/ats-operating-model';
 import { cn } from '@/lib/utils';
-import type { Candidate, CandidateDocument, Job, MatchReason } from '@/types';
+import type { Candidate, CandidateDocument, CandidatePreferenceSet, Job, MatchFitLevel, MatchReason } from '@/types';
 
 export const metadata: Metadata = { title: 'Modifier le poste', robots: { index: false, follow: false } };
 export const dynamic = 'force-dynamic';
@@ -17,6 +17,11 @@ interface MatchRow {
   reasons: MatchReason[];
   blockers: MatchReason[];
   decision: ReturnType<typeof getMatchDecision>;
+  preference_set_id?: string | null;
+  preference_set_label?: string | null;
+  preference_set?: CandidatePreferenceSet | null;
+  fit_level?: MatchFitLevel;
+  validation_questions?: string[];
 }
 
 async function fetchJob(id: string): Promise<Job | null> {
@@ -30,7 +35,7 @@ async function fetchTopMatches(job: Job): Promise<MatchRow[]> {
   const [{ data }, { data: deletedEvents }] = await Promise.all([
     supabase
       .from('candidates')
-      .select('*, profile:candidate_profiles(*), availability:candidate_availability(*), documents:candidate_documents(*), applications(*)')
+      .select('*, profile:candidate_profiles(*), availability:candidate_availability(*), preference_sets:candidate_preference_sets(*), documents:candidate_documents(*), applications(*)')
       .eq('status', 'active')
       .limit(200),
     supabase
@@ -46,7 +51,8 @@ async function fetchTopMatches(job: Job): Promise<MatchRow[]> {
       const candidate = hydrateCandidate(
         row,
         row.profile as Record<string, unknown>,
-        row.availability as Record<string, unknown>
+        row.availability as Record<string, unknown>,
+        row.preference_sets as Record<string, unknown>[]
       ) as Candidate | null;
       if (!candidate) return null;
       const documents = (row.documents as CandidateDocument[] | undefined) || [];
@@ -79,9 +85,14 @@ export default async function EditJobPage({ params }: { params: { id: string } }
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-display-md text-fg">Modifier le poste</h1>
-        <p className="mt-2 text-fg-muted">{job.title}</p>
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-display-md text-fg">Modifier le poste</h1>
+          <p className="mt-2 text-fg-muted">{job.title}</p>
+        </div>
+        <Link href={`/admin/recherche-mandat?job_id=${job.id}`} className="btn-primary">
+          Recherche mandat
+        </Link>
       </header>
 
       <section className="card p-5">
@@ -139,7 +150,7 @@ function MatchGrid({ matches, empty, muted }: { matches: MatchRow[]; empty: stri
 
   return (
     <div className="grid gap-3 lg:grid-cols-3">
-      {matches.map(({ candidate, score, reasons, blockers, decision }) => (
+      {matches.map(({ candidate, score, reasons, blockers, decision, preference_set_label, fit_level }) => (
         <Link
           key={candidate.id}
           href={`/admin/candidats/${candidate.id}`}
@@ -155,6 +166,9 @@ function MatchGrid({ matches, empty, muted }: { matches: MatchRow[]; empty: stri
             <span className="tabular-nums text-[16px] font-semibold text-fg">{score}%</span>
           </div>
           <span className={cn('tag mt-3', matchDecisionClass(decision.decision))}>{decision.label}</span>
+          <p className="mt-2 text-[12.5px] font-medium text-fg">
+            {preference_set_label || 'Choix principal'} {fit_level ? `| ${fit_level}` : ''}
+          </p>
           <ul className="mt-3 space-y-1">
             {[...blockers, ...reasons.filter((reason) => reason.state !== 'ok')].slice(0, 3).map((reason) => (
               <li key={`${reason.label}-${reason.detail}`} className="text-[12.5px] text-fg-muted">

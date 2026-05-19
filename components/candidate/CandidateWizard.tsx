@@ -260,6 +260,20 @@ export default function CandidateWizard({
     try {
       const documentList = buildDocumentList(form, job);
       const candidate = formToCandidate(initial, form);
+      const syncedPreferenceSets = form.preference_sets.length > 0
+        ? form.preference_sets.map((set, index) =>
+            index === 0
+              ? {
+                  ...set,
+                  professions: form.qualified_professions,
+                  regions: form.region_choices,
+                  departments: form.preferred_departments,
+                  shifts: form.shifts_accepted,
+                  start_date: form.start_availability || set.start_date || null,
+                }
+              : set
+          )
+        : [];
 
       const payload = {
         submission_type: mode,
@@ -304,6 +318,8 @@ export default function CandidateWizard({
           preferred_establishments: form.preferred_establishments,
           avoided_establishments: form.avoided_establishments,
           preferred_departments: form.preferred_departments,
+          preference_sets: syncedPreferenceSets,
+          preference_set_id: syncedPreferenceSets[0]?.id || null,
           housing_required: form.housing_required,
           transport_available: form.transport_available,
           similar_mandates: form.similar_mandates,

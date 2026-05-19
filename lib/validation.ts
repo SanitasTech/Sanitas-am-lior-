@@ -81,12 +81,63 @@ export const jobSchema = z.object({
 export type JobInput = z.infer<typeof jobSchema>;
 
 // ---------------------------------------------------------------------
+// Recherche mandat recruteur
+// ---------------------------------------------------------------------
+export const mandateSearchSchema = z.object({
+  job_id: z.string().uuid().optional().nullable(),
+  title: optionalString,
+  profession: nonEmpty('Profession'),
+  job_title_id: z.string().uuid().optional().nullable(),
+  region: nonEmpty('Region'),
+  city: optionalString,
+  establishment: optionalString,
+  department: optionalString,
+  shift: optionalString,
+  schedule: optionalString,
+  mandate_type: optionalString,
+  start_date: optionalString,
+  duration: optionalString,
+  salary: optionalString,
+  urgency: z.enum(['normal', 'high', 'urgent']).default('normal'),
+  required_documents: z.array(z.string().max(100)).default([]),
+  min_experience: optionalString,
+  languages: z.array(z.string().max(100)).default([]),
+  work_authorization: optionalString,
+  mobility: optionalString,
+  housing_required: optionalString,
+  transport_available: optionalString,
+  candidate_status: optionalString,
+  last_active_days: z.number().int().min(1).max(3650).optional().nullable(),
+  only_with_phone: z.boolean().default(false),
+  only_without_open_tasks: z.boolean().default(false),
+});
+
+export type MandateSearchInput = z.infer<typeof mandateSearchSchema>;
+
+// ---------------------------------------------------------------------
 // Submission
 // ---------------------------------------------------------------------
 export const regionChoiceSchema = z.object({
   region: z.string().max(200).default(''),
   all_region: z.boolean().default(true),
   cities: z.array(z.string().max(200)).default([]),
+});
+
+export const preferenceSetSchema = z.object({
+  id: z.string().optional().nullable(),
+  candidate_id: z.string().optional().nullable(),
+  label: z.string().max(120).default('Choix principal'),
+  priority: z.number().int().min(1).max(50).default(1),
+  professions: z.array(z.string().max(200)).default([]),
+  regions: z.array(regionChoiceSchema).default([]),
+  departments: z.array(z.string().max(200)).default([]),
+  shifts: z.array(z.string().max(200)).default([]),
+  mandate_types: z.array(z.string().max(200)).default([]),
+  start_date: optionalString,
+  mobility: optionalString,
+  salary_floor: optionalString,
+  constraints: optionalString,
+  active: z.boolean().default(true),
 });
 
 export const trackingSchema = z
@@ -134,6 +185,8 @@ export const submissionAnswersSchema = z.object({
   constraints: optionalString,
   recruiter_comment: optionalString,
   extra_answers: z.record(z.union([z.string(), z.boolean()])).optional(),
+  preference_sets: z.array(preferenceSetSchema).optional(),
+  preference_set_id: z.string().optional().nullable(),
   /**
    * Créneaux date+heure proposés par le candidat pour être rappelé.
    * Strings au format datetime-local (YYYY-MM-DDTHH:MM, fuseau local du

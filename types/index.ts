@@ -56,6 +56,33 @@ export interface RegionChoice {
   cities: string[];
 }
 
+export type MatchDecision =
+  | 'present_now'
+  | 'call_to_validate'
+  | 'request_document'
+  | 'do_not_propose';
+
+export type MatchFitLevel = 'exact' | 'partial' | 'blocked';
+
+export interface CandidatePreferenceSet {
+  id?: string;
+  candidate_id?: string;
+  label: string;
+  priority: number;
+  professions: string[];
+  regions: RegionChoice[];
+  departments: string[];
+  shifts: string[];
+  mandate_types: string[];
+  start_date?: string | null;
+  mobility?: string | null;
+  salary_floor?: string | null;
+  constraints?: string | null;
+  active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface Job {
   id: string;
   title: string;
@@ -151,6 +178,7 @@ export interface Candidate {
 
   profile?: CandidateProfile | null;
   availability?: CandidateAvailability | null;
+  preference_sets?: CandidatePreferenceSet[];
 
   // Flat fields exposed to existing forms.
   profession?: string | null;
@@ -206,6 +234,8 @@ export interface SubmissionAnswers {
   constraints?: string;
   recruiter_comment?: string;
   extra_answers?: Record<string, string | boolean>;
+  preference_sets?: CandidatePreferenceSet[];
+  preference_set_id?: string | null;
 }
 
 export interface CandidateDocument {
@@ -230,6 +260,7 @@ export interface Application {
   application_type: ApplicationType;
   submission_type?: ApplicationType;
   job_id: string | null;
+  preference_set_id?: string | null;
   posting_snapshot: Partial<Job> | null;
   answers: SubmissionAnswers;
   completion_score: number;
@@ -271,10 +302,90 @@ export interface MatchScore {
   id: string;
   candidate_id: string;
   job_id: string;
+  preference_set_id?: string | null;
   score: number;
   reasons: MatchReason[];
   blockers: MatchReason[];
+  fit_level?: MatchFitLevel | null;
+  decision?: MatchDecision | null;
+  validation_questions?: string[];
   calculated_at: string;
+}
+
+export type MandateSearchBucket =
+  | 'presentable'
+  | 'to_validate'
+  | 'document_blocked'
+  | 'incompatible';
+
+export interface MandateSearchInput {
+  job_id?: string | null;
+  title?: string | null;
+  profession: string;
+  job_title_id?: string | null;
+  region: string;
+  city?: string | null;
+  establishment?: string | null;
+  department?: string | null;
+  shift?: string | null;
+  schedule?: string | null;
+  mandate_type?: string | null;
+  start_date?: string | null;
+  duration?: string | null;
+  salary?: string | null;
+  urgency?: Urgency;
+  required_documents?: string[];
+  min_experience?: string | null;
+  languages?: string[];
+  work_authorization?: string | null;
+  mobility?: string | null;
+  housing_required?: string | null;
+  transport_available?: string | null;
+  candidate_status?: string | null;
+  last_active_days?: number | null;
+  only_with_phone?: boolean;
+  only_without_open_tasks?: boolean;
+}
+
+export interface MandateSearchResult {
+  bucket: MandateSearchBucket;
+  candidate: Candidate;
+  score: number;
+  priority_score: number;
+  reasons: MatchReason[];
+  blockers: MatchReason[];
+  preference_set_id?: string | null;
+  preference_set_label?: string | null;
+  preference_set?: CandidatePreferenceSet | null;
+  fit_level?: MatchFitLevel | null;
+  decision?: MatchDecision | null;
+  validation_questions: string[];
+  missing_documents: string[];
+  flags: {
+    has_cv: boolean;
+    has_required_documents: boolean;
+    available_soon: boolean;
+    already_applied: boolean;
+    already_presented: boolean;
+    previously_refused: boolean;
+    never_contacted: boolean;
+    has_open_tasks: boolean;
+    has_overdue_tasks: boolean;
+    has_phone: boolean;
+  };
+  applications: Application[];
+  open_tasks: RecruiterTask[];
+  documents: CandidateDocument[];
+}
+
+export interface MandateSearchResponse {
+  ok: true;
+  job: Job;
+  counts: Record<MandateSearchBucket, number>;
+  presentable: MandateSearchResult[];
+  to_validate: MandateSearchResult[];
+  document_blocked: MandateSearchResult[];
+  incompatible: MandateSearchResult[];
 }
 
 export interface RecruiterTask {

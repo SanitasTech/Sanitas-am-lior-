@@ -60,7 +60,7 @@ async function fetchDashboard() {
     supabase
       .from('applications')
       .select(
-        '*, candidate:candidates(*, profile:candidate_profiles(*), availability:candidate_availability(*), documents:candidate_documents(*)), job:jobs(*)'
+        '*, candidate:candidates(*, profile:candidate_profiles(*), availability:candidate_availability(*), preference_sets:candidate_preference_sets(*), documents:candidate_documents(*)), job:jobs(*)'
       )
       .order('updated_at', { ascending: false })
       .limit(120),
@@ -81,7 +81,7 @@ async function fetchDashboard() {
       .limit(30),
     supabase
       .from('candidates')
-      .select('*, profile:candidate_profiles(*), availability:candidate_availability(*), documents:candidate_documents(*), applications(*)')
+      .select('*, profile:candidate_profiles(*), availability:candidate_availability(*), preference_sets:candidate_preference_sets(*), documents:candidate_documents(*), applications(*)')
       .eq('status', 'active')
       .limit(200),
   ]);
@@ -91,7 +91,8 @@ async function fetchDashboard() {
     const candidate = hydrateCandidate(
       candidateRow,
       candidateRow?.profile as Record<string, unknown>,
-      candidateRow?.availability as Record<string, unknown>
+      candidateRow?.availability as Record<string, unknown>,
+      candidateRow?.preference_sets as Record<string, unknown>[]
     ) || (candidateRow as unknown as Candidate);
     const documents = (candidateRow?.documents as CandidateDocument[] | undefined) || [];
     return {
@@ -125,7 +126,8 @@ async function fetchDashboard() {
       const candidate = hydrateCandidate(
         row,
         row.profile as Record<string, unknown>,
-        row.availability as Record<string, unknown>
+        row.availability as Record<string, unknown>,
+        row.preference_sets as Record<string, unknown>[]
       );
       if (!candidate) return null;
       return {
@@ -213,6 +215,7 @@ export default async function AdminDashboardPage() {
         </div>
         <div className="flex gap-2">
           <Link href="/admin/applications" className="btn-primary">Ouvrir la file</Link>
+          <Link href="/admin/recherche-mandat" className="btn-secondary">Recherche mandat</Link>
           <Link href="/admin/postes" className="btn-secondary">Voir les mandats</Link>
         </div>
       </header>

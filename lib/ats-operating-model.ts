@@ -1,13 +1,8 @@
 import { hasCurrentDocument, missingRequiredDocuments } from '@/lib/ats';
-import type { Application, Candidate, CandidateDocument, Job, MatchReason, RecruiterTask } from '@/types';
+import type { Application, Candidate, CandidateDocument, Job, MatchDecision, MatchReason, RecruiterTask } from '@/types';
 
 export type AtsLaneId = 'intake' | 'qualified' | 'blocked' | 'ready' | 'client' | 'closed';
 export type AtsActionPriority = 'urgent' | 'high' | 'normal' | 'low';
-export type MatchDecision =
-  | 'present_now'
-  | 'call_to_validate'
-  | 'request_document'
-  | 'do_not_propose';
 
 export const CLOSED_APPLICATION_STATUSES = ['Place', 'Refuse', 'Inactif'] as const;
 export type ApplicationEligibilityInput = {
@@ -361,8 +356,26 @@ export function getMatchDecision(args: {
   score: number;
   reasons?: MatchReason[];
   blockers?: MatchReason[];
+  decision?: MatchDecision | null;
+  fit_level?: string | null;
+  preference_set_label?: string | null;
 }): { decision: MatchDecision; label: string; detail: string } {
   const { score, reasons = [], blockers = [] } = args;
+  if (args.decision) {
+    const detail =
+      args.decision === 'present_now'
+        ? `Choix compatible${args.preference_set_label ? `: ${args.preference_set_label}` : ''}.`
+        : args.decision === 'request_document'
+          ? 'Le choix est interessant, mais un document bloque la presentation.'
+          : args.decision === 'call_to_validate'
+            ? `Compatibilite partielle${args.preference_set_label ? ` (${args.preference_set_label})` : ''}: valider les points ouverts.`
+            : 'Aucun groupe de preferences ne couvre ce mandat.';
+    return {
+      decision: args.decision,
+      label: matchDecisionLabel(args.decision),
+      detail,
+    };
+  }
   const hasProfessionBlock = blockers.some((reason) => reason.label.toLowerCase().includes('profession'));
   const documentWarn = reasons.some((reason) =>
     ['CV', 'Permis', 'Documents'].includes(reason.label) && reason.state !== 'ok'

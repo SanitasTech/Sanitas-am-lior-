@@ -8,6 +8,7 @@ const NAV = [
   { href: '/admin', label: 'Tableau de bord' },
   { href: '/admin/candidats', label: 'Candidats' },
   { href: '/admin/applications', label: 'Pipeline' },
+  { href: '/admin/recherche-mandat', label: 'Recherche mandat' },
   { href: '/admin/postes', label: 'Postes' },
   { href: '/admin/taches', label: 'Tâches' },
   { href: '/admin/demandes', label: 'Demandes' },

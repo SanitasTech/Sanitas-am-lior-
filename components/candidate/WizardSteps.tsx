@@ -11,6 +11,7 @@
 import type { Dispatch, SetStateAction } from 'react';
 import DepartmentGroups from '@/components/DepartmentGroups';
 import DocumentUploadChoice from '@/components/DocumentUploadChoice';
+import PreferenceSetEditor from '@/components/PreferenceSetEditor';
 import SegmentedChoices from '@/components/SegmentedChoices';
 import {
   CONTACT_PREFS,
@@ -440,6 +441,30 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
         slots={form.interview_slots}
         onChange={(slots) => setField(setForm, 'interview_slots', slots)}
         locale={locale}
+      />
+
+      <PreferenceSetEditor
+        value={form.preference_sets}
+        locale={locale}
+        onChange={(preferenceSets) => {
+          const first = preferenceSets[0];
+          setForm((current) => ({
+            ...current,
+            preference_sets: preferenceSets,
+            qualified_professions:
+              first?.professions && first.professions.length > 0
+                ? first.professions
+                : current.qualified_professions,
+            shifts_accepted:
+              first?.shifts && first.shifts.length > 0 ? first.shifts : current.shifts_accepted,
+            region_choices:
+              first?.regions && first.regions.length > 0 ? first.regions : current.region_choices,
+            preferred_departments:
+              first?.departments && first.departments.length > 0
+                ? first.departments
+                : current.preferred_departments,
+          }));
+        }}
       />
 
       <Field

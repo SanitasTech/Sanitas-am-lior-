@@ -16,7 +16,7 @@ export async function GET(req: Request) {
   const supabase = createSupabaseAdminClient();
   const { data, error } = await supabase
     .from('candidates')
-    .select('*, profile:candidate_profiles(*), availability:candidate_availability(*), applications(*), documents:candidate_documents(*)')
+    .select('*, profile:candidate_profiles(*), availability:candidate_availability(*), preference_sets:candidate_preference_sets(*), applications(*), documents:candidate_documents(*)')
     .order('last_active_at', { ascending: false, nullsFirst: false })
     .limit(300);
   if (error) {

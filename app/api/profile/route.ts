@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getCurrentCandidate, getCurrentUser } from '@/lib/auth';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { computeAtsProfileCompletion, hydrateCandidate } from '@/lib/ats';
+import { syncCandidatePreferenceSets } from '@/lib/preference-sets';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -11,6 +12,23 @@ const regionChoiceSchema = z.object({
   region: z.string().max(200).default(''),
   all_region: z.boolean().default(true),
   cities: z.array(z.string().max(200)).default([]),
+});
+
+const preferenceSetSchema = z.object({
+  id: z.string().optional().nullable(),
+  candidate_id: z.string().optional().nullable(),
+  label: z.string().max(120).default('Choix principal'),
+  priority: z.number().int().min(1).max(50).default(1),
+  professions: z.array(z.string().max(200)).default([]),
+  regions: z.array(regionChoiceSchema).default([]),
+  departments: z.array(z.string().max(200)).default([]),
+  shifts: z.array(z.string().max(200)).default([]),
+  mandate_types: z.array(z.string().max(200)).default([]),
+  start_date: z.string().max(2000).optional().nullable(),
+  mobility: z.string().max(2000).optional().nullable(),
+  salary_floor: z.string().max(2000).optional().nullable(),
+  constraints: z.string().max(2000).optional().nullable(),
+  active: z.boolean().default(true),
 });
 
 const profileSchema = z.object({
@@ -44,6 +62,7 @@ const profileSchema = z.object({
   transport_available: z.string().optional().nullable(),
   constraints: z.string().optional().nullable(),
   mailing_list_opt_in: z.boolean().default(false),
+  preference_sets: z.array(preferenceSetSchema).default([]),
 });
 
 export async function GET() {
@@ -178,6 +197,33 @@ export async function PUT(req: Request) {
     );
   }
 
+  const savedPreferenceSets = await syncCandidatePreferenceSets(supabase, {
+    candidateId,
+    preferenceSets: input.preference_sets.map((set) => ({
+      ...set,
+      id: set.id || undefined,
+      candidate_id: set.candidate_id || undefined,
+    })),
+    fallback: {
+      id: candidateId,
+      profession: profilePayload.profession,
+      qualified_professions: profilePayload.qualified_professions,
+      mobility: profilePayload.mobility,
+      preferred_mandate_types: profilePayload.preferred_mandate_types,
+      preferred_establishments: profilePayload.preferred_establishments,
+      avoided_establishments: profilePayload.avoided_establishments,
+      salary_expectations: profilePayload.salary_expectations,
+      start_availability: availabilityPayload.start_availability,
+      preferred_hours: availabilityPayload.preferred_hours,
+      preferred_shifts: availabilityPayload.preferred_shifts,
+      preferred_regions: availabilityPayload.preferred_regions,
+      preferred_departments: availabilityPayload.preferred_departments,
+      housing_required: availabilityPayload.housing_required,
+      transport_available: availabilityPayload.transport_available,
+      constraints: availabilityPayload.constraints,
+    },
+  });
+
   const hydrated = hydrateCandidate(
     {
       id: candidateId,
@@ -189,7 +235,8 @@ export async function PUT(req: Request) {
       updated_at: now,
     },
     { candidate_id: candidateId, ...profilePayload },
-    { candidate_id: candidateId, ...availabilityPayload }
+    { candidate_id: candidateId, ...availabilityPayload },
+    savedPreferenceSets as unknown as Record<string, unknown>[]
   );
   const completion = hydrated ? computeAtsProfileCompletion(hydrated) : 0;
 

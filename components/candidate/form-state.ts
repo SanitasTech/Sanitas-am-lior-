@@ -7,7 +7,12 @@
 // `/api/applications` côté serveur.
 
 import { professionRequiresPDSB, professionRequiresPermit } from '@/lib/constants';
-import type { Candidate, CandidateDocument, DocumentRecord, Job, RegionChoice } from '@/types';
+import {
+  makePreferenceSetForJob,
+  makePreferenceSetFromFlat,
+  normalizeCandidatePreferenceSets,
+} from '@/lib/ats';
+import type { Candidate, CandidateDocument, CandidatePreferenceSet, DocumentRecord, Job, RegionChoice } from '@/types';
 
 export type Mode = 'posting' | 'spontaneous';
 
@@ -46,6 +51,7 @@ export interface FormState {
   region_choices: RegionChoice[];
   preferred_departments: string[];
   preferred_establishments: string;
+  preference_sets: CandidatePreferenceSet[];
   avoided_establishments: string;
   housing_required: string;
   transport_available: string;
@@ -123,6 +129,33 @@ export function makeInitialFormState(
   initialDocuments?: Record<string, Pick<DocumentRecord, 'id' | 'status' | 'file_name' | 'file_path'>>
 ): FormState {
   const isPosting = mode === 'posting';
+  const flatCandidate = {
+    ...initial,
+    profession: isPosting ? job?.profession || initial.profession || '' : initial.profession || '',
+    qualified_professions: initialQualifiedProfessions(mode, job, initial),
+    preferred_regions: initialRegions(mode, job, initial),
+    preferred_shifts: uniqueStrings([
+      ...(isPosting ? [job?.shift] : []),
+      ...(initial.preferred_shifts || []),
+    ]),
+    preferred_departments: uniqueStrings([
+      ...(isPosting ? [job?.department] : []),
+      ...(initial.preferred_departments || []),
+    ]),
+  };
+  const existingSets = normalizeCandidatePreferenceSets(initial.preference_sets, flatCandidate);
+  const preferenceSets =
+    isPosting && job
+      ? [
+          makePreferenceSetForJob(
+            flatCandidate,
+            job,
+            existingSets.length > 0 ? existingSets[0].label : 'Choix confirme pour ce mandat'
+          ),
+        ]
+      : existingSets.length > 0
+        ? existingSets
+        : [makePreferenceSetFromFlat(flatCandidate)];
   return {
     first_name: initial.first_name || '',
     last_name: initial.last_name || '',
@@ -157,6 +190,7 @@ export function makeInitialFormState(
       ...(initial.preferred_departments || []),
     ]),
     preferred_establishments: initial.preferred_establishments || '',
+    preference_sets: preferenceSets,
     avoided_establishments: initial.avoided_establishments || '',
     housing_required: initial.housing_required || '',
     transport_available: initial.transport_available || '',
@@ -202,6 +236,7 @@ export function formToCandidate(initial: Candidate, form: FormState): Candidate 
     preferred_shifts: form.shifts_accepted,
     preferred_regions: form.region_choices,
     preferred_departments: form.preferred_departments,
+    preference_sets: form.preference_sets,
     preferred_establishments: form.preferred_establishments || null,
     avoided_establishments: form.avoided_establishments || null,
     housing_required: form.housing_required || null,

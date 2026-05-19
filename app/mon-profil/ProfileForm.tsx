@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import SectionCard from '@/components/SectionCard';
 import SegmentedChoices from '@/components/SegmentedChoices';
 import DepartmentGroups from '@/components/DepartmentGroups';
+import PreferenceSetEditor from '@/components/PreferenceSetEditor';
 import {
   CONTACT_PREFS,
   CONTACT_TIMES,
@@ -24,6 +25,7 @@ import {
   professionRequiresPermit,
 } from '@/lib/constants';
 import type { Candidate, RegionChoice } from '@/types';
+import { makePreferenceSetFromFlat, normalizeCandidatePreferenceSets } from '@/lib/ats';
 import { displayValue, localizedPath, type Locale } from '@/lib/i18n';
 import { useLocale } from '@/components/I18nProvider';
 
@@ -71,6 +73,10 @@ export default function ProfileForm({ initial, locale: localeProp }: Props) {
       ? initial.preferred_regions
       : [emptyRegionChoice()]) as RegionChoice[],
     preferred_departments: initial.preferred_departments || [],
+    preference_sets:
+      normalizeCandidatePreferenceSets(initial.preference_sets, initial).length > 0
+        ? normalizeCandidatePreferenceSets(initial.preference_sets, initial)
+        : [makePreferenceSetFromFlat(initial)],
     preferred_establishments: initial.preferred_establishments || '',
     avoided_establishments: initial.avoided_establishments || '',
     housing_required: initial.housing_required || '',
@@ -117,11 +123,27 @@ export default function ProfileForm({ initial, locale: localeProp }: Props) {
     setSaving(true);
     setMsg(null);
     setShowSuccessPanel(false);
+    const syncedPreferenceSets = form.preference_sets.length > 0
+      ? form.preference_sets.map((set, index) =>
+          index === 0
+            ? {
+                ...set,
+                professions: form.qualified_professions,
+                regions: form.preferred_regions,
+                departments: form.preferred_departments,
+                shifts: form.preferred_shifts,
+                mandate_types: form.preferred_mandate_types,
+                start_date: form.start_availability || set.start_date || null,
+                mobility: form.mobility || set.mobility || null,
+              }
+            : set
+        )
+      : [];
     try {
       const res = await fetch('/api/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, preference_sets: syncedPreferenceSets }),
       });
       const json = await res.json();
       if (!res.ok || !json.ok) throw new Error(json.error || tr('Echec de la sauvegarde.', 'Save failed.'));
@@ -301,6 +323,42 @@ export default function ProfileForm({ initial, locale: localeProp }: Props) {
         <Field label={tr('Types de mandat recherches', 'Assignment types sought')}>
           <SegmentedChoices options={MANDATE_TYPES} value={form.preferred_mandate_types} onChange={(v) => set('preferred_mandate_types', v as string[])} multi />
         </Field>
+      </SectionCard>
+
+      <SectionCard
+        title={tr('Mes choix de mandats', 'My assignment preferences')}
+        helper={tr(
+          'Regroupez ce qui va ensemble. Exemple: une region peut etre acceptable seulement pour certains departements ou certains quarts.',
+          'Group what belongs together. For example, one region may work only for certain departments or shifts.'
+        )}
+      >
+        <PreferenceSetEditor
+          value={form.preference_sets}
+          locale={locale}
+          onChange={(preferenceSets) => {
+            const first = preferenceSets[0];
+            setForm((current) => ({
+              ...current,
+              preference_sets: preferenceSets,
+              qualified_professions:
+                first?.professions && first.professions.length > 0
+                  ? first.professions
+                  : current.qualified_professions,
+              preferred_regions:
+                first?.regions && first.regions.length > 0 ? first.regions : current.preferred_regions,
+              preferred_shifts:
+                first?.shifts && first.shifts.length > 0 ? first.shifts : current.preferred_shifts,
+              preferred_departments:
+                first?.departments && first.departments.length > 0
+                  ? first.departments
+                  : current.preferred_departments,
+              preferred_mandate_types:
+                first?.mandate_types && first.mandate_types.length > 0
+                  ? first.mandate_types
+                  : current.preferred_mandate_types,
+            }));
+          }}
+        />
       </SectionCard>
 
       <SectionCard title={tr('Geographie preferee', 'Preferred geography')} helper={tr('Regions, villes, etablissements qui vous interessent.', 'Regions, cities and facilities that interest you.')}>

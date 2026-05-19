@@ -101,6 +101,24 @@ set start_availability = excluded.start_availability,
     housing_required = excluded.housing_required,
     transport_available = excluded.transport_available;
 
+insert into public.candidate_preference_sets (
+  candidate_id, label, priority, professions, regions, departments, shifts,
+  mandate_types, start_date, mobility, constraints, active
+) values (
+  '00000000-0000-0000-0000-000000000101',
+  'Abitibi ou Montreal - chirurgie',
+  1,
+  ARRAY['Infirmier(Ã¨re)', 'Infirmier(Ã¨re) clinicien(ne)']::text[],
+  '[{"region":"Abitibi-TÃ©miscamingue","all_region":true,"cities":[]},{"region":"MontrÃ©al","all_region":true,"cities":[]}]'::jsonb,
+  ARRAY['Chirurgie', 'MÃ©decine']::text[],
+  ARRAY['Jour', 'Soir']::text[],
+  ARRAY['Remplacement', 'Long terme']::text[],
+  'Dans 2 semaines',
+  'RÃ©gionale',
+  'Hebergement a valider hors Montreal.',
+  true
+) on conflict do nothing;
+
 insert into public.recruiter_tasks (
   candidate_id, task_type, title, details, due_at, status
 ) values (

@@ -44,7 +44,7 @@ async function fetchApplications(sp: Props['searchParams']) {
   let query = supabase
     .from('applications')
     .select(
-      '*, candidate:candidates(*, profile:candidate_profiles(*), availability:candidate_availability(*), documents:candidate_documents(*)), job:jobs(*)'
+        '*, candidate:candidates(*, profile:candidate_profiles(*), availability:candidate_availability(*), preference_sets:candidate_preference_sets(*), documents:candidate_documents(*)), job:jobs(*)'
     )
     .order('created_at', { ascending: false })
     .limit(300);
@@ -58,7 +58,8 @@ async function fetchApplications(sp: Props['searchParams']) {
     const candidate = hydrateCandidate(
       candidateRow,
       candidateRow?.profile as Record<string, unknown>,
-      candidateRow?.availability as Record<string, unknown>
+      candidateRow?.availability as Record<string, unknown>,
+      candidateRow?.preference_sets as Record<string, unknown>[]
     ) || (candidateRow as unknown as Candidate);
     return {
       ...(row as unknown as Application),

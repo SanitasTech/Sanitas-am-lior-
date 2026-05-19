@@ -58,7 +58,7 @@ export async function getOrCreateCandidateForUser(user: User): Promise<Candidate
   const admin = createSupabaseAdminClient();
   const { data: existing, error: existingError } = await admin
     .from('candidates')
-    .select('*, profile:candidate_profiles(*), availability:candidate_availability(*)')
+    .select('*, profile:candidate_profiles(*), availability:candidate_availability(*), preference_sets:candidate_preference_sets(*)')
     .eq('auth_user_id', user.id)
     .maybeSingle();
 
@@ -69,7 +69,12 @@ export async function getOrCreateCandidateForUser(user: User): Promise<Candidate
 
   if (existing) {
     const row = existing as Record<string, unknown>;
-    return hydrateCandidate(row, row.profile as Record<string, unknown>, row.availability as Record<string, unknown>);
+    return hydrateCandidate(
+      row,
+      row.profile as Record<string, unknown>,
+      row.availability as Record<string, unknown>,
+      row.preference_sets as Record<string, unknown>[]
+    );
   }
 
   // Premier login : créer un candidat vide. On utilise les metadata Google
@@ -112,6 +117,17 @@ export async function getOrCreateCandidateForUser(user: User): Promise<Candidate
       preferred_shifts: [],
       preferred_departments: [],
     }),
+    admin.from('candidate_preference_sets').insert({
+      candidate_id: created.id,
+      label: 'Choix principal',
+      priority: 1,
+      professions: [],
+      regions: [],
+      departments: [],
+      shifts: [],
+      mandate_types: [],
+      active: true,
+    }),
   ]);
 
   return hydrateCandidate(created as Record<string, unknown>, null, null);
@@ -127,10 +143,15 @@ export async function getCurrentCandidate(): Promise<Candidate | null> {
   const admin = createSupabaseAdminClient();
   const { data } = await admin
     .from('candidates')
-    .select('*, profile:candidate_profiles(*), availability:candidate_availability(*)')
+    .select('*, profile:candidate_profiles(*), availability:candidate_availability(*), preference_sets:candidate_preference_sets(*)')
     .eq('auth_user_id', user.id)
     .maybeSingle();
   if (!data) return null;
   const row = data as Record<string, unknown>;
-  return hydrateCandidate(row, row.profile as Record<string, unknown>, row.availability as Record<string, unknown>);
+  return hydrateCandidate(
+    row,
+    row.profile as Record<string, unknown>,
+    row.availability as Record<string, unknown>,
+    row.preference_sets as Record<string, unknown>[]
+  );
 }

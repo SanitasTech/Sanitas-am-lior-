@@ -54,7 +54,7 @@ export async function POST(req: Request) {
   const { data: contextualApp } = await supabase
     .from('applications')
     .select(
-      '*, candidate:candidates(*, profile:candidate_profiles(*), availability:candidate_availability(*), documents:candidate_documents(*)), job:jobs(*)'
+      '*, candidate:candidates(*, profile:candidate_profiles(*), availability:candidate_availability(*), preference_sets:candidate_preference_sets(*), documents:candidate_documents(*)), job:jobs(*)'
     )
     .eq('id', applicationId)
     .maybeSingle();
@@ -65,7 +65,8 @@ export async function POST(req: Request) {
     const candidate = hydrateCandidate(
       candidateRow,
       candidateRow?.profile as Record<string, unknown>,
-      candidateRow?.availability as Record<string, unknown>
+      candidateRow?.availability as Record<string, unknown>,
+      candidateRow?.preference_sets as Record<string, unknown>[]
     ) as Candidate | null;
     const documents = (candidateRow?.documents as CandidateDocument[] | undefined) || [];
     const job = (row.job as Job | null) || null;

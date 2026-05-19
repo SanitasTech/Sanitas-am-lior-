@@ -5,6 +5,7 @@ const REQUIRED_ATS_TABLES = [
   'candidates',
   'candidate_profiles',
   'candidate_availability',
+  'candidate_preference_sets',
   'candidate_documents',
   'applications',
   'application_documents',

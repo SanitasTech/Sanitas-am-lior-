@@ -26,7 +26,7 @@ export async function POST(req: Request) {
   const [{ data: candidateRow }, { data: job }, { data: docs }] = await Promise.all([
     supabase
       .from('candidates')
-      .select('*, profile:candidate_profiles(*), availability:candidate_availability(*), applications(*)')
+      .select('*, profile:candidate_profiles(*), availability:candidate_availability(*), preference_sets:candidate_preference_sets(*), applications(*)')
       .eq('id', candidateId)
       .maybeSingle(),
     supabase.from('jobs').select('*').eq('id', jobId).maybeSingle(),
@@ -41,7 +41,8 @@ export async function POST(req: Request) {
   const candidate = hydrateCandidate(
     row,
     row?.profile as Record<string, unknown>,
-    row?.availability as Record<string, unknown>
+    row?.availability as Record<string, unknown>,
+    row?.preference_sets as Record<string, unknown>[]
   );
   if (!candidate || !job) {
     return NextResponse.json({ ok: false, error: 'Candidat ou poste introuvable.' }, { status: 404 });
@@ -73,6 +74,10 @@ export async function POST(req: Request) {
     score: match.score,
     reasons: match.reasons,
     blockers: match.blockers,
+    preference_set_id: match.preference_set_id || null,
+    fit_level: match.fit_level || null,
+    decision: match.decision || null,
+    validation_questions: match.validation_questions || [],
     calculated_at: new Date().toISOString(),
   });
 
