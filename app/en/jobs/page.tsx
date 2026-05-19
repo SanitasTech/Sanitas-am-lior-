@@ -1,19 +1,22 @@
-import type { Metadata } from 'next';
 import { unstable_noStore as noStore } from 'next/cache';
 import PublicLayout from '@/components/PublicLayout';
 import JobFilters from '@/components/JobFilters';
 import JobCard from '@/components/JobCard';
 import { DecorativeBlob } from '@/components/Icons';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
+import { publicPageMetadata } from '@/lib/seo';
 import type { Job } from '@/types';
 import { urgencyOrder } from '@/lib/utils';
 
-export const metadata: Metadata = {
-  title: 'Healthcare jobs',
+export const metadata = publicPageMetadata({
+  title: 'Healthcare jobs and assignments in Quebec',
   description:
-    'Healthcare assignments across Quebec. Filter by profession, region, department, shift and urgency.',
-  alternates: { canonical: '/en/jobs', languages: { fr: '/postes', en: '/en/jobs' } },
-};
+    'Browse active healthcare assignments in Quebec for registered nurses, licensed practical nurses, beneficiary attendants, ASSS and specialized workers.',
+  path: '/en/jobs',
+  locale: 'en',
+  frPath: '/postes',
+  enPath: '/en/jobs',
+});
 
 export const dynamic = 'force-dynamic';
 

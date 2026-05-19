@@ -1,16 +1,19 @@
-import type { Metadata } from 'next';
 import PublicLayout from '@/components/PublicLayout';
 import EstablishmentRequestForm from '@/components/EstablishmentRequestForm';
 import ContactInfo from '@/components/ContactInfo';
 import Photo from '@/components/Photo';
 import { DecorativeBlob } from '@/components/Icons';
+import { publicPageMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Request healthcare staff',
+export const metadata = publicPageMetadata({
+  title: 'Healthcare staffing agency in Quebec for facilities',
   description:
-    'Healthcare facilities: submit your staffing need to Agence Sanitas. Fast, structured response.',
-  alternates: { canonical: '/en/facilities', languages: { fr: '/etablissements', en: '/en/facilities' } },
-};
+    'Healthcare facilities can request qualified staff from Agence Sanitas for urgent, temporary, recurring or planned needs across Quebec.',
+  path: '/en/facilities',
+  locale: 'en',
+  frPath: '/etablissements',
+  enPath: '/en/facilities',
+});
 
 const NEEDS = ['Replacement', 'Urgent need', 'Short term', 'Long term', 'Temporary support', 'By department', 'By shift'];
 const PROFESSIONS = [

@@ -2,9 +2,16 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import PublicLayout from '@/components/PublicLayout';
+import SeoJsonLd from '@/components/SeoJsonLd';
 import UrgencyBadge from '@/components/UrgencyBadge';
 import { DecorativeBlob } from '@/components/Icons';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
+import {
+  breadcrumbJsonLd,
+  jobMetaDescription,
+  jobPostingJsonLd,
+  publicPageMetadata,
+} from '@/lib/seo';
 import { formatDate } from '@/lib/utils';
 import type { Job } from '@/types';
 
@@ -28,10 +35,13 @@ async function fetchJob(id: string): Promise<Job | null> {
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const job = await fetchJob(params.id);
   if (!job) return { title: 'Poste introuvable' };
-  return {
+  return publicPageMetadata({
     title: `${job.title}${job.city ? ` · ${job.city}` : ''}`,
-    description: `${job.profession} · ${job.establishment || ''} · ${job.region}`.trim(),
-  };
+    description: jobMetaDescription(job, 'fr'),
+    path: `/postes/${params.id}`,
+    frPath: `/postes/${params.id}`,
+    enPath: `/en/jobs/${params.id}`,
+  });
 }
 
 export default async function JobDetailPage({ params }: { params: { id: string } }) {
@@ -42,6 +52,20 @@ export default async function JobDetailPage({ params }: { params: { id: string }
 
   return (
     <PublicLayout>
+      <SeoJsonLd
+        id={`job-schema-${job.id}`}
+        data={{
+          '@context': 'https://schema.org',
+          '@graph': [
+            jobPostingJsonLd(job, 'fr'),
+            breadcrumbJsonLd([
+              { name: 'Accueil', url: '/' },
+              { name: 'Postes', url: '/postes' },
+              { name: job.title, url: `/postes/${job.id}` },
+            ]),
+          ],
+        }}
+      />
       <section className="relative section pt-16 pb-12 overflow-hidden">
         <DecorativeBlob className="absolute -top-32 -right-40 h-[450px] w-[450px] text-accent pointer-events-none" />
         <div className="container-page relative">

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import PublicLayout from '@/components/PublicLayout';
+import SeoJsonLd from '@/components/SeoJsonLd';
 import UrgencyBadge from '@/components/UrgencyBadge';
 import { DecorativeBlob } from '@/components/Icons';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
@@ -14,6 +15,12 @@ import {
   jobTitle,
   localizedPath,
 } from '@/lib/i18n';
+import {
+  breadcrumbJsonLd,
+  jobMetaDescription,
+  jobPostingJsonLd,
+  publicPageMetadata,
+} from '@/lib/seo';
 import type { Job } from '@/types';
 
 export const dynamic = 'force-dynamic';
@@ -31,14 +38,14 @@ async function fetchJob(id: string): Promise<Job | null> {
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const job = await fetchJob(params.id);
   if (!job) return { title: 'Job not found' };
-  return {
+  return publicPageMetadata({
     title: `${jobTitle(job, 'en')}${job.city ? ` · ${job.city}` : ''}`,
-    description: `${displayValue('en', job.profession)} · ${job.establishment || ''} · ${job.region}`.trim(),
-    alternates: {
-      canonical: `/en/jobs/${params.id}`,
-      languages: { fr: `/postes/${params.id}`, en: `/en/jobs/${params.id}` },
-    },
-  };
+    description: jobMetaDescription(job, 'en'),
+    path: `/en/jobs/${params.id}`,
+    locale: 'en',
+    frPath: `/postes/${params.id}`,
+    enPath: `/en/jobs/${params.id}`,
+  });
 }
 
 export default async function EnglishJobDetailPage({ params }: { params: { id: string } }) {
@@ -51,6 +58,20 @@ export default async function EnglishJobDetailPage({ params }: { params: { id: s
 
   return (
     <PublicLayout locale="en">
+      <SeoJsonLd
+        id={`job-schema-${job.id}`}
+        data={{
+          '@context': 'https://schema.org',
+          '@graph': [
+            jobPostingJsonLd(job, 'en'),
+            breadcrumbJsonLd([
+              { name: 'Home', url: '/en' },
+              { name: 'Jobs', url: '/en/jobs' },
+              { name: jobTitle(job, 'en'), url: `/en/jobs/${job.id}` },
+            ]),
+          ],
+        }}
+      />
       <section className="relative section pt-16 pb-12 overflow-hidden">
         <DecorativeBlob className="absolute -top-32 -right-40 h-[450px] w-[450px] text-accent pointer-events-none" />
         <div className="container-page relative">

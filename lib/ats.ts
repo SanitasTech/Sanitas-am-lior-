@@ -127,11 +127,15 @@ export function hasCurrentDocument(documents: CandidateDocument[], type: string)
   return documents.some(
     (doc) =>
       doc.document_type === type &&
-      (String(doc.status) === 'ReÃ§u' || String(doc.status) === 'Reçu') &&
+      isReceivedDocumentStatus(doc.status) &&
       !!doc.file_path &&
       doc.is_current !== false &&
       (!doc.expires_at || new Date(doc.expires_at).getTime() >= now)
   );
+}
+
+function isReceivedDocumentStatus(status?: string | null): boolean {
+  return ['Reçu', 'Recu', 'ReÃ§u', 'ReÃƒÂ§u'].includes(String(status || ''));
 }
 
 export function missingRequiredDocuments(

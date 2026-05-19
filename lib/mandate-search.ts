@@ -26,12 +26,18 @@ export interface CandidateSearchRecord {
 
 const EXPERIENCE_RANK: Record<string, number> = {
   'Moins de 1 an': 0,
+  '1 à 2 ans': 1,
   '1 a 2 ans': 1,
   '1 Ã  2 ans': 1,
+  '1 ÃƒÂ  2 ans': 1,
+  '3 à 5 ans': 2,
   '3 a 5 ans': 2,
   '3 Ã  5 ans': 2,
+  '3 ÃƒÂ  5 ans': 2,
+  '6 à 10 ans': 3,
   '6 a 10 ans': 3,
   '6 Ã  10 ans': 3,
+  '6 ÃƒÂ  10 ans': 3,
   '10 ans et plus': 4,
 };
 
@@ -323,8 +329,16 @@ export function searchMandateCandidates(
       has_required_documents: missingDocuments.length === 0,
       available_soon: isSoon(candidate),
       already_applied: !!sameJobApplication,
-      already_presented: hasStatus(applications, ['Presente', 'PrÃ©sentÃ©', 'Place', 'PlacÃ©'], input.job_id || null),
-      previously_refused: hasStatus(applications, ['Refuse', 'RefusÃ©'], input.job_id || null),
+      already_presented: hasStatus(
+        applications,
+        ['Presente', 'Présenté', 'PrÃ©sentÃ©', 'PrÃƒÂ©sentÃƒÂ©', 'Place', 'Placé', 'PlacÃ©', 'PlacÃƒÂ©'],
+        input.job_id || null
+      ),
+      previously_refused: hasStatus(
+        applications,
+        ['Refuse', 'Refusé', 'RefusÃ©', 'RefusÃƒÂ©'],
+        input.job_id || null
+      ),
       never_contacted: !candidate.last_active_at,
       has_open_tasks: tasks.some((task) => task.status === 'open'),
       has_overdue_tasks: tasks.some(isOverdue),

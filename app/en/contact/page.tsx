@@ -1,15 +1,19 @@
 import Link from 'next/link';
-import type { Metadata } from 'next';
 import PublicLayout from '@/components/PublicLayout';
 import ContactForm from '@/components/ContactForm';
 import ContactInfo from '@/components/ContactInfo';
 import { DecorativeBlob, PeopleIcon, ClipboardIcon, ChatIcon } from '@/components/Icons';
+import { publicPageMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Contact',
-  description: 'Contact Agence Sanitas. Candidates, healthcare professionals or facility representatives.',
-  alternates: { canonical: '/en/contact', languages: { fr: '/contact', en: '/en/contact' } },
-};
+export const metadata = publicPageMetadata({
+  title: 'Contact Agence Sanitas | Candidates and facilities',
+  description:
+    'Contact Agence Sanitas in Laval to apply, ask a question or request healthcare staffing support in Quebec.',
+  path: '/en/contact',
+  locale: 'en',
+  frPath: '/contact',
+  enPath: '/en/contact',
+});
 
 export default function EnglishContactPage() {
   return (

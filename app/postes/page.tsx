@@ -1,18 +1,21 @@
-import type { Metadata } from 'next';
 import { unstable_noStore as noStore } from 'next/cache';
 import PublicLayout from '@/components/PublicLayout';
 import JobFilters from '@/components/JobFilters';
 import JobCard from '@/components/JobCard';
 import { DecorativeBlob } from '@/components/Icons';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
+import { publicPageMetadata } from '@/lib/seo';
 import type { Job } from '@/types';
 import { urgencyOrder } from '@/lib/utils';
 
-export const metadata: Metadata = {
-  title: 'Postes en santé',
+export const metadata = publicPageMetadata({
+  title: 'Mandats et emplois en santé au Québec',
   description:
-    'Mandats en santé partout au Québec. Filtrez par profession, région, département, quart et urgence.',
-};
+    'Consultez les mandats actifs en santé au Québec: infirmières, infirmières auxiliaires, PAB, ASSS et autres professionnels. Filtrez par région, quart et département.',
+  path: '/postes',
+  frPath: '/postes',
+  enPath: '/en/jobs',
+});
 
 export const dynamic = 'force-dynamic';
 

@@ -1,15 +1,18 @@
-import type { Metadata } from 'next';
 import PublicLayout from '@/components/PublicLayout';
 import EstablishmentRequestForm from '@/components/EstablishmentRequestForm';
 import ContactInfo from '@/components/ContactInfo';
 import Photo from '@/components/Photo';
 import { DecorativeBlob } from '@/components/Icons';
+import { publicPageMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Demander du personnel en santé',
+export const metadata = publicPageMetadata({
+  title: 'Agence de placement personnel de santé au Québec',
   description:
-    'Établissements de santé : présentez votre besoin de personnel à Agence Sanitas. Réponse rapide et structurée.',
-};
+    'Établissements de santé: demandez du personnel qualifié avec Agence Sanitas. Réponse structurée pour besoins urgents, ponctuels ou récurrents.',
+  path: '/etablissements',
+  frPath: '/etablissements',
+  enPath: '/en/facilities',
+});
 
 const NEEDS = [
   'Remplacement',

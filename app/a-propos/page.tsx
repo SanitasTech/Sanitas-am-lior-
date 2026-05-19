@@ -1,14 +1,17 @@
-import type { Metadata } from 'next';
 import PublicLayout from '@/components/PublicLayout';
 import ContactInfo from '@/components/ContactInfo';
 import Photo from '@/components/Photo';
 import { DecorativeBlob } from '@/components/Icons';
+import { publicPageMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'À propos',
+export const metadata = publicPageMetadata({
+  title: "À propos d'Agence Sanitas | Placement santé Laval",
   description:
-    "À propos d'Agence Sanitas, agence de placement en santé basée à Laval.",
-};
+    "Découvrez Agence Sanitas, agence de placement en santé basée à Laval, au service des professionnels et des établissements du Québec.",
+  path: '/a-propos',
+  frPath: '/a-propos',
+  enPath: '/en/about',
+});
 
 const HERO_PHOTO =
   'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1200&q=80&auto=format&fit=crop';

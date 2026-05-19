@@ -1,13 +1,16 @@
-import type { Metadata } from 'next';
 import PublicLayout from '@/components/PublicLayout';
 import { DecorativeBlob } from '@/components/Icons';
 import { COMPANY } from '@/lib/constants';
+import { publicPageMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
+export const metadata = publicPageMetadata({
   title: 'Privacy policy',
-  description: 'How Agence Sanitas collects, uses and protects your information.',
-  alternates: { canonical: '/en/privacy-policy', languages: { fr: '/politique-confidentialite', en: '/en/privacy-policy' } },
-};
+  description: 'How Agence Sanitas collects, uses and protects candidate and facility information.',
+  path: '/en/privacy-policy',
+  locale: 'en',
+  frPath: '/politique-confidentialite',
+  enPath: '/en/privacy-policy',
+});
 
 export default function EnglishPrivacyPolicyPage() {
   return (

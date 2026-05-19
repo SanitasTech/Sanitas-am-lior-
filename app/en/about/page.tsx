@@ -1,14 +1,18 @@
-import type { Metadata } from 'next';
 import PublicLayout from '@/components/PublicLayout';
 import ContactInfo from '@/components/ContactInfo';
 import Photo from '@/components/Photo';
 import { DecorativeBlob } from '@/components/Icons';
+import { publicPageMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'About',
-  description: 'About Agence Sanitas, a healthcare staffing agency based in Laval.',
-  alternates: { canonical: '/en/about', languages: { fr: '/a-propos', en: '/en/about' } },
-};
+export const metadata = publicPageMetadata({
+  title: 'About Agence Sanitas | Healthcare staffing in Laval',
+  description:
+    'Learn about Agence Sanitas, a Laval-based healthcare staffing agency serving professionals and facilities across Quebec.',
+  path: '/en/about',
+  locale: 'en',
+  frPath: '/a-propos',
+  enPath: '/en/about',
+});
 
 const HERO_PHOTO = 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1200&q=80&auto=format&fit=crop';
 const MISSION_PHOTO = 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=1200&q=80&auto=format&fit=crop';

@@ -35,7 +35,7 @@ export default function DocumentUploadChoice({
   const [replacedThisSession, setReplacedThisSession] = useState(false);
 
   const current = value || { status: 'À recevoir' };
-  const received = current.status === 'Recu' || current.status === 'Reçu' || current.status === 'ReÃ§u';
+  const received = ['Reçu', 'Recu', 'ReÃ§u', 'ReÃƒÂ§u'].includes(current.status);
   const fromExistingFile = reused && received && !replacedThisSession;
 
   async function handleFile(file: File) {

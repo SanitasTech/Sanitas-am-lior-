@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import type { Metadata } from 'next';
 import { unstable_noStore as noStore } from 'next/cache';
 import PublicLayout from '@/components/PublicLayout';
 import HomeSearch from '@/components/HomeSearch';
@@ -20,35 +19,19 @@ import {
 } from '@/components/Icons';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { localizedPath } from '@/lib/i18n';
+import { publicPageMetadata } from '@/lib/seo';
 import type { Job } from '@/types';
 import { urgencyOrder } from '@/lib/utils';
 
-export const metadata: Metadata = {
-  title: 'Agence Sanitas | Healthcare staffing in Quebec',
+export const metadata = publicPageMetadata({
+  title: 'Healthcare staffing agency in Quebec | Agence Sanitas',
   description:
-    'Healthcare staffing agency based in Laval. Assignments for healthcare professionals and reliable staffing support for facilities across Quebec.',
-  alternates: { canonical: '/en', languages: { fr: '/', en: '/en' } },
-  openGraph: {
-    title: 'Agence Sanitas',
-    description: 'Healthcare staffing in Quebec for professionals and facilities.',
-    locale: 'en_CA',
-    type: 'website',
-    images: [
-      {
-        url: '/opengraph-image',
-        width: 1200,
-        height: 630,
-        alt: 'Agence Sanitas - Healthcare assignments in Quebec',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Agence Sanitas',
-    description: 'Healthcare assignments in Quebec for healthcare professionals.',
-    images: ['/opengraph-image'],
-  },
-};
+    'Agence Sanitas connects healthcare professionals with assignments across Quebec and supports facilities with reliable staffing.',
+  path: '/en',
+  locale: 'en',
+  frPath: '/',
+  enPath: '/en',
+});
 
 export const revalidate = 60;
 
@@ -76,6 +59,44 @@ const PARTNERS = [
   { name: 'Groupe Champlain', logo: '/logos/champlain.png' },
   { name: 'CHSLD Saint-Lambert sur le Golf', logo: '/logos/chsld-saint-lambert.svg' },
   { name: 'Résidence Soleil', logo: '/logos/residence-soleil.png' },
+];
+
+type Testimonial = {
+  quote: string;
+  author: string;
+  role: string;
+  rating?: number;
+};
+
+const TESTIMONIALS: Testimonial[] = [
+  {
+    quote:
+      'I am satisfied with the services of Agence Sanitas. The agents are welcoming, helpful and professional. They respond to my needs quickly and listen before proposing assignments.',
+    author: 'Souad N.',
+    role: 'Clinical nurse',
+    rating: 5,
+  },
+  {
+    quote:
+      'Professional, flexible and human, with excellent ethical values. They listen to employees and respect availability. You really feel considered and respected.',
+    author: 'Sisi D.',
+    role: 'Beneficiary attendant',
+    rating: 5,
+  },
+  {
+    quote:
+      'Very good agency. The supervisors handling schedules are polite, courteous, understanding and patient. I recommend them.',
+    author: 'Charlotte M.',
+    role: 'Nurse',
+    rating: 5,
+  },
+  {
+    quote:
+      'It is the first agency where I feel they truly listen before offering me an assignment. The options match my availability.',
+    author: 'Tamara F.',
+    role: 'Clinical nurse',
+    rating: 5,
+  },
 ];
 
 async function fetchUrgentJobs(): Promise<Job[]> {
@@ -300,6 +321,28 @@ export default async function EnglishHomePage() {
         </div>
       </section>
 
+      <section className="section bg-muted/40">
+        <div className="container-page">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
+                Testimonials
+              </p>
+              <h2 className="mt-2 text-display-lg text-fg">What candidates say about us.</h2>
+            </div>
+            <p className="text-[13.5px] text-fg-muted">
+              Reviews available from our Google Business profile.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {TESTIMONIALS.map((testimonial) => (
+              <TestimonialCard key={testimonial.author} testimonial={testimonial} />
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="py-14 sm:py-16 border-y border-border bg-surface">
         <div className="container-page">
           <p className="text-[12.5px] font-semibold uppercase tracking-[0.2em] text-fg-subtle text-center">
@@ -390,5 +433,40 @@ function PartnerLogo({ name, logo }: { name: string; logo: string | null }) {
         </span>
       )}
     </div>
+  );
+}
+
+function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
+  const rating = testimonial.rating ?? 5;
+  return (
+    <figure className="card p-5 flex flex-col h-full">
+      <div className="flex items-center gap-0.5 text-accent" aria-label={`${rating} out of 5`}>
+        {Array.from({ length: 5 }).map((_, index) => (
+          <Star key={index} filled={index < rating} />
+        ))}
+      </div>
+      <blockquote className="mt-4 text-[14.5px] leading-relaxed text-fg flex-1">
+        {testimonial.quote}
+      </blockquote>
+      <figcaption className="mt-5 pt-4 border-t border-border">
+        <p className="text-[14px] font-medium text-fg">{testimonial.author}</p>
+        <p className="text-[12.5px] text-fg-muted">{testimonial.role}</p>
+      </figcaption>
+    </figure>
+  );
+}
+
+function Star({ filled }: { filled: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      className="h-3.5 w-3.5"
+      fill={filled ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      strokeWidth="1.5"
+      aria-hidden
+    >
+      <path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.2 1 5.9L10 15l-5.3 2.8 1-5.9L1.5 7.7l5.9-.9z" />
+    </svg>
   );
 }

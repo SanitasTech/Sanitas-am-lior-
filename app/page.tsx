@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import type { Metadata } from 'next';
 import { unstable_noStore as noStore } from 'next/cache';
 import PublicLayout from '@/components/PublicLayout';
 import HomeSearch from '@/components/HomeSearch';
@@ -20,14 +19,18 @@ import {
   DecorativeBlob,
 } from '@/components/Icons';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
+import { publicPageMetadata } from '@/lib/seo';
 import type { Job } from '@/types';
 import { urgencyOrder } from '@/lib/utils';
 
-export const metadata: Metadata = {
-  title: 'Agence Sanitas | Placement en santé au Québec',
+export const metadata = publicPageMetadata({
+  title: 'Agence de placement en santé au Québec | Agence Sanitas',
   description:
-    'Agence de placement en santé basée à Laval. Mandats adaptés pour les professionnels de la santé et soutien aux établissements partout au Québec.',
-};
+    'Agence Sanitas aide les professionnels de la santé à trouver des mandats adaptés et accompagne les établissements partout au Québec.',
+  path: '/',
+  frPath: '/',
+  enPath: '/en',
+});
 
 export const revalidate = 60;
 

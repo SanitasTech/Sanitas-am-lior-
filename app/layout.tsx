@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { Playfair_Display } from 'next/font/google';
+import SeoJsonLd from '@/components/SeoJsonLd';
+import { SITE_URL, organizationJsonLd, websiteJsonLd } from '@/lib/seo';
 import './globals.css';
 
 const playfair = Playfair_Display({
@@ -10,12 +12,11 @@ const playfair = Playfair_Display({
   display: 'swap',
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 const facebookAppId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID;
 const socialImage = '/opengraph-image';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'Agence Sanitas | Placement en sant\u00e9 au Qu\u00e9bec',
     template: '%s | Agence Sanitas',
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
     title: 'Agence Sanitas',
     description:
       'Mandats en sant\u00e9 au Qu\u00e9bec. Choisissez vos r\u00e9gions, vos quarts et le type de mandat qui vous convient.',
-    url: siteUrl,
+    url: SITE_URL,
     locale: 'fr_CA',
     type: 'website',
     siteName: 'Agence Sanitas',
@@ -52,7 +53,16 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr-CA" className={playfair.variable}>
-      <body className="min-h-screen antialiased">{children}</body>
+      <body className="min-h-screen antialiased">
+        <SeoJsonLd
+          id="sanitas-global-schema"
+          data={{
+            '@context': 'https://schema.org',
+            '@graph': [organizationJsonLd(), websiteJsonLd()],
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

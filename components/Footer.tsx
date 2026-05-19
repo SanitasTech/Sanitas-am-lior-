@@ -11,6 +11,23 @@ export default function Footer({ locale = 'fr' }: { locale?: Locale }) {
     { href: ROUTES.facilities.fr, label: copy.nav.facilities },
     { href: ROUTES.login.fr, label: copy.footer.candidateSpace },
   ];
+  const seoLinks =
+    locale === 'en'
+      ? [
+          { href: '/en/nursing-agency-jobs-quebec', label: 'Nursing jobs Quebec' },
+          { href: '/en/pab-jobs-quebec', label: 'PAB jobs Quebec' },
+          { href: '/en/remote-region-nursing-assignments-quebec', label: 'Remote nursing assignments' },
+          { href: '/en/healthcare-staffing-laval', label: 'Healthcare staffing Laval' },
+          { href: '/en/healthcare-staffing-agency-quebec', label: 'Healthcare staffing Quebec' },
+          { href: '/en/healthcare-recruitment-quebec', label: 'Healthcare recruitment Quebec' },
+        ]
+      : [
+          { href: '/emplois-infirmieres-quebec', label: 'Emplois infirmières Québec' },
+          { href: '/emplois-pab-quebec', label: 'Emplois PAB Québec' },
+          { href: '/mandats-infirmiers-region-eloignee', label: 'Mandats en région éloignée' },
+          { href: '/agence-placement-sante-laval', label: 'Agence placement santé Laval' },
+          { href: '/recrutement-personnel-sante-quebec', label: 'Recrutement personnel santé' },
+        ];
   const linksRight = [
     { href: ROUTES.about.fr, label: copy.nav.about },
     { href: ROUTES.contact.fr, label: copy.nav.contact },
@@ -57,6 +74,13 @@ export default function Footer({ locale = 'fr' }: { locale?: Locale }) {
               {linksLeft.map((l) => (
                 <li key={l.href}>
                   <Link href={localizeHref(locale, l.href)} className="text-fg-muted hover:text-fg">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+              {seoLinks.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className="text-fg-muted hover:text-fg">
                     {l.label}
                   </Link>
                 </li>

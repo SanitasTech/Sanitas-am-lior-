@@ -1,15 +1,18 @@
 import Link from 'next/link';
-import type { Metadata } from 'next';
 import PublicLayout from '@/components/PublicLayout';
 import ContactForm from '@/components/ContactForm';
 import ContactInfo from '@/components/ContactInfo';
 import { DecorativeBlob, PeopleIcon, ClipboardIcon, ChatIcon } from '@/components/Icons';
+import { publicPageMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Contact',
+export const metadata = publicPageMetadata({
+  title: 'Contact Agence Sanitas | Candidats et établissements',
   description:
-    'Contactez Agence Sanitas. Candidats, professionnels de la santé ou représentants d\'établissement.',
-};
+    "Contactez Agence Sanitas à Laval pour postuler, poser une question ou demander du personnel de santé au Québec.",
+  path: '/contact',
+  frPath: '/contact',
+  enPath: '/en/contact',
+});
 
 export default function ContactPage() {
   return (
