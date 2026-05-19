@@ -50,7 +50,11 @@ async function fetchCandidates(sp: Props['searchParams']) {
     return candidate;
   });
 
-  if (status) rows = rows.filter((candidate) => candidate.status === status);
+  if (status) {
+    rows = rows.filter((candidate) => candidate.status === status);
+  } else {
+    rows = rows.filter((candidate) => candidate.status === 'active');
+  }
   if (profession) {
     rows = rows.filter((candidate) =>
       candidate.profession === profession ||
@@ -128,7 +132,7 @@ export default async function AdminCandidatesPage({ searchParams }: Props) {
           <div>
             <label className="label" htmlFor="status">Statut</label>
             <select id="status" name="status" defaultValue={param(searchParams, 'status')} className="input">
-              <option value="">Tous</option>
+              <option value="">Actifs</option>
               <option value="active">Actif</option>
               <option value="inactive">Inactif</option>
               <option value="blocked">Bloqué</option>

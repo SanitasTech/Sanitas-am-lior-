@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import JobForm from '@/components/JobForm';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { computeMatchScore, hydrateCandidate } from '@/lib/ats';
-import { getMatchDecision, matchDecisionClass } from '@/lib/ats-operating-model';
+import { getMatchDecision, isCandidateEligibleForMatching, matchDecisionClass } from '@/lib/ats-operating-model';
 import { cn } from '@/lib/utils';
 import type { Candidate, CandidateDocument, Job, MatchReason } from '@/types';
 
@@ -27,11 +27,19 @@ async function fetchJob(id: string): Promise<Job | null> {
 
 async function fetchTopMatches(job: Job): Promise<MatchRow[]> {
   const supabase = createSupabaseAdminClient();
-  const { data } = await supabase
-    .from('candidates')
-    .select('*, profile:candidate_profiles(*), availability:candidate_availability(*), documents:candidate_documents(*)')
-    .eq('status', 'active')
-    .limit(200);
+  const [{ data }, { data: deletedEvents }] = await Promise.all([
+    supabase
+      .from('candidates')
+      .select('*, profile:candidate_profiles(*), availability:candidate_availability(*), documents:candidate_documents(*), applications(*)')
+      .eq('status', 'active')
+      .limit(200),
+    supabase
+      .from('activity_events')
+      .select('candidate_id')
+      .eq('event_type', 'application_deleted')
+      .eq('job_id', job.id),
+  ]);
+  const deletedCandidateIds = new Set((deletedEvents || []).map((event) => event.candidate_id).filter(Boolean));
 
   return ((data || []) as Array<Record<string, unknown>>)
     .map((row) => {
@@ -42,6 +50,15 @@ async function fetchTopMatches(job: Job): Promise<MatchRow[]> {
       ) as Candidate | null;
       if (!candidate) return null;
       const documents = (row.documents as CandidateDocument[] | undefined) || [];
+      const applications = (row.applications as Array<{ job_id: string | null; status: string; application_type: string }> | undefined) || [];
+      if (!isCandidateEligibleForMatching({
+        candidate,
+        applications,
+        jobId: job.id,
+        deletedJobIds: deletedCandidateIds.has(candidate.id) ? [job.id] : [],
+      })) {
+        return null;
+      }
       const match = computeMatchScore(candidate, job, documents);
       return { candidate, ...match, decision: getMatchDecision(match) };
     })

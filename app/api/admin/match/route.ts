@@ -3,6 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { requireAdmin } from '@/lib/auth';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { computeMatchScore, hydrateCandidate } from '@/lib/ats';
+import { isCandidateEligibleForMatching } from '@/lib/ats-operating-model';
 import type { CandidateDocument, Job } from '@/types';
 
 export const runtime = 'nodejs';
@@ -25,7 +26,7 @@ export async function POST(req: Request) {
   const [{ data: candidateRow }, { data: job }, { data: docs }] = await Promise.all([
     supabase
       .from('candidates')
-      .select('*, profile:candidate_profiles(*), availability:candidate_availability(*)')
+      .select('*, profile:candidate_profiles(*), availability:candidate_availability(*), applications(*)')
       .eq('id', candidateId)
       .maybeSingle(),
     supabase.from('jobs').select('*').eq('id', jobId).maybeSingle(),
@@ -44,6 +45,25 @@ export async function POST(req: Request) {
   );
   if (!candidate || !job) {
     return NextResponse.json({ ok: false, error: 'Candidat ou poste introuvable.' }, { status: 404 });
+  }
+  const applications = ((row?.applications as Array<{ job_id: string | null; status: string; application_type: string }> | undefined) || []);
+  const { data: deletedEvents } = await supabase
+    .from('activity_events')
+    .select('id')
+    .eq('event_type', 'application_deleted')
+    .eq('candidate_id', candidateId)
+    .eq('job_id', jobId);
+  if (!isCandidateEligibleForMatching({
+    candidate,
+    applications,
+    jobId,
+    deletedJobIds: deletedEvents && deletedEvents.length > 0 ? [jobId] : [],
+  })) {
+    await supabase.from('match_scores').delete().eq('candidate_id', candidateId).eq('job_id', jobId);
+    return NextResponse.json(
+      { ok: false, error: 'Candidat non eligible au matching pour ce mandat.' },
+      { status: 409 }
+    );
   }
 
   const match = computeMatchScore(candidate, job as Job, (docs || []) as CandidateDocument[]);

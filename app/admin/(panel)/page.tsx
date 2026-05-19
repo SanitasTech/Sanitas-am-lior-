@@ -10,6 +10,8 @@ import {
   candidateDisplayName,
   getApplicationNextAction,
   getMatchDecision,
+  isCandidateEligibleForMatching,
+  isRecruitableApplication,
   laneForStatus,
   priorityClass,
   priorityLabel,
@@ -79,7 +81,7 @@ async function fetchDashboard() {
       .limit(30),
     supabase
       .from('candidates')
-      .select('*, profile:candidate_profiles(*), availability:candidate_availability(*), documents:candidate_documents(*)')
+      .select('*, profile:candidate_profiles(*), availability:candidate_availability(*), documents:candidate_documents(*), applications(*)')
       .eq('status', 'active')
       .limit(200),
   ]);
@@ -101,7 +103,11 @@ async function fetchDashboard() {
   });
 
   const actionItems: ActionItem[] = rows
-    .filter((application) => laneForStatus(application.status).id !== 'closed')
+    .filter((application) =>
+      application.candidate?.status === 'active' &&
+      isRecruitableApplication(application) &&
+      laneForStatus(application.status).id !== 'closed'
+    )
     .map((application) => {
       const candidate = application.candidate;
       const action = getApplicationNextAction({
@@ -125,12 +131,42 @@ async function fetchDashboard() {
       return {
         candidate,
         documents: (row.documents as CandidateDocument[] | undefined) || [],
+        applications: (row.applications as Array<{ job_id: string | null; status: string; application_type: string }> | undefined) || [],
       };
     })
-    .filter((row): row is { candidate: Candidate; documents: CandidateDocument[] } => !!row);
+    .filter((row): row is {
+      candidate: Candidate;
+      documents: CandidateDocument[];
+      applications: Array<{ job_id: string | null; status: string; application_type: string }>;
+    } => !!row);
+
+  const urgentJobIds = ((jobRows || []) as Job[]).map((job) => job.id);
+  const { data: deletedEvents } = urgentJobIds.length > 0
+    ? await supabase
+        .from('activity_events')
+        .select('candidate_id, job_id')
+        .eq('event_type', 'application_deleted')
+        .in('job_id', urgentJobIds)
+    : { data: [] };
+  const deletedByJob = new Map<string, Set<string>>();
+  for (const event of deletedEvents || []) {
+    if (!event.job_id || !event.candidate_id) continue;
+    const set = deletedByJob.get(event.job_id) || new Set<string>();
+    set.add(event.candidate_id);
+    deletedByJob.set(event.job_id, set);
+  }
 
   const urgentCoverage: JobCoverage[] = ((jobRows || []) as Job[]).map((job) => {
-    const scores = activeCandidates.map(({ candidate, documents }) => {
+    const scores = activeCandidates
+      .filter(({ candidate, applications }) =>
+        isCandidateEligibleForMatching({
+          candidate,
+          applications,
+          jobId: job.id,
+          deletedJobIds: deletedByJob.get(job.id)?.has(candidate.id) ? [job.id] : [],
+        })
+      )
+      .map(({ candidate, documents }) => {
       const match = computeMatchScore(candidate, job, documents);
       const decision = getMatchDecision(match);
       return { score: match.score, decision: decision.decision };

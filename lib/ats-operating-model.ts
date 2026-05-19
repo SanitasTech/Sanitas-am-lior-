@@ -9,6 +9,13 @@ export type MatchDecision =
   | 'request_document'
   | 'do_not_propose';
 
+export const CLOSED_APPLICATION_STATUSES = ['Place', 'Refuse', 'Inactif'] as const;
+export type ApplicationEligibilityInput = {
+  status?: string | null;
+  job_id?: string | null;
+  application_type?: string | null;
+};
+
 export interface AtsPipelineLane {
   id: AtsLaneId;
   label: string;
@@ -100,6 +107,45 @@ const NORMALIZED_STATUS: Record<string, string> = {
 export function normalizeApplicationStatus(status?: string | null): string {
   if (!status) return 'Nouveau';
   return NORMALIZED_STATUS[status] || status;
+}
+
+export function isClosedApplicationStatus(status?: string | null): boolean {
+  return CLOSED_APPLICATION_STATUSES.includes(
+    normalizeApplicationStatus(status) as (typeof CLOSED_APPLICATION_STATUSES)[number]
+  );
+}
+
+export function isRecruitableApplication(application?: ApplicationEligibilityInput | null): boolean {
+  return !!application && !isClosedApplicationStatus(application.status);
+}
+
+export function candidateHasRecruitableApplication(applications: ApplicationEligibilityInput[] = []): boolean {
+  return applications.some(isRecruitableApplication);
+}
+
+export function candidateExcludedForJob(args: {
+  applications?: ApplicationEligibilityInput[];
+  jobId?: string | null;
+  deletedJobIds?: string[];
+}): boolean {
+  const { applications = [], jobId, deletedJobIds = [] } = args;
+  if (!jobId) return false;
+  if (deletedJobIds.includes(jobId)) return true;
+  return applications.some((application) =>
+    application.job_id === jobId && isClosedApplicationStatus(application.status)
+  );
+}
+
+export function isCandidateEligibleForMatching(args: {
+  candidate: Pick<Candidate, 'status'>;
+  applications?: ApplicationEligibilityInput[];
+  jobId?: string | null;
+  deletedJobIds?: string[];
+}): boolean {
+  const { candidate, applications = [], jobId, deletedJobIds = [] } = args;
+  if (candidate.status !== 'active') return false;
+  if (!candidateHasRecruitableApplication(applications)) return false;
+  return !candidateExcludedForJob({ applications, jobId, deletedJobIds });
 }
 
 export function laneForStatus(status?: string | null): AtsPipelineLane {

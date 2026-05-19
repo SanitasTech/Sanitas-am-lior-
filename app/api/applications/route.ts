@@ -183,6 +183,7 @@ export async function POST(req: Request) {
     mailing_list_opt_in: !!input.candidate.mailing_list_opt_in,
     mailing_list_opt_in_at: input.candidate.mailing_list_opt_in ? now : null,
     auth_user_id: authUser.id,
+    status: 'active',
     last_active_at: now,
   };
 
@@ -402,6 +403,13 @@ export async function POST(req: Request) {
     .eq('id', candidateId);
 
   if (job) {
+    await supabase
+      .from('activity_events')
+      .delete()
+      .eq('event_type', 'application_deleted')
+      .eq('candidate_id', candidateId)
+      .eq('job_id', job.id);
+
     const match = computeMatchScore(candidate, job, docs);
     await supabase.from('match_scores').upsert({
       candidate_id: candidateId,
