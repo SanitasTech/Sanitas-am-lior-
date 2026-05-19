@@ -20,7 +20,7 @@ export default function LavalHealthcareStaffingPage() {
         intro="Basée à Laval, Agence Sanitas accompagne les professionnels de la santé et les établissements qui cherchent une solution de placement claire, humaine et structurée."
         highlights={[
           'Adresse: 4 Place Laval, Suite 570, Laval, QC H7N 5Y3.',
-          'Permis CNESST AP-2000952 affiché pour rassurer candidats et établissements.',
+          'Permis CNESST AP-2000952.',
           'Mandats et besoins couverts dans plusieurs régions du Québec.',
         ]}
         sections={[

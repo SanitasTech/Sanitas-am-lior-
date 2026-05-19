@@ -21,7 +21,7 @@ export default function HealthcareStaffingLavalPage() {
         intro="Based in Laval, Agence Sanitas supports healthcare professionals and facilities looking for a clear, human and structured staffing process."
         highlights={[
           'Address: 4 Place Laval, Suite 570, Laval, QC H7N 5Y3.',
-          'CNESST permit AP-2000952 is displayed to reassure candidates and facilities.',
+          'CNESST permit AP-2000952.',
           'Assignments and staffing needs are handled across multiple Quebec regions.',
         ]}
         sections={[
