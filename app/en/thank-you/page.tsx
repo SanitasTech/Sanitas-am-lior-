@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import GoogleAdsConversionEvent from '@/components/GoogleAdsConversionEvent';
 import PublicLayout from '@/components/PublicLayout';
 import {
   CheckCircleIcon,
@@ -20,9 +21,12 @@ interface Props {
 
 export default function EnglishThankYouPage({ searchParams }: Props) {
   const isPosting = searchParams.type === 'posting';
+  const shouldTrackCandidateLead =
+    searchParams.type === 'posting' || searchParams.type === 'spontaneous';
 
   return (
     <PublicLayout locale="en">
+      {shouldTrackCandidateLead ? <GoogleAdsConversionEvent /> : null}
       <section className="relative section pt-16 pb-24 overflow-hidden">
         <DecorativeBlob className="absolute -top-40 left-1/2 -translate-x-1/2 h-[600px] w-[600px] text-accent pointer-events-none" />
         <div className="container-page max-w-2xl relative">
