@@ -74,10 +74,14 @@ export default function Header({ initialUser = null, locale = 'fr' }: HeaderProp
       <div className="container-page flex h-16 items-center justify-between">
         <Link
           href={ROUTES.home[locale]}
-          className="text-[17px] font-semibold tracking-tight text-fg hover:opacity-80"
+          className="inline-flex h-9 shrink-0 items-center text-[20px] font-bold uppercase leading-none tracking-[0.11em] text-fg transition-opacity hover:opacity-80 sm:text-[21px]"
+          style={{
+            fontFamily:
+              'Gotham, "Gotham SSm", "Avenir Next", Montserrat, "SF Pro Display", "Segoe UI", sans-serif',
+          }}
           aria-label={copy.nav.homeAria}
         >
-          Agence Sanitas
+          SANITAS
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex" aria-label={copy.nav.primary}>
