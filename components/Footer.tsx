@@ -43,6 +43,7 @@ export default function Footer({ locale = 'fr' }: { locale?: Locale }) {
     { href: ROUTES.privacy.fr, label: copy.footer.privacy },
   ];
   const localSeoLinks = LOCAL_SEO_FOOTER_LINKS[locale];
+  const searchLinks = [...seoLinks, ...localSeoLinks];
 
   return (
     <footer className="border-t border-border bg-bg mt-auto">
@@ -88,20 +89,6 @@ export default function Footer({ locale = 'fr' }: { locale?: Locale }) {
                   </Link>
                 </li>
               ))}
-              {seoLinks.map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="text-fg-muted hover:text-fg">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-              {localSeoLinks.map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="text-fg-muted hover:text-fg">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
             </ul>
           </div>
 
@@ -119,6 +106,21 @@ export default function Footer({ locale = 'fr' }: { locale?: Locale }) {
               ))}
             </ul>
           </div>
+        </div>
+
+        <div className="mt-10 border-t border-border pt-8">
+          <p className="text-[13px] font-semibold uppercase tracking-wider text-fg-subtle">
+            {locale === 'en' ? 'Popular searches' : 'Recherches populaires'}
+          </p>
+          <ul className="mt-4 grid gap-x-10 gap-y-2 text-[14.5px] sm:grid-cols-2">
+            {searchLinks.map((l) => (
+              <li key={l.href} className="min-w-0">
+                <Link href={l.href} className="text-fg-muted hover:text-fg">
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div className="hr-soft mt-12 pt-6 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">

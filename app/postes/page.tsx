@@ -2,6 +2,7 @@ import { unstable_noStore as noStore } from 'next/cache';
 import PublicLayout from '@/components/PublicLayout';
 import JobFilters from '@/components/JobFilters';
 import JobCard from '@/components/JobCard';
+import PopularSearchLinks from '@/components/PopularSearchLinks';
 import { DecorativeBlob } from '@/components/Icons';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { publicPageMetadata } from '@/lib/seo';
@@ -83,8 +84,9 @@ export default async function PostesPage({ searchParams }: Props) {
       </section>
 
       <section className="pb-12">
-        <div className="container-page">
+        <div className="container-page space-y-6">
           <JobFilters />
+          <PopularSearchLinks />
         </div>
       </section>
 
