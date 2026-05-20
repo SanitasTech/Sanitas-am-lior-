@@ -43,7 +43,7 @@ export const revalidate = 60;
 const HERO_BG = '/images/sanitas-hero.png';
 const PHOTOS = {
   trust: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=1200&q=80&auto=format&fit=crop',
-  candidates: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1200&q=80&auto=format&fit=crop',
+  candidates: '/images/sanitas-candidats.png',
   establishments: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=1200&q=80&auto=format&fit=crop',
 } as const;
 
@@ -238,12 +238,12 @@ export default async function HomePage() {
           </div>
 
           {/* Petit chip de réassurance, comme un sous-titre visuel */}
-          <p className="mt-12 inline-flex flex-wrap items-center gap-2.5 text-[15px] text-bg/70">
-            <span className="font-serif italic tracking-[-0.05em] text-[oklch(0.72_0.09_220)]">17 régions</span>
-            <span className="opacity-50">·</span>
-            <span className="font-serif italic tracking-[-0.05em] text-[oklch(0.72_0.09_220)]">14+ professions</span>
-            <span className="opacity-50">·</span>
-            <span className="font-serif italic tracking-[-0.05em] text-[oklch(0.72_0.09_220)]">réponse en 24 h</span>
+          <p className="mt-12 inline-flex flex-wrap items-center gap-2.5 text-[15px] text-bg/90">
+            <span className="font-serif italic tracking-[-0.05em]">17 régions</span>
+            <span className="text-bg/50">·</span>
+            <span className="font-serif italic tracking-[-0.05em]">14+ professions</span>
+            <span className="text-bg/50">·</span>
+            <span className="font-serif italic tracking-[-0.05em]">réponse en 24 h</span>
           </p>
 
           {/* Barre de recherche intégrée au hero, en bas */}
