@@ -3,8 +3,14 @@ import { COMPANY } from '@/lib/constants';
 import { displayValue, jobTitle, type Locale } from '@/lib/i18n';
 import type { Job } from '@/types';
 
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.agencesanitas.com')
-  .replace(/\/+$/, '');
+function normalizePublicSiteUrl(value: string) {
+  const siteUrl = value.replace(/\/+$/, '');
+  return siteUrl === 'https://agencesanitas.com' ? 'https://www.agencesanitas.com' : siteUrl;
+}
+
+export const SITE_URL = normalizePublicSiteUrl(
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://www.agencesanitas.com',
+);
 
 export const SOCIAL_IMAGE_PATH = '/opengraph-image';
 

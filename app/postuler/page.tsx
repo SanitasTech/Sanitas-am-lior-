@@ -13,6 +13,7 @@ import type { Candidate, DocumentRecord, Job, Submission } from '@/types';
 export const metadata: Metadata = {
   title: 'Postuler en ligne',
   description: 'Postulez à un mandat ou activez votre profil candidat Agence Sanitas.',
+  robots: { index: false, follow: true },
 };
 
 export const dynamic = 'force-dynamic';

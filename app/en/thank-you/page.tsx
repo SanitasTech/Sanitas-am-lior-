@@ -11,7 +11,7 @@ import {
 export const metadata: Metadata = {
   title: 'Thank you',
   description: 'Your application has been received by Agence Sanitas.',
-  robots: { index: false, follow: false },
+  robots: { index: false, follow: true },
 };
 
 interface Props {

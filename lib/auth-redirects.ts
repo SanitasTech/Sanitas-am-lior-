@@ -1,15 +1,20 @@
 const PRODUCTION_SITE_URL = 'https://www.agencesanitas.com';
 const LOCAL_SITE_URL = 'http://localhost:3000';
 
+function normalizeProductionSiteUrl(value: string) {
+  const siteUrl = value.replace(/\/$/, '');
+  return siteUrl === 'https://agencesanitas.com' ? PRODUCTION_SITE_URL : siteUrl;
+}
+
 export function isLocalOrigin(origin: string) {
   return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin);
 }
 
 export function getCanonicalSiteUrl(runtimeOrigin = '') {
   const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '');
-  if (configured && !isLocalOrigin(configured)) return configured;
+  if (configured && !isLocalOrigin(configured)) return normalizeProductionSiteUrl(configured);
   if (configured && process.env.NODE_ENV !== 'production') return configured;
-  if (runtimeOrigin && !isLocalOrigin(runtimeOrigin)) return runtimeOrigin.replace(/\/$/, '');
+  if (runtimeOrigin && !isLocalOrigin(runtimeOrigin)) return normalizeProductionSiteUrl(runtimeOrigin);
   return process.env.NODE_ENV === 'production' ? PRODUCTION_SITE_URL : LOCAL_SITE_URL;
 }
 

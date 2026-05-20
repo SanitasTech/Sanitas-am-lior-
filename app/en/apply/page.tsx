@@ -14,7 +14,7 @@ import type { Candidate, DocumentRecord, Job, Submission } from '@/types';
 export const metadata: Metadata = {
   title: 'Apply online',
   description: 'Apply to an assignment or activate your Agence Sanitas candidate profile.',
-  robots: { index: false, follow: false },
+  robots: { index: false, follow: true },
 };
 
 export const dynamic = 'force-dynamic';

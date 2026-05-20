@@ -11,6 +11,7 @@ import {
 export const metadata: Metadata = {
   title: 'Merci',
   description: 'Votre candidature a bien été reçue par Agence Sanitas.',
+  robots: { index: false, follow: true },
 };
 
 interface Props {
