@@ -26,10 +26,10 @@ export default function HomeSearch({ locale: localeProp }: { locale?: Locale }) 
   return (
     <form
       onSubmit={submit}
-      className="card p-3 sm:p-4 shadow-card grid gap-2 sm:grid-cols-[1fr_1fr_1fr_auto]"
+      className="card grid min-w-0 max-w-full gap-2 overflow-hidden p-3 shadow-card sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] sm:p-4"
     >
       <select
-        className="input border-0 bg-transparent sm:rounded-r-none"
+        className="input min-w-0 border-0 bg-transparent sm:rounded-r-none"
         aria-label={locale === 'en' ? 'Profession' : 'Profession'}
         value={profession}
         onChange={(e) => setProfession(e.target.value)}
@@ -42,7 +42,7 @@ export default function HomeSearch({ locale: localeProp }: { locale?: Locale }) 
         ))}
       </select>
       <select
-        className="input border-0 bg-transparent sm:rounded-none"
+        className="input min-w-0 border-0 bg-transparent sm:rounded-none"
         aria-label={locale === 'en' ? 'Region' : 'Region'}
         value={region}
         onChange={(e) => setRegion(e.target.value)}
@@ -55,7 +55,7 @@ export default function HomeSearch({ locale: localeProp }: { locale?: Locale }) 
         ))}
       </select>
       <select
-        className="input border-0 bg-transparent sm:rounded-none"
+        className="input min-w-0 border-0 bg-transparent sm:rounded-none"
         aria-label={locale === 'en' ? 'Department' : 'Departement'}
         value={department}
         onChange={(e) => setDepartment(e.target.value)}
