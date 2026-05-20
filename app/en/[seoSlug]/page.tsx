@@ -4,7 +4,7 @@ import PublicLayout from '@/components/PublicLayout';
 import SeoJsonLd from '@/components/SeoJsonLd';
 import SeoLandingPage from '@/components/SeoLandingPage';
 import { getLocalSeoPage, getLocalSeoSlugs } from '@/lib/local-seo-pages';
-import { breadcrumbJsonLd, publicPageMetadata } from '@/lib/seo';
+import { breadcrumbJsonLd, publicPageMetadata, webPageJsonLd } from '@/lib/seo';
 
 export const dynamicParams = false;
 
@@ -37,6 +37,12 @@ export default function EnglishLocalSeoPage({ params }: { params: { seoSlug: str
         data={{
           '@context': 'https://schema.org',
           '@graph': [
+            webPageJsonLd({
+              name: page.title,
+              description: page.metaDescription,
+              url: `/en/${page.slug}`,
+              locale: 'en',
+            }),
             breadcrumbJsonLd([
               { name: 'Home', url: '/en' },
               { name: page.title, url: `/en/${page.slug}` },

@@ -1,18 +1,19 @@
 import { unstable_noStore as noStore } from 'next/cache';
 import PublicLayout from '@/components/PublicLayout';
+import SeoJsonLd from '@/components/SeoJsonLd';
 import JobFilters from '@/components/JobFilters';
 import JobCard from '@/components/JobCard';
 import PopularSearchLinks from '@/components/PopularSearchLinks';
 import { DecorativeBlob } from '@/components/Icons';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { publicPageMetadata } from '@/lib/seo';
+import { breadcrumbJsonLd, itemListJsonLd, jobMetaDescription, publicPageMetadata, webPageJsonLd } from '@/lib/seo';
 import type { Job } from '@/types';
 import { urgencyOrder } from '@/lib/utils';
 
 export const metadata = publicPageMetadata({
-  title: 'Healthcare jobs and assignments in Quebec',
+  title: 'Healthcare jobs in Quebec | Nursing, PAB and ASSS assignments',
   description:
-    'Browse active healthcare assignments in Quebec for registered nurses, licensed practical nurses, beneficiary attendants, ASSS and specialized workers.',
+    'Browse active healthcare assignments in Quebec with Agence Sanitas. Filter by profession, region, department, shift and assignment type.',
   path: '/en/jobs',
   locale: 'en',
   frPath: '/postes',
@@ -72,6 +73,32 @@ export default async function EnglishJobsPage({ searchParams }: Props) {
 
   return (
     <PublicLayout locale="en">
+      <SeoJsonLd
+        id="jobs-list-schema-en"
+        data={{
+          '@context': 'https://schema.org',
+          '@graph': [
+            webPageJsonLd({
+              name: 'Healthcare jobs and assignments in Quebec',
+              description:
+                'Active healthcare assignments in Quebec for nurses, licensed practical nurses, PABs, ASSS and specialized workers.',
+              url: '/en/jobs',
+              locale: 'en',
+            }),
+            breadcrumbJsonLd([
+              { name: 'Home', url: '/en' },
+              { name: 'Jobs', url: '/en/jobs' },
+            ]),
+            itemListJsonLd(
+              jobs.slice(0, 30).map((job) => ({
+                name: job.title_en || job.title,
+                url: `/en/jobs/${job.id}`,
+                description: jobMetaDescription(job, 'en'),
+              })),
+            ),
+          ],
+        }}
+      />
       <section className="relative section pt-16 pb-8 overflow-hidden">
         <DecorativeBlob className="absolute -top-32 -right-40 h-[450px] w-[450px] text-accent pointer-events-none" />
         <div className="container-page relative">

@@ -1,9 +1,10 @@
 import PublicLayout from '@/components/PublicLayout';
+import SeoJsonLd from '@/components/SeoJsonLd';
 import EstablishmentRequestForm from '@/components/EstablishmentRequestForm';
 import ContactInfo from '@/components/ContactInfo';
 import Photo from '@/components/Photo';
 import { DecorativeBlob } from '@/components/Icons';
-import { publicPageMetadata } from '@/lib/seo';
+import { breadcrumbJsonLd, publicPageMetadata, webPageJsonLd } from '@/lib/seo';
 
 export const metadata = publicPageMetadata({
   title: 'Agence de placement personnel de santé au Québec',
@@ -40,6 +41,24 @@ const HERO_PHOTO =
 export default function EtablissementsPage() {
   return (
     <PublicLayout>
+      <SeoJsonLd
+        id="facilities-schema"
+        data={{
+          '@context': 'https://schema.org',
+          '@graph': [
+            webPageJsonLd({
+              name: 'Demander du personnel en santé',
+              description:
+                'Page pour les établissements de santé au Québec qui souhaitent demander du personnel qualifié à Agence Sanitas.',
+              url: '/etablissements',
+            }),
+            breadcrumbJsonLd([
+              { name: 'Accueil', url: '/' },
+              { name: 'Établissements', url: '/etablissements' },
+            ]),
+          ],
+        }}
+      />
       {/* Hero avec photo */}
       <section className="relative section pt-16 overflow-hidden">
         <DecorativeBlob className="absolute -top-32 -left-40 h-[500px] w-[500px] text-accent pointer-events-none" />

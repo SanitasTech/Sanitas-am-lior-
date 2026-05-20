@@ -58,6 +58,7 @@ export function publicPageMetadata({
       description,
       url: absoluteUrl(path),
       locale: locale === 'en' ? 'en_CA' : 'fr_CA',
+      alternateLocale: locale === 'en' ? ['fr_CA'] : ['en_CA'],
       type: 'website',
       siteName: COMPANY.name,
       images: [
@@ -87,9 +88,13 @@ export function organizationJsonLd() {
     '@type': ['Organization', 'LocalBusiness', 'EmploymentAgency'],
     '@id': `${SITE_URL}/#organization`,
     name: COMPANY.name,
+    legalName: COMPANY.name,
     url: SITE_URL,
     email: COMPANY.email,
     telephone: COMPANY.phone,
+    image: absoluteUrl(SOCIAL_IMAGE_PATH),
+    logo: absoluteUrl(SOCIAL_IMAGE_PATH),
+    priceRange: '$$',
     description:
       'Agence de placement en santé basée à Laval, spécialisée dans les mandats pour professionnels de la santé au Québec.',
     address: {
@@ -103,6 +108,22 @@ export function organizationJsonLd() {
     areaServed: [
       { '@type': 'AdministrativeArea', name: 'Québec' },
       { '@type': 'Country', name: 'Canada' },
+    ],
+    knowsAbout: [
+      'Placement infirmier au Quebec',
+      'Mandats infirmiers',
+      'Placement PAB',
+      'Personnel de sante',
+      'Recrutement en sante',
+      'Healthcare staffing in Quebec',
+    ],
+    openingHoursSpecification: [
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        opens: '08:00',
+        closes: '17:00',
+      },
     ],
     contactPoint: [
       {
@@ -137,6 +158,42 @@ export function websiteJsonLd() {
       target: `${SITE_URL}/postes?profession={search_term_string}`,
       'query-input': 'required name=search_term_string',
     },
+  };
+}
+
+export function webPageJsonLd({
+  name,
+  description,
+  url,
+  locale = 'fr',
+}: {
+  name: string;
+  description: string;
+  url: string;
+  locale?: Locale;
+}) {
+  return {
+    '@type': 'WebPage',
+    '@id': `${absoluteUrl(url)}#webpage`,
+    url: absoluteUrl(url),
+    name,
+    description,
+    inLanguage: locale === 'en' ? 'en-CA' : 'fr-CA',
+    isPartOf: { '@id': `${SITE_URL}/#website` },
+    publisher: { '@id': `${SITE_URL}/#organization` },
+  };
+}
+
+export function itemListJsonLd(items: Array<{ name: string; url: string; description?: string }>) {
+  return {
+    '@type': 'ItemList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: absoluteUrl(item.url),
+      name: item.name,
+      description: item.description,
+    })),
   };
 }
 
@@ -205,14 +262,27 @@ export function jobPostingJsonLd(job: Job, locale: Locale) {
   return {
     '@type': 'JobPosting',
     '@id': `${absoluteUrl(locale === 'en' ? `/en/jobs/${job.id}` : `/postes/${job.id}`)}#job`,
+    identifier: {
+      '@type': 'PropertyValue',
+      name: COMPANY.name,
+      value: job.id,
+    },
     title,
     description,
     datePosted: job.created_at,
     directApply: true,
     employmentType: employmentTypeForMandate(job.mandate_type),
-    hiringOrganization: { '@id': `${SITE_URL}/#organization` },
+    hiringOrganization: {
+      '@type': 'Organization',
+      '@id': `${SITE_URL}/#organization`,
+      name: COMPANY.name,
+      sameAs: SITE_URL,
+      logo: absoluteUrl(SOCIAL_IMAGE_PATH),
+    },
     industry: 'Healthcare staffing',
     occupationalCategory: displayValue(locale, job.profession),
+    workHours: job.schedule || job.shift || undefined,
+    baseSalary: baseSalaryFromText(job.salary),
     jobLocation: {
       '@type': 'Place',
       address: {
@@ -225,6 +295,25 @@ export function jobPostingJsonLd(job: Job, locale: Locale) {
     applicantLocationRequirements: {
       '@type': 'Country',
       name: 'Canada',
+    },
+  };
+}
+
+function baseSalaryFromText(salary?: string | null) {
+  if (!salary) return undefined;
+  const match = salary.replace(',', '.').match(/(\d+(?:\.\d+)?)/);
+  if (!match) return undefined;
+  const value = Number(match[1]);
+  if (!Number.isFinite(value)) return undefined;
+  const isMaximum = /jusqu|up to|max/i.test(salary);
+
+  return {
+    '@type': 'MonetaryAmount',
+    currency: 'CAD',
+    value: {
+      '@type': 'QuantitativeValue',
+      ...(isMaximum ? { maxValue: value } : { value }),
+      unitText: /h|heure|hour/i.test(salary) ? 'HOUR' : 'DAY',
     },
   };
 }

@@ -1,18 +1,19 @@
 import { unstable_noStore as noStore } from 'next/cache';
 import PublicLayout from '@/components/PublicLayout';
+import SeoJsonLd from '@/components/SeoJsonLd';
 import JobFilters from '@/components/JobFilters';
 import JobCard from '@/components/JobCard';
 import PopularSearchLinks from '@/components/PopularSearchLinks';
 import { DecorativeBlob } from '@/components/Icons';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { publicPageMetadata } from '@/lib/seo';
+import { breadcrumbJsonLd, itemListJsonLd, jobMetaDescription, publicPageMetadata, webPageJsonLd } from '@/lib/seo';
 import type { Job } from '@/types';
 import { urgencyOrder } from '@/lib/utils';
 
 export const metadata = publicPageMetadata({
-  title: 'Mandats et emplois en santé au Québec',
+  title: 'Emplois en santé au Québec | Mandats infirmières, PAB et ASSS',
   description:
-    'Consultez les mandats actifs en santé au Québec: infirmières, infirmières auxiliaires, PAB, ASSS et autres professionnels. Filtrez par région, quart et département.',
+    'Consultez les mandats actifs en santé au Québec avec Agence Sanitas. Filtrez par profession, région, département, quart et type de mandat.',
   path: '/postes',
   frPath: '/postes',
   enPath: '/en/jobs',
@@ -71,6 +72,31 @@ export default async function PostesPage({ searchParams }: Props) {
 
   return (
     <PublicLayout>
+      <SeoJsonLd
+        id="jobs-list-schema"
+        data={{
+          '@context': 'https://schema.org',
+          '@graph': [
+            webPageJsonLd({
+              name: 'Mandats et emplois en santé au Québec',
+              description:
+                'Mandats actifs en santé au Québec pour infirmières, infirmières auxiliaires, PAB, ASSS et autres professionnels.',
+              url: '/postes',
+            }),
+            breadcrumbJsonLd([
+              { name: 'Accueil', url: '/' },
+              { name: 'Postes', url: '/postes' },
+            ]),
+            itemListJsonLd(
+              jobs.slice(0, 30).map((job) => ({
+                name: job.title,
+                url: `/postes/${job.id}`,
+                description: jobMetaDescription(job, 'fr'),
+              })),
+            ),
+          ],
+        }}
+      />
       <section className="relative section pt-16 pb-8 overflow-hidden">
         <DecorativeBlob className="absolute -top-32 -right-40 h-[450px] w-[450px] text-accent pointer-events-none" />
         <div className="container-page relative">

@@ -1,9 +1,10 @@
 import PublicLayout from '@/components/PublicLayout';
+import SeoJsonLd from '@/components/SeoJsonLd';
 import EstablishmentRequestForm from '@/components/EstablishmentRequestForm';
 import ContactInfo from '@/components/ContactInfo';
 import Photo from '@/components/Photo';
 import { DecorativeBlob } from '@/components/Icons';
-import { publicPageMetadata } from '@/lib/seo';
+import { breadcrumbJsonLd, publicPageMetadata, webPageJsonLd } from '@/lib/seo';
 
 export const metadata = publicPageMetadata({
   title: 'Healthcare staffing agency in Quebec for facilities',
@@ -30,6 +31,25 @@ const HERO_PHOTO = 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d
 export default function EnglishFacilitiesPage() {
   return (
     <PublicLayout locale="en">
+      <SeoJsonLd
+        id="facilities-schema-en"
+        data={{
+          '@context': 'https://schema.org',
+          '@graph': [
+            webPageJsonLd({
+              name: 'Request healthcare staff',
+              description:
+                'Page for healthcare facilities in Quebec that want to request qualified staff from Agence Sanitas.',
+              url: '/en/facilities',
+              locale: 'en',
+            }),
+            breadcrumbJsonLd([
+              { name: 'Home', url: '/en' },
+              { name: 'Facilities', url: '/en/facilities' },
+            ]),
+          ],
+        }}
+      />
       <section className="relative section pt-16 overflow-hidden">
         <DecorativeBlob className="absolute -top-32 -left-40 h-[500px] w-[500px] text-accent pointer-events-none" />
         <div className="container-page relative">

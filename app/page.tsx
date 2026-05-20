@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { unstable_noStore as noStore } from 'next/cache';
 import PublicLayout from '@/components/PublicLayout';
+import SeoJsonLd from '@/components/SeoJsonLd';
 import HomeSearch from '@/components/HomeSearch';
 import JobCard from '@/components/JobCard';
 import Photo from '@/components/Photo';
@@ -19,14 +20,14 @@ import {
   DecorativeBlob,
 } from '@/components/Icons';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { publicPageMetadata } from '@/lib/seo';
+import { publicPageMetadata, webPageJsonLd } from '@/lib/seo';
 import type { Job } from '@/types';
 import { urgencyOrder } from '@/lib/utils';
 
 export const metadata = publicPageMetadata({
-  title: 'Agence de placement en santé au Québec | Agence Sanitas',
+  title: 'Agence de placement en santé au Québec | Mandats infirmières et PAB',
   description:
-    'Agence Sanitas aide les professionnels de la santé à trouver des mandats adaptés et accompagne les établissements partout au Québec.',
+    'Agence Sanitas aide les infirmières, PAB, ASSS et professionnels de la santé à trouver des mandats au Québec, et accompagne les établissements.',
   path: '/',
   frPath: '/',
   enPath: '/en',
@@ -134,6 +135,20 @@ export default async function HomePage() {
 
   return (
     <PublicLayout>
+      <SeoJsonLd
+        id="home-page-schema"
+        data={{
+          '@context': 'https://schema.org',
+          '@graph': [
+            webPageJsonLd({
+              name: 'Agence de placement en santé au Québec',
+              description:
+                'Agence Sanitas aide les professionnels de la santé à trouver des mandats au Québec et accompagne les établissements dans leurs besoins de personnel.',
+              url: '/',
+            }),
+          ],
+        }}
+      />
       {/* ============================================================
           Hero cinématographique : image de fond + overlay coloré
           (HERO_BG en haut du fichier : remplaçable par /images/xxx.jpg)

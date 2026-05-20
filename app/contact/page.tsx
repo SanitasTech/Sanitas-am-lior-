@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import PublicLayout from '@/components/PublicLayout';
+import SeoJsonLd from '@/components/SeoJsonLd';
 import ContactForm from '@/components/ContactForm';
 import ContactInfo from '@/components/ContactInfo';
 import { DecorativeBlob, PeopleIcon, ClipboardIcon, ChatIcon } from '@/components/Icons';
-import { publicPageMetadata } from '@/lib/seo';
+import { breadcrumbJsonLd, publicPageMetadata, webPageJsonLd } from '@/lib/seo';
 
 export const metadata = publicPageMetadata({
   title: 'Contact Agence Sanitas | Candidats et établissements',
@@ -17,6 +18,24 @@ export const metadata = publicPageMetadata({
 export default function ContactPage() {
   return (
     <PublicLayout>
+      <SeoJsonLd
+        id="contact-schema"
+        data={{
+          '@context': 'https://schema.org',
+          '@graph': [
+            webPageJsonLd({
+              name: 'Contact Agence Sanitas',
+              description:
+                'Coordonnées et formulaire de contact pour candidats, professionnels de la santé et établissements au Québec.',
+              url: '/contact',
+            }),
+            breadcrumbJsonLd([
+              { name: 'Accueil', url: '/' },
+              { name: 'Contact', url: '/contact' },
+            ]),
+          ],
+        }}
+      />
       <section className="relative section pt-16 overflow-hidden">
         <DecorativeBlob className="absolute -top-32 -right-40 h-[500px] w-[500px] text-accent pointer-events-none" />
         <div className="container-page max-w-4xl relative">

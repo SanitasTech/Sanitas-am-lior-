@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import PublicLayout from '@/components/PublicLayout';
+import SeoJsonLd from '@/components/SeoJsonLd';
 import ContactForm from '@/components/ContactForm';
 import ContactInfo from '@/components/ContactInfo';
 import { DecorativeBlob, PeopleIcon, ClipboardIcon, ChatIcon } from '@/components/Icons';
-import { publicPageMetadata } from '@/lib/seo';
+import { breadcrumbJsonLd, publicPageMetadata, webPageJsonLd } from '@/lib/seo';
 
 export const metadata = publicPageMetadata({
   title: 'Contact Agence Sanitas | Candidates and facilities',
@@ -18,6 +19,25 @@ export const metadata = publicPageMetadata({
 export default function EnglishContactPage() {
   return (
     <PublicLayout locale="en">
+      <SeoJsonLd
+        id="contact-schema-en"
+        data={{
+          '@context': 'https://schema.org',
+          '@graph': [
+            webPageJsonLd({
+              name: 'Contact Agence Sanitas',
+              description:
+                'Contact details and form for candidates, healthcare professionals and facilities in Quebec.',
+              url: '/en/contact',
+              locale: 'en',
+            }),
+            breadcrumbJsonLd([
+              { name: 'Home', url: '/en' },
+              { name: 'Contact', url: '/en/contact' },
+            ]),
+          ],
+        }}
+      />
       <section className="relative section pt-16 overflow-hidden">
         <DecorativeBlob className="absolute -top-32 -right-40 h-[500px] w-[500px] text-accent pointer-events-none" />
         <div className="container-page max-w-4xl relative">

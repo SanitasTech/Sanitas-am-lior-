@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { unstable_noStore as noStore } from 'next/cache';
 import PublicLayout from '@/components/PublicLayout';
+import SeoJsonLd from '@/components/SeoJsonLd';
 import HomeSearch from '@/components/HomeSearch';
 import JobCard from '@/components/JobCard';
 import Photo from '@/components/Photo';
@@ -19,14 +20,14 @@ import {
 } from '@/components/Icons';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { localizedPath } from '@/lib/i18n';
-import { publicPageMetadata } from '@/lib/seo';
+import { publicPageMetadata, webPageJsonLd } from '@/lib/seo';
 import type { Job } from '@/types';
 import { urgencyOrder } from '@/lib/utils';
 
 export const metadata = publicPageMetadata({
-  title: 'Healthcare staffing agency in Quebec | Agence Sanitas',
+  title: 'Healthcare staffing agency in Quebec | Nursing and PAB assignments',
   description:
-    'Agence Sanitas connects healthcare professionals with assignments across Quebec and supports facilities with reliable staffing.',
+    'Agence Sanitas connects nurses, PABs, ASSS and healthcare professionals with assignments in Quebec, and supports facilities with staffing needs.',
   path: '/en',
   locale: 'en',
   frPath: '/',
@@ -122,6 +123,21 @@ export default async function EnglishHomePage() {
 
   return (
     <PublicLayout locale="en">
+      <SeoJsonLd
+        id="home-page-schema-en"
+        data={{
+          '@context': 'https://schema.org',
+          '@graph': [
+            webPageJsonLd({
+              name: 'Healthcare staffing agency in Quebec',
+              description:
+                'Agence Sanitas connects healthcare professionals with assignments in Quebec and supports facilities with staffing needs.',
+              url: '/en',
+              locale: 'en',
+            }),
+          ],
+        }}
+      />
       <section className="relative isolate overflow-hidden bg-fg">
         <div className="absolute inset-0 -z-10 opacity-90">
           {/* eslint-disable-next-line @next/next/no-img-element */}
