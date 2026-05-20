@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { COMPANY } from '@/lib/constants';
 import { PUBLIC_COPY, ROUTES, localizeHref, type Locale } from '@/lib/i18n';
+import { LOCAL_SEO_FOOTER_LINKS } from '@/lib/local-seo-pages';
 
 export default function Footer({ locale = 'fr' }: { locale?: Locale }) {
   const copy = PUBLIC_COPY[locale];
@@ -41,6 +42,7 @@ export default function Footer({ locale = 'fr' }: { locale?: Locale }) {
     { href: ROUTES.contact.fr, label: copy.nav.contact },
     { href: ROUTES.privacy.fr, label: copy.footer.privacy },
   ];
+  const localSeoLinks = LOCAL_SEO_FOOTER_LINKS[locale];
 
   return (
     <footer className="border-t border-border bg-bg mt-auto">
@@ -87,6 +89,13 @@ export default function Footer({ locale = 'fr' }: { locale?: Locale }) {
                 </li>
               ))}
               {seoLinks.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className="text-fg-muted hover:text-fg">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+              {localSeoLinks.map((l) => (
                 <li key={l.href}>
                   <Link href={l.href} className="text-fg-muted hover:text-fg">
                     {l.label}

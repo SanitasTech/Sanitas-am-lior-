@@ -1,4 +1,5 @@
 import type { Application, Job } from '@/types';
+import { LOCAL_SEO_PAGES } from '@/lib/local-seo-pages';
 
 export type Locale = 'fr' | 'en';
 
@@ -58,6 +59,13 @@ function mapStaticPath(path: string, targetLocale: Locale): string | null {
   for (const key of ROUTE_KEYS) {
     if (ROUTES[key].fr === path || ROUTES[key].en === path) {
       return ROUTES[key][targetLocale];
+    }
+  }
+  for (const page of LOCAL_SEO_PAGES) {
+    const frPath = `/${page.fr.slug}`;
+    const enPath = `/en/${page.en.slug}`;
+    if (path === frPath || path === enPath) {
+      return targetLocale === 'en' ? enPath : frPath;
     }
   }
   return null;

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
+import { getLocalSeoRoutes } from '@/lib/local-seo-pages';
 import { absoluteUrl, languageAlternates } from '@/lib/seo';
 import type { Job } from '@/types';
 
@@ -43,11 +44,13 @@ const staticRoutes: Array<{
   },
 ];
 
+const allStaticRoutes = [...staticRoutes, ...getLocalSeoRoutes()];
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const pages: MetadataRoute.Sitemap = [];
 
-  for (const route of staticRoutes) {
+  for (const route of allStaticRoutes) {
     pages.push({
       url: absoluteUrl(route.fr),
       lastModified: now,
