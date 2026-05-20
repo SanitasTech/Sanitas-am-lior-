@@ -4,7 +4,6 @@ import PublicLayout from '@/components/PublicLayout';
 import HomeSearch from '@/components/HomeSearch';
 import JobCard from '@/components/JobCard';
 import Photo from '@/components/Photo';
-import { HeroProofStrip, SanitasSignal } from '@/components/SanitasHeroVisuals';
 import {
   TargetIcon,
   HandshakeIcon,
@@ -17,6 +16,7 @@ import {
   AnalyzeIcon,
   PeopleIcon,
   CheckCircleIcon,
+  DecorativeBlob,
 } from '@/components/Icons';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { publicPageMetadata } from '@/lib/seo';
@@ -152,54 +152,56 @@ export default async function HomePage() {
         </div>
 
         {/* Couche 2 : teinte accent légère pour rester dans les tons du site */}
-        <div className="absolute inset-0 -z-10 sanitas-hero-atmosphere" aria-hidden />
+        <div
+          className="absolute inset-0 -z-10 bg-gradient-to-br from-accent/35 via-accent/15 to-fg/40"
+          aria-hidden
+        />
         {/* Couche 3 : ombrage subtil en bas-gauche uniquement, pour la lisibilité du texte */}
-        <div className="absolute inset-0 -z-10 sanitas-hero-lines" aria-hidden />
-        <div className="sanitas-hero-word" aria-hidden>
-          Sanitas
-        </div>
+        <div
+          className="absolute inset-0 -z-10 bg-gradient-to-tr from-fg/55 via-fg/15 to-transparent"
+          aria-hidden
+        />
 
         {/* Contenu */}
         <div className="container-page relative pt-24 pb-32 sm:pt-28 sm:pb-36 lg:pt-32 lg:pb-44">
-          <div className="grid grid-cols-[minmax(0,1fr)] gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(360px,430px)] lg:items-center">
-            <div className="min-w-0 max-w-3xl">
-            <p className="inline-flex max-w-full flex-wrap items-center gap-2 rounded-full bg-bg/15 px-4 py-1.5 text-[11px] font-semibold uppercase leading-snug tracking-[0.13em] text-bg ring-1 ring-bg/20 sm:text-[12px] sm:tracking-[0.15em]">
+          <div className="max-w-3xl">
+            <p className="inline-flex items-center gap-2 rounded-full bg-bg/15 backdrop-blur px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.15em] text-bg ring-1 ring-bg/20">
               <span className="h-1.5 w-1.5 rounded-full bg-bg" aria-hidden />
               Agence de placement en santé · Laval, Québec
             </p>
 
-            <h1 className="mt-6 max-w-full text-[clamp(2.3rem,10.5vw,5.25rem)] leading-[1.01] tracking-[-0.035em] font-semibold text-bg">
+            <h1 className="mt-6 text-[clamp(2.75rem,6vw,5rem)] leading-[1.02] tracking-[-0.025em] font-semibold text-bg">
               Des mandats en santé
               <br />
-              <span className="font-serif text-[clamp(1.82rem,8vw,5.25rem)] italic font-normal text-bg tracking-[-0.08em] sm:text-[inherit]">
+              <span className="font-serif italic font-normal text-bg tracking-[-0.08em]">
                 adaptés à{' '}
-                <span className="text-[oklch(var(--accent-bright))]">votre</span>{' '}
+                <span className="text-[oklch(0.72_0.09_220)]">votre</span>{' '}
                 réalité.
               </span>
             </h1>
 
-            <p className="mt-8 max-w-[34ch] text-[17px] leading-relaxed text-bg/90 sm:max-w-2xl sm:text-[20px]">
+            <p className="mt-8 max-w-2xl text-[18.5px] sm:text-[20px] leading-relaxed text-bg/85">
               Choisissez vos régions, vos établissements, vos départements et vos horaires
               préférés. Sanitas vous aide à trouver des opportunités qui correspondent vraiment
               à ce que vous recherchez.
             </p>
 
             {/* CTAs : audience-segmentés, libellés agrandis pour identification immédiate */}
-            <div className="mt-10 grid max-w-full grid-cols-[minmax(0,1fr)] gap-6 sm:gap-8 sm:grid-cols-[minmax(0,auto)_1px_minmax(0,auto)] sm:items-start">
+            <div className="mt-10 grid gap-6 sm:gap-8 sm:grid-cols-[auto_1px_auto] sm:items-start">
               <div>
                 <p className="text-[16px] font-serif italic tracking-[-0.05em] text-bg mb-3">
                   Vous êtes <span className="font-semibold not-italic font-sans tracking-normal">professionnel de la santé</span>
                 </p>
-                <div className="flex max-w-full flex-wrap gap-2.5">
+                <div className="flex flex-wrap gap-2.5">
                   <Link
                     href="/postes"
-                    className="inline-flex items-center justify-center rounded-full bg-bg px-4 py-2.5 text-[14.5px] font-medium text-fg transition-all hover:opacity-90 sm:px-5 sm:text-[15px]"
+                    className="inline-flex items-center justify-center rounded-full bg-bg px-5 py-2.5 text-[15px] font-medium text-fg transition-all hover:opacity-90"
                   >
                     Voir les postes ouverts
                   </Link>
                   <Link
                     href="/postuler"
-                    className="inline-flex items-center justify-center rounded-full border border-bg/35 bg-bg/10 px-4 py-2.5 text-[14.5px] font-medium text-bg transition-colors hover:bg-bg/20 sm:px-5 sm:text-[15px]"
+                    className="inline-flex items-center justify-center rounded-full border border-bg/35 bg-bg/10 backdrop-blur px-5 py-2.5 text-[15px] font-medium text-bg transition-colors hover:bg-bg/20"
                   >
                     Envoyer mon profil
                   </Link>
@@ -212,21 +214,25 @@ export default async function HomePage() {
                 </p>
                 <Link
                   href="/etablissements"
-                  className="inline-flex items-center justify-center rounded-full bg-bg px-4 py-2.5 text-[14.5px] font-medium text-fg transition-all hover:opacity-90 sm:px-5 sm:text-[15px]"
+                  className="inline-flex items-center justify-center rounded-full bg-bg px-5 py-2.5 text-[15px] font-medium text-fg transition-all hover:opacity-90"
                 >
                   Demander du personnel
                 </Link>
               </div>
             </div>
-
-            <HeroProofStrip />
           </div>
 
-            <SanitasSignal />
-          </div>
+          {/* Petit chip de réassurance, comme un sous-titre visuel */}
+          <p className="mt-12 inline-flex flex-wrap items-center gap-2.5 text-[15px] text-bg/70">
+            <span className="font-serif italic tracking-[-0.05em] text-[oklch(0.72_0.09_220)]">17 régions</span>
+            <span className="opacity-50">·</span>
+            <span className="font-serif italic tracking-[-0.05em] text-[oklch(0.72_0.09_220)]">14+ professions</span>
+            <span className="opacity-50">·</span>
+            <span className="font-serif italic tracking-[-0.05em] text-[oklch(0.72_0.09_220)]">réponse en 24 h</span>
+          </p>
 
           {/* Barre de recherche intégrée au hero, en bas */}
-          <div className="mt-14 w-full max-w-[calc(100vw-2.5rem)] sm:max-w-5xl">
+          <div className="mt-14">
             <p className="text-[12.5px] font-semibold uppercase tracking-[0.18em] text-bg/65 mb-3">
               Recherche rapide
             </p>
