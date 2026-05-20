@@ -36,7 +36,7 @@ export const metadata = publicPageMetadata({
 
 export const revalidate = 60;
 
-const HERO_BG = '/images/travel-nurse-quebec.jpg';
+const HERO_BG = '/images/sanitas-hero.png';
 const PHOTOS = {
   candidates: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1200&q=80&auto=format&fit=crop',
   establishments: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=1200&q=80&auto=format&fit=crop',

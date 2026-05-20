@@ -40,7 +40,7 @@ export const revalidate = 60;
 // → HERO_BG : grande image atmosphérique en fond du hero, modifiable librement.
 // Image locale : place le fichier dans /public/images/ et utilise un chemin
 // commençant par "/" (servi automatiquement par Next.js).
-const HERO_BG = '/images/travel-nurse-quebec.jpg';
+const HERO_BG = '/images/sanitas-hero.png';
 const PHOTOS = {
   trust: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=1200&q=80&auto=format&fit=crop',
   candidates: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1200&q=80&auto=format&fit=crop',
@@ -151,7 +151,7 @@ export default async function HomePage() {
       />
       {/* ============================================================
           Hero cinématographique : image de fond + overlay coloré
-          (HERO_BG en haut du fichier : remplaçable par /images/xxx.jpg)
+          (HERO_BG en haut du fichier : remplaçable par /images/xxx.jpg ou /images/xxx.png)
           Le bg-fg sur la section sert de secours sombre si l'image échoue.
           ============================================================ */}
       <section className="relative isolate overflow-hidden bg-fg">
