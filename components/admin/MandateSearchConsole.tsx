@@ -506,7 +506,15 @@ function ResultRow({
 }) {
   const contact = row.candidate.phone || row.candidate.email || 'Contact a completer';
   const validation = row.validation_questions.slice(0, 2);
-  const reasons = [...row.blockers, ...row.reasons.filter((reason) => reason.state !== 'ok')].slice(0, 2);
+  const reasonKeys = new Set<string>();
+  const reasons = [...row.blockers, ...row.reasons.filter((reason) => reason.state !== 'ok')]
+    .filter((reason) => {
+      const key = `${reason.label}:${reason.detail}`;
+      if (reasonKeys.has(key)) return false;
+      reasonKeys.add(key);
+      return true;
+    })
+    .slice(0, 2);
 
   return (
     <tr className="hover:bg-muted/40">

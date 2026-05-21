@@ -1,4 +1,5 @@
 import { hasCurrentDocument, missingRequiredDocuments } from '@/lib/ats';
+import { professionListCovers } from '@/lib/constants';
 import type { Application, Candidate, CandidateDocument, Job, MatchDecision, MatchReason, RecruiterTask } from '@/types';
 
 export type AtsLaneId = 'intake' | 'qualified' | 'blocked' | 'ready' | 'client' | 'closed';
@@ -497,7 +498,7 @@ export function buildCandidateReadiness(args: {
       : candidate.profession
         ? [candidate.profession]
         : [];
-  const jobProfessionOk = !job || qualifiedProfessions.includes(job.profession);
+  const jobProfessionOk = !job || professionListCovers(qualifiedProfessions, job.profession);
 
   return [
     {

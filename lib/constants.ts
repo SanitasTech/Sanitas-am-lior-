@@ -89,6 +89,68 @@ export function professionRequiresPDSB(profession?: string | null): boolean {
   return PROFESSIONS_REQUIRING_PDSB.has(profession);
 }
 
+export function professionKey(profession?: string | null): string {
+  const value = (profession || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+
+  if (!value) return '';
+  if (
+    value.includes('inf cli') ||
+    value.includes('clinical nurse') ||
+    value.includes('nurse clinician') ||
+    (value.includes('infirm') && value.includes('clinicien'))
+  ) {
+    return 'nurse_clinician';
+  }
+  if (
+    value.includes('infirmiere auxiliaire') ||
+    value.includes('infirmier auxiliaire') ||
+    value.includes('licensed practical nurse') ||
+    value === 'lpn'
+  ) {
+    return 'licensed_practical_nurse';
+  }
+  if (
+    value === 'inf' ||
+    value === 'rn' ||
+    value === 'nurse' ||
+    value.includes('infirmier') ||
+    value.includes('infirmiere') ||
+    value.includes('registered nurse')
+  ) {
+    return 'nurse';
+  }
+  if (value.includes('prepose') || value.includes('beneficiaire')) return 'pab';
+  if (value.includes('asss') || value.includes('auxiliaire aux services')) return 'asss';
+  return value;
+}
+
+const PROFESSION_COVERAGE: Record<string, string[]> = {
+  // Une infirmiere clinicienne peut couvrir un mandat infirmier general.
+  // L'inverse n'est pas vrai: infirmiere generale ne couvre pas clinicienne.
+  nurse_clinician: ['nurse'],
+};
+
+export function professionCovers(candidateProfession?: string | null, mandateProfession?: string | null): boolean {
+  const source = professionKey(candidateProfession);
+  const target = professionKey(mandateProfession);
+  if (!target) return true;
+  if (!source) return false;
+  return source === target || (PROFESSION_COVERAGE[source] || []).includes(target);
+}
+
+export function professionListCovers(
+  candidateProfessions: Array<string | null | undefined> | undefined,
+  mandateProfession?: string | null
+): boolean {
+  if (!mandateProfession) return true;
+  return (candidateProfessions || []).some((profession) => professionCovers(profession, mandateProfession));
+}
+
 export const SHIFTS = ['Jour', 'Soir', 'Nuit'] as const;
 
 export const MANDATE_TYPES = [

@@ -1,5 +1,6 @@
 import {
   DOCUMENT_TYPES,
+  professionCovers,
   professionRequiresPDSB,
   professionRequiresPermit,
 } from '@/lib/constants';
@@ -379,12 +380,13 @@ function computePreferenceSetMatch(
       : candidate.profession
         ? [candidate.profession]
         : [];
-  const professionOk = professions.includes(job.profession);
+  const coveringProfession = professions.find((profession) => professionCovers(profession, job.profession));
+  const professionOk = !!coveringProfession;
   add({
     label: 'Profession',
     state: professionOk ? 'ok' : 'block',
     detail: professionOk
-      ? `Couvert par ${preferenceSet.label}: ${job.profession}`
+      ? `${coveringProfession} couvre le mandat ${job.profession}`
       : `Ce choix couvre ${professions.join(', ') || 'aucun titre'}; mandat: ${job.profession}`,
     points: professionOk ? 32 : 0,
   });

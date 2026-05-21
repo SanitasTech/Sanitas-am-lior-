@@ -24,6 +24,7 @@ import {
   WORK_AUTH,
   YEARS_EXPERIENCE,
   YES_NO_DISCUSS,
+  professionListCovers,
   professionRequiresPermit,
 } from '@/lib/constants';
 import { displayValue, type Locale } from '@/lib/i18n';
@@ -283,7 +284,7 @@ export function StepWork({ form, setForm, errors, mode, job, locale }: StepProps
             }));
           }}
         />
-        {isPosting && job?.profession && !form.qualified_professions.includes(job.profession) && (
+        {isPosting && job?.profession && !professionListCovers(form.qualified_professions, job.profession) && (
           <p className="mt-2 rounded-md border border-warning/30 bg-warning-soft px-3 py-2 text-[13px] text-warning">
             {tr(
               locale,
