@@ -11,6 +11,11 @@ import {
   URGENCY_LEVELS,
   URGENCY_LABELS,
   DOCUMENT_TYPES,
+  JOB_COUNTRIES,
+  DEFAULT_JOB_COUNTRY,
+  INTERNATIONAL_CANDIDATE_COUNTRIES,
+  defaultEligibleCountriesForJobCountry,
+  isInternationalCountry,
 } from '@/lib/constants';
 import type { Job, ExtraQuestion } from '@/types';
 
@@ -23,6 +28,8 @@ interface State {
   title: string;
   title_en: string;
   profession: string;
+  country: string;
+  eligible_countries: string[];
   region: string;
   city: string;
   establishment: string;
@@ -53,10 +60,16 @@ function newQuestion(): ExtraQuestion {
 
 export default function JobForm({ initial, mode }: JobFormProps) {
   const router = useRouter();
+  const initialCountry = initial?.country || DEFAULT_JOB_COUNTRY;
   const [form, setForm] = useState<State>({
     title: initial?.title || '',
     title_en: initial?.title_en || '',
     profession: initial?.profession || '',
+    country: initialCountry,
+    eligible_countries:
+      initial?.eligible_countries && initial.eligible_countries.length > 0
+        ? initial.eligible_countries
+        : defaultEligibleCountriesForJobCountry(initialCountry),
     region: initial?.region || '',
     city: initial?.city || '',
     establishment: initial?.establishment || '',
@@ -83,6 +96,29 @@ export default function JobForm({ initial, mode }: JobFormProps) {
 
   function set<K extends keyof State>(k: K, v: State[K]) {
     setForm((f) => ({ ...f, [k]: v }));
+  }
+
+  function setCountry(country: string) {
+    setForm((f) => ({
+      ...f,
+      country,
+      eligible_countries:
+        !isInternationalCountry(country)
+          ? []
+          : f.eligible_countries.length === 0
+            ? defaultEligibleCountriesForJobCountry(country)
+            : f.eligible_countries,
+      region: country === DEFAULT_JOB_COUNTRY && !QUEBEC_REGIONS.includes(f.region) ? '' : f.region,
+    }));
+  }
+
+  function toggleEligibleCountry(country: string) {
+    set(
+      'eligible_countries',
+      form.eligible_countries.includes(country)
+        ? form.eligible_countries.filter((value) => value !== country)
+        : [...form.eligible_countries, country]
+    );
   }
 
   function toggleDoc(doc: string) {
@@ -112,8 +148,12 @@ export default function JobForm({ initial, mode }: JobFormProps) {
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    if (!form.title.trim() || !form.profession || !form.region) {
-      setError('Titre, profession et région sont requis.');
+    if (!form.title.trim() || !form.profession || !form.country || !form.region) {
+      setError('Titre, profession, pays et région sont requis.');
+      return;
+    }
+    if (isInternationalCountry(form.country) && form.eligible_countries.length === 0) {
+      setError('Choisissez au moins un pays depuis lequel les candidats peuvent postuler.');
       return;
     }
     setSaving(true);
@@ -123,6 +163,8 @@ export default function JobForm({ initial, mode }: JobFormProps) {
         title: form.title.trim(),
         title_en: form.title_en || null,
         profession: form.profession,
+        country: form.country,
+        eligible_countries: isInternationalCountry(form.country) ? form.eligible_countries : [],
         region: form.region,
         city: form.city || null,
         establishment: form.establishment || null,
@@ -190,6 +232,8 @@ export default function JobForm({ initial, mode }: JobFormProps) {
     }
   }
 
+  const isInternational = isInternationalCountry(form.country);
+
   return (
     <form onSubmit={save} className="space-y-6">
       <section className="card p-6 space-y-5">
@@ -207,11 +251,29 @@ export default function JobForm({ initial, mode }: JobFormProps) {
               {PROFESSIONS.map((p) => <option key={p} value={p}>{p}</option>)}
             </select>
           </Field>
-          <Field label="Région" required>
-            <select className="input" value={form.region} onChange={(e) => set('region', e.target.value)}>
-              <option value="">Choisir</option>
-              {QUEBEC_REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+          <Field label="Pays du mandat" required>
+            <select className="input" value={form.country} onChange={(e) => setCountry(e.target.value)}>
+              {JOB_COUNTRIES.map((country) => (
+                <option key={country} value={country}>
+                  {country}
+                </option>
+              ))}
             </select>
+          </Field>
+          <Field label={isInternational ? 'Région / province / territoire' : 'Région'} required>
+            {isInternational ? (
+              <input
+                className="input"
+                value={form.region}
+                onChange={(e) => set('region', e.target.value)}
+                placeholder="Ex. Riyad, Djeddah, Arabie saoudite"
+              />
+            ) : (
+              <select className="input" value={form.region} onChange={(e) => set('region', e.target.value)}>
+                <option value="">Choisir</option>
+                {QUEBEC_REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+              </select>
+            )}
           </Field>
           <Field label="Ville">
             <input className="input" value={form.city} onChange={(e) => set('city', e.target.value)} />
@@ -262,6 +324,30 @@ export default function JobForm({ initial, mode }: JobFormProps) {
             </select>
           </Field>
         </div>
+
+        {isInternational && (
+          <Field
+            label="Candidats admissibles depuis"
+            helper="Pays de résidence depuis lesquels un candidat peut postuler à ce mandat international."
+          >
+            <div className="mt-2 flex flex-wrap gap-2">
+              {INTERNATIONAL_CANDIDATE_COUNTRIES.map((country) => {
+                const active = form.eligible_countries.includes(country);
+                return (
+                  <button
+                    key={country}
+                    type="button"
+                    onClick={() => toggleEligibleCountry(country)}
+                    className={active ? 'chip chip-active' : 'chip'}
+                    aria-pressed={active}
+                  >
+                    {country}
+                  </button>
+                );
+              })}
+            </div>
+          </Field>
+        )}
 
         <Field label="Exigences">
           <textarea className="textarea" rows={4} value={form.requirements} onChange={(e) => set('requirements', e.target.value)} />

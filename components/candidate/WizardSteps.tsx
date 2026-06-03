@@ -24,6 +24,8 @@ import {
   WORK_AUTH,
   YEARS_EXPERIENCE,
   YES_NO_DISCUSS,
+  DEFAULT_JOB_COUNTRY,
+  isInternationalCountry,
   professionListCovers,
   professionRequiresPermit,
 } from '@/lib/constants';
@@ -77,11 +79,19 @@ export function StepIdentity({
   form,
   setForm,
   errors,
+  mode,
+  job,
   locale,
   canJumpToReview,
   onJumpToReview,
 }: StepProps) {
   const en = locale === 'en';
+  const isInternationalPosting =
+    mode === 'posting' && isInternationalCountry(job?.country || DEFAULT_JOB_COUNTRY);
+  const residenceOptions =
+    isInternationalPosting && job?.eligible_countries && job.eligible_countries.length > 0
+      ? job.eligible_countries
+      : QUEBEC_REGIONS;
   return (
     <div className="space-y-6">
       <StepIntro
@@ -178,16 +188,20 @@ export function StepIdentity({
             autoCapitalize="words"
           />
         </Field>
-        <Field label={tr(locale, 'Région', 'Region')} required error={errors.region_residence}>
+        <Field
+          label={isInternationalPosting ? tr(locale, 'Pays de résidence', 'Country of residence') : tr(locale, 'Région', 'Region')}
+          required
+          error={errors.region_residence}
+        >
           <select
             className="input"
             value={form.region_residence}
             onChange={(e) => setField(setForm, 'region_residence', e.target.value)}
           >
             <option value="">{tr(locale, 'Choisir', 'Select')}</option>
-            {QUEBEC_REGIONS.map((region) => (
+            {residenceOptions.map((region) => (
               <option key={region} value={region}>
-                {region}
+                {displayValue(locale, region)}
               </option>
             ))}
           </select>
@@ -362,6 +376,10 @@ export function StepWork({ form, setForm, errors, mode, job, locale }: StepProps
 
 export function StepAvailability({ form, setForm, errors, mode, job, locale }: StepProps) {
   const isPosting = mode === 'posting';
+  const isInternationalPosting =
+    isPosting && isInternationalCountry(job?.country || DEFAULT_JOB_COUNTRY);
+  const mandateRegionOptions =
+    isInternationalPosting && job?.region ? [job.region] : QUEBEC_REGIONS;
   const needsWeekendCheck = isPosting && mandateRequiresWeekendCheck(job?.mandate_type);
 
   function updateRegionChoice(idx: number, patch: Partial<RegionChoice>) {
@@ -447,6 +465,22 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
       <PreferenceSetEditor
         value={form.preference_sets}
         locale={locale}
+        regionOptions={mandateRegionOptions}
+        regionLabel={
+          isInternationalPosting
+            ? tr(locale, 'Territoire pour ce groupe', 'Territory for this group')
+            : undefined
+        }
+        wholeRegionLabel={
+          isInternationalPosting
+            ? tr(locale, 'Tout ce territoire me convient', 'This whole territory works for me')
+            : undefined
+        }
+        addRegionLabel={
+          isInternationalPosting
+            ? tr(locale, '+ Ajouter un autre territoire', '+ Add another territory')
+            : undefined
+        }
         onChange={(preferenceSets) => {
           const first = preferenceSets[0];
           setForm((current) => ({
@@ -493,7 +527,9 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
 
       <div data-error={!!errors.region_choices} className="space-y-3">
         <p className="label">
-          {isPosting
+          {isInternationalPosting
+            ? tr(locale, 'Territoire accepté', 'Accepted territory')
+            : isPosting
             ? tr(locale, 'Régions acceptées', 'Accepted regions')
             : tr(locale, 'Où tu veux travailler', 'Where you want to work')}
           {!isPosting && <span className="ml-0.5 text-danger">*</span>}
@@ -504,7 +540,9 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
               <Field
                 label={
                   isPosting
-                    ? tr(locale, 'Région du mandat', 'Assignment region')
+                    ? isInternationalPosting
+                      ? tr(locale, 'Territoire du mandat', 'Assignment territory')
+                      : tr(locale, 'Région du mandat', 'Assignment region')
                     : `${tr(locale, 'Région', 'Region')} ${idx + 1}`
                 }
               >
@@ -514,7 +552,7 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
                   onChange={(e) => updateRegionChoice(idx, { region: e.target.value })}
                 >
                   <option value="">{tr(locale, 'Choisir', 'Select')}</option>
-                  {QUEBEC_REGIONS.map((region) => (
+                  {mandateRegionOptions.map((region) => (
                     <option key={region} value={region}>
                       {region}
                     </option>
@@ -544,7 +582,9 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
                 }
               />
               <span className="text-[14px] text-fg">
-                {tr(locale, 'Toute la région me convient', 'Whole region works for me')}
+                {isInternationalPosting
+                  ? tr(locale, 'Tout ce territoire me convient', 'This whole territory works for me')
+                  : tr(locale, 'Toute la région me convient', 'Whole region works for me')}
               </span>
             </label>
             {!regionChoice.all_region && (
@@ -553,8 +593,12 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
                   label={tr(locale, 'Villes ou villages acceptés', 'Accepted cities or towns')}
                   helper={tr(
                     locale,
-                    'Sépare par des virgules. Beaucoup de mandats sont en région — pense aussi aux villages.',
-                    'Comma separated. Many assignments are in small towns — include those too.'
+                    isInternationalPosting
+                      ? 'Sépare par des virgules si certaines villes seulement te conviennent.'
+                      : 'Sépare par des virgules. Beaucoup de mandats sont en région — pense aussi aux villages.',
+                    isInternationalPosting
+                      ? 'Comma separated if only certain cities work for you.'
+                      : 'Comma separated. Many assignments are in small towns — include those too.'
                   )}
                 >
                   {/* TODO future : autocomplete villes/villages Québec */}

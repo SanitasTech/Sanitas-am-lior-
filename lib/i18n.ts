@@ -195,6 +195,8 @@ export const PUBLIC_COPY = {
       startDate: 'Date de début',
       duration: 'Durée',
       salary: 'Rémunération',
+      country: 'Pays',
+      territory: 'Région / territoire',
       region: 'Région',
       city: 'Ville',
       establishment: 'Etablissement',
@@ -293,6 +295,8 @@ export const PUBLIC_COPY = {
       startDate: 'Start date',
       duration: 'Duration',
       salary: 'Compensation',
+      country: 'Country',
+      territory: 'Region / territory',
       region: 'Region',
       city: 'City',
       establishment: 'Facility',
@@ -380,6 +384,10 @@ export const OPTION_LABELS: Record<string, Partial<Record<Locale, string>>> = {
   'Partout au Quebec': { en: 'Anywhere in Quebec' },
   'Partout au Québec': { en: 'Anywhere in Quebec' },
   Canada: { en: 'Canada' },
+  'Arabie saoudite': { en: 'Saudi Arabia' },
+  'États-Unis': { en: 'United States' },
+  'Royaume-Uni': { en: 'United Kingdom' },
+  France: { en: 'France' },
   International: { en: 'International' },
   'Des que possible': { en: 'As soon as possible' },
   'Dès que possible': { en: 'As soon as possible' },
@@ -558,7 +566,8 @@ export function jobTitle(job: Job, locale: Locale): string {
   if (locale === 'en') {
     if (job.title_en) return job.title_en;
     const profession = displayValue(locale, job.profession);
-    const city = job.city ? ` in ${job.city}` : '';
+    const location = job.city || (job.country && job.country !== 'Canada' ? displayValue(locale, job.country) : '');
+    const city = location ? ` in ${location}` : '';
     const shift = job.shift ? `, ${displayValue(locale, job.shift).toLowerCase()} shift` : '';
     return `${profession} assignment${city}${shift}`;
   }

@@ -2,7 +2,16 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { QUEBEC_REGIONS, PROFESSIONS, SHIFTS, MANDATE_TYPES, ALL_DEPARTMENTS } from '@/lib/constants';
+import {
+  QUEBEC_REGIONS,
+  PROFESSIONS,
+  SHIFTS,
+  MANDATE_TYPES,
+  ALL_DEPARTMENTS,
+  JOB_COUNTRIES,
+  DEFAULT_JOB_COUNTRY,
+  isInternationalCountry,
+} from '@/lib/constants';
 import { PUBLIC_COPY, displayValue, localizedPath, optionLabel, type Locale } from '@/lib/i18n';
 import { useLocale } from './I18nProvider';
 
@@ -15,6 +24,7 @@ const URGENCIES = [
 
 interface FilterState {
   profession: string;
+  country: string;
   region: string;
   city: string;
   establishment: string;
@@ -33,6 +43,7 @@ export default function JobFilters({ locale: localeProp }: { locale?: Locale }) 
 
   const [filters, setFilters] = useState<FilterState>({
     profession: params.get('profession') || '',
+    country: params.get('country') || '',
     region: params.get('region') || '',
     city: params.get('city') || '',
     establishment: params.get('establishment') || '',
@@ -45,6 +56,7 @@ export default function JobFilters({ locale: localeProp }: { locale?: Locale }) 
   useEffect(() => {
     setFilters({
       profession: params.get('profession') || '',
+      country: params.get('country') || '',
       region: params.get('region') || '',
       city: params.get('city') || '',
       establishment: params.get('establishment') || '',
@@ -70,6 +82,7 @@ export default function JobFilters({ locale: localeProp }: { locale?: Locale }) 
   function reset() {
     setFilters({
       profession: '',
+      country: '',
       region: '',
       city: '',
       establishment: '',
@@ -80,6 +93,9 @@ export default function JobFilters({ locale: localeProp }: { locale?: Locale }) 
     });
     router.push(localizedPath(locale, 'jobs'));
   }
+
+  const selectedCountry = filters.country || DEFAULT_JOB_COUNTRY;
+  const internationalFilter = isInternationalCountry(selectedCountry);
 
   return (
     <form
@@ -110,22 +126,52 @@ export default function JobFilters({ locale: localeProp }: { locale?: Locale }) 
         </div>
 
         <div>
-          <label className="label" htmlFor="f-region">
-            {copy.jobs.region}
+          <label className="label" htmlFor="f-country">
+            {copy.jobs.country}
           </label>
           <select
-            id="f-region"
+            id="f-country"
             className="input"
-            value={filters.region}
-            onChange={(e) => update('region', e.target.value)}
+            value={filters.country}
+            onChange={(e) => update('country', e.target.value)}
           >
-            <option value="">{copy.common.allFem}</option>
-            {QUEBEC_REGIONS.map((r) => (
-              <option key={r} value={r}>
-                {r}
+            <option value="">{copy.common.all}</option>
+            {JOB_COUNTRIES.map((country) => (
+              <option key={country} value={country}>
+                {displayValue(locale, country)}
               </option>
             ))}
           </select>
+        </div>
+
+        <div>
+          <label className="label" htmlFor="f-region">
+            {internationalFilter ? copy.jobs.territory : copy.jobs.region}
+          </label>
+          {internationalFilter ? (
+            <input
+              id="f-region"
+              className="input"
+              type="text"
+              placeholder={locale === 'en' ? 'Riyadh, Jeddah...' : 'Riyad, Djeddah...'}
+              value={filters.region}
+              onChange={(e) => update('region', e.target.value)}
+            />
+          ) : (
+            <select
+              id="f-region"
+              className="input"
+              value={filters.region}
+              onChange={(e) => update('region', e.target.value)}
+            >
+              <option value="">{copy.common.allFem}</option>
+              {QUEBEC_REGIONS.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         <div>

@@ -58,6 +58,8 @@ export const jobSchema = z.object({
   title_en: optionalString,
   profession: nonEmpty('Profession'),
   job_title_id: z.string().uuid().optional().nullable(),
+  country: z.string().min(1, 'Pays requis').max(120).default('Canada'),
+  eligible_countries: z.array(z.string().max(120)).default([]),
   region: nonEmpty('Région'),
   city: optionalString,
   establishment: optionalString,

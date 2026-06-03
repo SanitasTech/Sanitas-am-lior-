@@ -10,12 +10,15 @@ export const dynamic = 'force-dynamic';
 function revalidateJobs() {
   revalidatePath('/admin/postes');
   revalidatePath('/postes');
+  revalidatePath('/en/jobs');
   revalidatePath('/');
+  revalidatePath('/en');
 }
 
 function revalidateJobDetail(id: string) {
   revalidatePath(`/admin/postes/${id}`);
   revalidatePath(`/postes/${id}`);
+  revalidatePath(`/en/jobs/${id}`);
 }
 
 export async function POST(req: Request) {
@@ -50,6 +53,8 @@ export async function POST(req: Request) {
       title_en: input.title_en || null,
       profession: input.profession,
       job_title_id: input.job_title_id || null,
+      country: input.country || 'Canada',
+      eligible_countries: input.eligible_countries || [],
       region: input.region,
       city: input.city || null,
       establishment: input.establishment || null,
@@ -116,6 +121,8 @@ export async function PUT(req: Request) {
       title_en: input.title_en || null,
       profession: input.profession,
       job_title_id: input.job_title_id || null,
+      country: input.country || 'Canada',
+      eligible_countries: input.eligible_countries || [],
       region: input.region,
       city: input.city || null,
       establishment: input.establishment || null,

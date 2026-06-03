@@ -89,6 +89,8 @@ export interface Job {
   title_en?: string | null;
   profession: string;
   job_title_id?: string | null;
+  country?: string | null;
+  eligible_countries?: string[];
   region: string;
   city: string | null;
   establishment: string | null;

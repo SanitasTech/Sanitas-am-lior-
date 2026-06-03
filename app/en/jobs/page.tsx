@@ -11,9 +11,9 @@ import type { Job } from '@/types';
 import { urgencyOrder } from '@/lib/utils';
 
 export const metadata = publicPageMetadata({
-  title: 'Healthcare jobs in Quebec | Nursing, PAB and ASSS assignments',
+  title: 'Healthcare jobs | Quebec and international assignments',
   description:
-    'Browse active healthcare assignments in Quebec with Agence Sanitas. Filter by profession, region, department, shift and assignment type.',
+    'Browse active healthcare assignments with Agence Sanitas, in Quebec and internationally. Filter by profession, country, region, department, shift and assignment type.',
   path: '/en/jobs',
   locale: 'en',
   frPath: '/postes',
@@ -39,6 +39,7 @@ async function fetchJobs(sp: Props['searchParams']): Promise<Job[]> {
     let q = supabase.from('jobs').select('*').eq('status', 'active');
 
     const profession = param(sp, 'profession');
+    const country = param(sp, 'country');
     const region = param(sp, 'region');
     const city = param(sp, 'city');
     const establishment = param(sp, 'establishment');
@@ -48,6 +49,7 @@ async function fetchJobs(sp: Props['searchParams']): Promise<Job[]> {
     const urgency = param(sp, 'urgency');
 
     if (profession) q = q.eq('profession', profession);
+    if (country) q = q.eq('country', country);
     if (region) q = q.eq('region', region);
     if (city) q = q.ilike('city', `%${city}%`);
     if (establishment) q = q.ilike('establishment', `%${establishment}%`);
@@ -105,8 +107,8 @@ export default async function EnglishJobsPage({ searchParams }: Props) {
           <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">Jobs</p>
           <h1 className="mt-2 text-display-lg text-fg">Healthcare assignments</h1>
           <p className="mt-4 max-w-prose text-[16px] leading-relaxed text-fg-muted">
-            Filter open roles by profession, region, city, facility, department, shift or assignment type.
-            These active openings come from Agence Sanitas.
+            Filter open roles by profession, country, region, city, facility, department, shift or
+            assignment type. These active openings come from Agence Sanitas.
           </p>
         </div>
       </section>

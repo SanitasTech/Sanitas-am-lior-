@@ -227,7 +227,8 @@ export function jobMetaDescription(job: Job, locale: Locale): string {
   const profession = displayValue(locale, job.profession);
   const department = displayValue(locale, job.department);
   const shift = displayValue(locale, job.shift);
-  const location = [job.city, job.region].filter(Boolean).join(', ');
+  const country = job.country || 'Canada';
+  const location = [job.city, job.region, country !== 'Canada' ? displayValue(locale, country) : null].filter(Boolean).join(', ');
   const parts =
     locale === 'en'
       ? [
@@ -248,8 +249,23 @@ export function jobMetaDescription(job: Job, locale: Locale): string {
   return parts.filter(Boolean).join(' · ').slice(0, 160);
 }
 
+function countryCode(country?: string | null): string {
+  const value = (country || 'Canada')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+  if (value.includes('arabie') || value.includes('saudi')) return 'SA';
+  if (value.includes('etats') || value.includes('united states') || value === 'us') return 'US';
+  if (value.includes('royaume') || value.includes('united kingdom') || value === 'uk') return 'GB';
+  if (value.includes('france')) return 'FR';
+  return 'CA';
+}
+
 export function jobPostingJsonLd(job: Job, locale: Locale) {
   const title = jobTitle(job, locale);
+  const country = job.country || 'Canada';
+  const applicantCountries =
+    job.eligible_countries && job.eligible_countries.length > 0 ? job.eligible_countries : ['Canada'];
   const description = [
     title,
     jobMetaDescription(job, locale),
@@ -289,13 +305,13 @@ export function jobPostingJsonLd(job: Job, locale: Locale) {
         '@type': 'PostalAddress',
         addressLocality: job.city || undefined,
         addressRegion: job.region || COMPANY.address.province,
-        addressCountry: 'CA',
+        addressCountry: countryCode(country),
       },
     },
-    applicantLocationRequirements: {
+    applicantLocationRequirements: applicantCountries.map((name) => ({
       '@type': 'Country',
-      name: 'Canada',
-    },
+      name: displayValue(locale, name),
+    })),
   };
 }
 

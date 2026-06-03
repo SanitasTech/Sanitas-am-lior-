@@ -82,6 +82,8 @@ create table public.jobs (
   title_en text,
   profession text not null,
   job_title_id uuid references public.job_titles(id) on delete set null,
+  country text not null default 'Canada',
+  eligible_countries text[] not null default '{}',
   region text not null,
   city text,
   establishment text,
@@ -107,6 +109,7 @@ create table public.jobs (
 
 create index idx_jobs_status on public.jobs(status);
 create index idx_jobs_profession on public.jobs(profession);
+create index idx_jobs_country on public.jobs(country);
 create index idx_jobs_region on public.jobs(region);
 create index idx_jobs_urgency on public.jobs(urgency);
 create trigger trg_jobs_updated_at before update on public.jobs

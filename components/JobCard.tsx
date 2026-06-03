@@ -20,9 +20,12 @@ interface JobCardProps {
 
 export default function JobCard({ job, variant = 'default', locale = 'fr' }: JobCardProps) {
   const copy = PUBLIC_COPY[locale].jobs;
+  const country = job.country || 'Canada';
+  const isInternational = country !== 'Canada';
   const meta: string[] = [];
   if (job.establishment) meta.push(job.establishment);
   if (job.city) meta.push(job.city);
+  if (isInternational) meta.push(displayValue(locale, country));
   if (job.department) meta.push(displayValue(locale, job.department));
 
   return (
@@ -36,7 +39,14 @@ export default function JobCard({ job, variant = 'default', locale = 'fr' }: Job
             {jobTitle(job, locale)}
           </h3>
         </div>
-        <UrgencyBadge urgency={job.urgency} locale={locale} />
+        <div className="flex flex-col items-end gap-2">
+          <UrgencyBadge urgency={job.urgency} locale={locale} />
+          {isInternational && (
+            <span className="rounded-full border border-accent/30 bg-accent-soft px-2.5 py-1 text-[11.5px] font-medium text-accent">
+              International
+            </span>
+          )}
+        </div>
       </div>
 
       {meta.length > 0 && <p className="text-[15px] text-fg-muted leading-relaxed">{meta.join(' · ')}</p>}
@@ -60,13 +70,28 @@ export default function JobCard({ job, variant = 'default', locale = 'fr' }: Job
             <dd className="text-fg">{formatDate(job.start_date, dateLocale(locale))}</dd>
           </div>
         )}
+        {isInternational && (
+          <div>
+            <dt className="text-fg-subtle">{copy.country}</dt>
+            <dd className="text-fg">{displayValue(locale, country)}</dd>
+          </div>
+        )}
         {job.region && (
           <div>
-            <dt className="text-fg-subtle">{copy.region}</dt>
+            <dt className="text-fg-subtle">{isInternational ? copy.territory : copy.region}</dt>
             <dd className="text-fg">{job.region}</dd>
           </div>
         )}
       </dl>
+
+      {isInternational && job.eligible_countries && job.eligible_countries.length > 0 && (
+        <p className="text-[13.5px] text-fg-muted">
+          <span className="text-fg-subtle">
+            {locale === 'en' ? 'Applicants from ' : 'Candidats depuis '}
+          </span>
+          {job.eligible_countries.map((value) => displayValue(locale, value)).join(', ')}
+        </p>
+      )}
 
       {variant === 'default' && job.salary && (
         <p className="text-[14.5px] text-fg-muted">

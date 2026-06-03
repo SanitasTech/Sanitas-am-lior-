@@ -121,6 +121,8 @@ export async function POST(req: Request) {
       id: job.id,
       title: job.title,
       profession: job.profession,
+      country: job.country || 'Canada',
+      eligible_countries: job.eligible_countries || [],
       region: job.region,
       city: job.city,
       establishment: job.establishment,

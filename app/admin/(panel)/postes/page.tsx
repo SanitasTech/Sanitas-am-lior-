@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { formatDate } from '@/lib/utils';
 import UrgencyBadge from '@/components/UrgencyBadge';
+import { DEFAULT_JOB_COUNTRY, JOB_COUNTRIES } from '@/lib/constants';
 import type { Job } from '@/types';
 
 export const metadata: Metadata = { title: 'Postes', robots: { index: false, follow: false } };
@@ -23,9 +24,11 @@ async function fetchJobs(sp: Props['searchParams']) {
   let q = supabase.from('jobs').select('*, applications:applications(count)').order('created_at', { ascending: false });
   const profession = param(sp, 'profession');
   const region = param(sp, 'region');
+  const country = param(sp, 'country');
   const status = param(sp, 'status');
   if (profession) q = q.eq('profession', profession);
   if (region) q = q.eq('region', region);
+  if (country) q = q.eq('country', country);
   if (status) q = q.eq('status', status);
   const { data } = await q.limit(200);
   return (data || []) as unknown as Array<Job & { applications: { count: number }[] }>;
@@ -48,7 +51,7 @@ export default async function AdminJobsPage({ searchParams }: Props) {
       </header>
 
       <form className="card p-4 sm:p-5">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <div>
             <label className="label" htmlFor="profession">Profession</label>
             <input id="profession" name="profession" defaultValue={param(searchParams, 'profession')} className="input" />
@@ -56,6 +59,15 @@ export default async function AdminJobsPage({ searchParams }: Props) {
           <div>
             <label className="label" htmlFor="region">Region</label>
             <input id="region" name="region" defaultValue={param(searchParams, 'region')} className="input" />
+          </div>
+          <div>
+            <label className="label" htmlFor="country">Pays</label>
+            <select id="country" name="country" defaultValue={param(searchParams, 'country')} className="input">
+              <option value="">Tous</option>
+              {JOB_COUNTRIES.map((country) => (
+                <option key={country} value={country}>{country}</option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="label" htmlFor="status">Statut</label>
@@ -102,7 +114,7 @@ export default async function AdminJobsPage({ searchParams }: Props) {
                   </td>
                   <td className="px-4 py-3 align-top text-fg">{job.profession}</td>
                   <td className="px-4 py-3 align-top text-fg">
-                    {[job.city, job.region].filter(Boolean).join(', ')}
+                    {[job.city, job.region, job.country && job.country !== DEFAULT_JOB_COUNTRY ? job.country : null].filter(Boolean).join(', ')}
                   </td>
                   <td className="px-4 py-3 align-top text-fg-muted">{job.department || '-'}</td>
                   <td className="px-4 py-3 align-top text-fg-muted">{job.shift || '-'}</td>

@@ -41,6 +41,28 @@ export const QUEBEC_REGIONS: string[] = [
   'Saguenay–Lac-Saint-Jean',
 ];
 
+export const DEFAULT_JOB_COUNTRY = 'Canada';
+
+export const JOB_COUNTRIES: string[] = [
+  DEFAULT_JOB_COUNTRY,
+  'Arabie saoudite',
+];
+
+export const INTERNATIONAL_CANDIDATE_COUNTRIES: string[] = [
+  'Canada',
+  'États-Unis',
+  'Royaume-Uni',
+  'France',
+];
+
+export function isInternationalCountry(country?: string | null): boolean {
+  return !!country && country !== DEFAULT_JOB_COUNTRY;
+}
+
+export function defaultEligibleCountriesForJobCountry(country?: string | null): string[] {
+  return isInternationalCountry(country) ? [...INTERNATIONAL_CANDIDATE_COUNTRIES] : [];
+}
+
 export const PROFESSIONS: string[] = [
   'Infirmier(ère)',
   'Infirmier(ère) clinicien(ne)',

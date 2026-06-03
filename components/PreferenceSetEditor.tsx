@@ -18,6 +18,10 @@ interface PreferenceSetEditorProps {
   onChange: (value: CandidatePreferenceSet[]) => void;
   locale?: Locale;
   compact?: boolean;
+  regionOptions?: string[];
+  regionLabel?: string;
+  wholeRegionLabel?: string;
+  addRegionLabel?: string;
 }
 
 function tr(locale: Locale, fr: string, en: string) {
@@ -54,6 +58,10 @@ export default function PreferenceSetEditor({
   onChange,
   locale = 'fr',
   compact,
+  regionOptions,
+  regionLabel,
+  wholeRegionLabel,
+  addRegionLabel,
 }: PreferenceSetEditorProps) {
   const sets = ensurePreferenceSets(value);
 
@@ -141,6 +149,10 @@ export default function PreferenceSetEditor({
               value={set.regions}
               onChange={(regions) => patchSet(index, { regions })}
               locale={locale}
+              regionOptions={regionOptions}
+              regionLabel={regionLabel}
+              wholeRegionLabel={wholeRegionLabel}
+              addRegionLabel={addRegionLabel}
             />
 
             <DepartmentGroups
@@ -215,12 +227,23 @@ function RegionSetField({
   value,
   onChange,
   locale,
+  regionOptions,
+  regionLabel,
+  wholeRegionLabel,
+  addRegionLabel,
 }: {
   value: RegionChoice[];
   onChange: (value: RegionChoice[]) => void;
   locale: Locale;
+  regionOptions?: string[];
+  regionLabel?: string;
+  wholeRegionLabel?: string;
+  addRegionLabel?: string;
 }) {
   const regions = value.length > 0 ? value : [emptyRegionChoice()];
+  const options = Array.from(
+    new Set([...(regionOptions && regionOptions.length > 0 ? regionOptions : QUEBEC_REGIONS), ...regions.map((region) => region.region).filter(Boolean)])
+  );
 
   function patchRegion(index: number, patch: Partial<RegionChoice>) {
     onChange(regions.map((region, i) => (i === index ? { ...region, ...patch } : region)));
@@ -237,7 +260,7 @@ function RegionSetField({
 
   return (
     <div>
-      <p className="label">{tr(locale, 'Regions pour ce groupe', 'Regions for this group')}</p>
+      <p className="label">{regionLabel || tr(locale, 'Regions pour ce groupe', 'Regions for this group')}</p>
       <div className="mt-2 space-y-3">
         {regions.map((region, index) => (
           <div key={index} className="rounded-lg border border-border bg-muted/20 p-3">
@@ -248,7 +271,7 @@ function RegionSetField({
                 onChange={(event) => patchRegion(index, { region: event.target.value })}
               >
                 <option value="">{tr(locale, 'Choisir', 'Select')}</option>
-                {QUEBEC_REGIONS.map((option) => (
+                {options.map((option) => (
                   <option key={option} value={option}>
                     {option}
                   </option>
@@ -273,7 +296,7 @@ function RegionSetField({
                 }
               />
               <span className="text-[13.5px] text-fg">
-                {tr(locale, 'Toute la region', 'Entire region')}
+                {wholeRegionLabel || tr(locale, 'Toute la region', 'Entire region')}
               </span>
             </label>
             {!region.all_region && (
@@ -292,7 +315,7 @@ function RegionSetField({
         ))}
       </div>
       <button type="button" className="btn-ghost btn-sm mt-2" onClick={addRegion}>
-        {tr(locale, '+ Ajouter une region a ce groupe', '+ Add a region to this group')}
+        {addRegionLabel || tr(locale, '+ Ajouter une region a ce groupe', '+ Add a region to this group')}
       </button>
     </div>
   );

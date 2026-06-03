@@ -11,9 +11,9 @@ import type { Job } from '@/types';
 import { urgencyOrder } from '@/lib/utils';
 
 export const metadata = publicPageMetadata({
-  title: 'Emplois en santé au Québec | Mandats infirmières, PAB et ASSS',
+  title: 'Emplois en santé | Mandats Québec et internationaux',
   description:
-    'Consultez les mandats actifs en santé au Québec avec Agence Sanitas. Filtrez par profession, région, département, quart et type de mandat.',
+    'Consultez les mandats actifs en santé avec Agence Sanitas, au Québec et à l’international. Filtrez par profession, pays, région, département, quart et type de mandat.',
   path: '/postes',
   frPath: '/postes',
   enPath: '/en/jobs',
@@ -38,6 +38,7 @@ async function fetchJobs(sp: Props['searchParams']): Promise<Job[]> {
     let q = supabase.from('jobs').select('*').eq('status', 'active');
 
     const profession = param(sp, 'profession');
+    const country = param(sp, 'country');
     const region = param(sp, 'region');
     const city = param(sp, 'city');
     const establishment = param(sp, 'establishment');
@@ -47,6 +48,7 @@ async function fetchJobs(sp: Props['searchParams']): Promise<Job[]> {
     const urgency = param(sp, 'urgency');
 
     if (profession) q = q.eq('profession', profession);
+    if (country) q = q.eq('country', country);
     if (region) q = q.eq('region', region);
     if (city) q = q.ilike('city', `%${city}%`);
     if (establishment) q = q.ilike('establishment', `%${establishment}%`);
@@ -103,8 +105,8 @@ export default async function PostesPage({ searchParams }: Props) {
           <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">Postes</p>
           <h1 className="mt-2 text-display-lg text-fg">Mandats en santé</h1>
           <p className="mt-4 max-w-prose text-[16px] leading-relaxed text-fg-muted">
-            Filtrez les postes par profession, région, ville, établissement, département, quart ou
-            type de mandat. Les postes affichés sont actifs et provenant d'Agence Sanitas.
+            Filtrez les postes par profession, pays, région, ville, établissement, département,
+            quart ou type de mandat. Les postes affichés sont actifs et provenant d'Agence Sanitas.
           </p>
         </div>
       </section>

@@ -38,8 +38,9 @@ async function fetchJob(id: string): Promise<Job | null> {
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const job = await fetchJob(params.id);
   if (!job) return { title: 'Job not found' };
+  const metaLocation = job.city || (job.country && job.country !== 'Canada' ? displayValue('en', job.country) : '');
   return publicPageMetadata({
-    title: `${jobTitle(job, 'en')}${job.city ? ` · ${job.city}` : ''}`,
+    title: `${jobTitle(job, 'en')}${metaLocation ? ` · ${metaLocation}` : ''}`,
     description: jobMetaDescription(job, 'en'),
     path: `/en/jobs/${params.id}`,
     locale: 'en',
@@ -55,6 +56,9 @@ export default async function EnglishJobDetailPage({ params }: { params: { id: s
   const interestedHref = `${localizedPath('en', 'apply')}?mandat_id=${job.id}`;
   const requirements = jobRequirements(job, 'en');
   const particularities = jobParticularities(job, 'en');
+  const country = job.country || 'Canada';
+  const isInternational = country !== 'Canada';
+  const eligibleCountries = job.eligible_countries || [];
 
   return (
     <PublicLayout locale="en">
@@ -88,14 +92,20 @@ export default async function EnglishJobDetailPage({ params }: { params: { id: s
                   {displayValue('en', job.profession)}
                 </p>
                 <UrgencyBadge urgency={job.urgency} locale="en" />
+                {isInternational && (
+                  <span className="rounded-full border border-accent/30 bg-accent-soft px-3 py-1 text-[12px] font-medium text-accent">
+                    International
+                  </span>
+                )}
               </div>
               <h1 className="mt-3 text-display-lg text-fg">{jobTitle(job, 'en')}</h1>
 
               <div className="mt-6 text-[15px] text-fg-muted">
-                {[job.establishment, job.city, job.region].filter(Boolean).join(' · ')}
+                {[job.establishment, job.city, job.region, isInternational ? displayValue('en', country) : null].filter(Boolean).join(' · ')}
               </div>
 
               <dl className="mt-10 grid gap-x-8 gap-y-5 sm:grid-cols-2">
+                {isInternational && <Detail label="Country" value={displayValue('en', country)} />}
                 <Detail label="Department" value={displayValue('en', job.department)} />
                 <Detail label="Shift" value={displayValue('en', job.shift)} />
                 <Detail label="Schedule" value={job.schedule} />
@@ -103,8 +113,18 @@ export default async function EnglishJobDetailPage({ params }: { params: { id: s
                 <Detail label="Start date" value={formatDate(job.start_date, dateLocale('en'))} />
                 <Detail label="Duration" value={job.duration} />
                 <Detail label="Compensation" value={job.salary} />
-                <Detail label="Region" value={job.region} />
+                <Detail label={isInternational ? 'Region / territory' : 'Region'} value={job.region} />
               </dl>
+
+              {isInternational && eligibleCountries.length > 0 && (
+                <section className="mt-10 rounded-xl border border-accent/30 bg-accent-soft/30 p-5">
+                  <h2 className="text-[18px] font-semibold text-fg">International assignment</h2>
+                  <p className="mt-2 text-[15px] leading-relaxed text-fg-muted">
+                    This assignment is located in {displayValue('en', country)}. Applications are
+                    accepted from: {eligibleCountries.map((value) => displayValue('en', value)).join(', ')}.
+                  </p>
+                </section>
+              )}
 
               {requirements && (
                 <section className="mt-12">
@@ -148,7 +168,9 @@ export default async function EnglishJobDetailPage({ params }: { params: { id: s
                 <p className="text-[12.5px] font-semibold uppercase tracking-wider text-fg-subtle">Summary</p>
                 <dl className="mt-4 space-y-3.5 text-[14px]">
                   <SidebarItem label="Facility" value={job.establishment} />
+                  {isInternational && <SidebarItem label="Country" value={displayValue('en', country)} />}
                   <SidebarItem label="City" value={job.city} />
+                  <SidebarItem label={isInternational ? 'Territory' : 'Region'} value={job.region} />
                   <SidebarItem label="Department" value={displayValue('en', job.department)} />
                   <SidebarItem label="Shift" value={displayValue('en', job.shift)} />
                   <SidebarItem label="Assignment type" value={displayValue('en', job.mandate_type)} />
