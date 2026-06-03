@@ -6,6 +6,8 @@ import {
   PUBLIC_COPY,
   dateLocale,
   displayValue,
+  jobEstablishment,
+  jobSalary,
   jobTitle,
   localizedJobPath,
   localizedPath,
@@ -22,8 +24,10 @@ export default function JobCard({ job, variant = 'default', locale = 'fr' }: Job
   const copy = PUBLIC_COPY[locale].jobs;
   const country = job.country || 'Canada';
   const isInternational = country !== 'Canada';
+  const establishment = jobEstablishment(job, locale);
+  const salary = jobSalary(job, locale);
   const meta: string[] = [];
-  if (job.establishment) meta.push(job.establishment);
+  if (establishment) meta.push(establishment);
   if (job.city) meta.push(job.city);
   if (isInternational) meta.push(displayValue(locale, country));
   if (job.department) meta.push(displayValue(locale, job.department));
@@ -93,10 +97,10 @@ export default function JobCard({ job, variant = 'default', locale = 'fr' }: Job
         </p>
       )}
 
-      {variant === 'default' && job.salary && (
+      {variant === 'default' && salary && (
         <p className="text-[14.5px] text-fg-muted">
           <span className="text-fg-subtle">{copy.salary} · </span>
-          {job.salary}
+          {salary}
         </p>
       )}
 

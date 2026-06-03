@@ -12,7 +12,15 @@ import {
   jobPostingJsonLd,
   publicPageMetadata,
 } from '@/lib/seo';
-import { displayValue } from '@/lib/i18n';
+import {
+  displayValue,
+  jobBenefits,
+  jobDescription,
+  jobDuration,
+  jobEstablishment,
+  jobSalary,
+  jobSchedule,
+} from '@/lib/i18n';
 import { formatDate } from '@/lib/utils';
 import type { Job } from '@/types';
 
@@ -54,6 +62,12 @@ export default async function JobDetailPage({ params }: { params: { id: string }
   const country = job.country || 'Canada';
   const isInternational = country !== 'Canada';
   const eligibleCountries = job.eligible_countries || [];
+  const description = jobDescription(job, 'fr');
+  const benefits = jobBenefits(job, 'fr');
+  const establishment = jobEstablishment(job, 'fr');
+  const schedule = jobSchedule(job, 'fr');
+  const duration = jobDuration(job, 'fr');
+  const salary = jobSalary(job, 'fr');
 
   return (
     <PublicLayout>
@@ -96,18 +110,27 @@ export default async function JobDetailPage({ params }: { params: { id: string }
               <h1 className="mt-3 text-display-lg text-fg">{job.title}</h1>
 
               <div className="mt-6 text-[15px] text-fg-muted">
-                {[job.establishment, job.city, job.region, isInternational ? displayValue('fr', country) : null].filter(Boolean).join(' · ')}
+                {[establishment, job.city, job.region, isInternational ? displayValue('fr', country) : null].filter(Boolean).join(' · ')}
               </div>
+
+              {description && (
+                <section className="mt-10">
+                  <h2 className="text-[20px] font-semibold text-fg">Description</h2>
+                  <p className="mt-3 max-w-prose text-[15.5px] leading-relaxed text-fg whitespace-pre-line">
+                    {description}
+                  </p>
+                </section>
+              )}
 
               <dl className="mt-10 grid gap-x-8 gap-y-5 sm:grid-cols-2">
                 {isInternational && <Detail label="Pays" value={displayValue('fr', country)} />}
                 <Detail label="Département" value={job.department} />
                 <Detail label="Quart" value={job.shift} />
-                <Detail label="Horaire" value={job.schedule} />
+                <Detail label="Horaire" value={schedule} />
                 <Detail label="Type de mandat" value={job.mandate_type} />
                 <Detail label="Date de début" value={formatDate(job.start_date)} />
-                <Detail label="Durée" value={job.duration} />
-                <Detail label="Rémunération" value={job.salary} />
+                <Detail label="Durée" value={duration} />
+                <Detail label="Rémunération" value={salary} />
                 <Detail label={isInternational ? 'Région / territoire' : 'Région'} value={job.region} />
               </dl>
 
@@ -126,6 +149,15 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                   <h2 className="text-[20px] font-semibold text-fg">Exigences</h2>
                   <p className="mt-3 max-w-prose text-[15.5px] leading-relaxed text-fg whitespace-pre-line">
                     {job.requirements}
+                  </p>
+                </section>
+              )}
+
+              {benefits && (
+                <section className="mt-10">
+                  <h2 className="text-[20px] font-semibold text-fg">Avantages</h2>
+                  <p className="mt-3 max-w-prose text-[15.5px] leading-relaxed text-fg whitespace-pre-line">
+                    {benefits}
                   </p>
                 </section>
               )}
@@ -171,7 +203,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                   Résumé
                 </p>
                 <dl className="mt-4 space-y-3.5 text-[14px]">
-                  <SidebarItem label="Établissement" value={job.establishment} />
+                  <SidebarItem label="Établissement" value={establishment} />
                   {isInternational && <SidebarItem label="Pays" value={displayValue('fr', country)} />}
                   <SidebarItem label="Ville" value={job.city} />
                   <SidebarItem label={isInternational ? 'Territoire' : 'Région'} value={job.region} />

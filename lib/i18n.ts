@@ -574,9 +574,39 @@ export function jobTitle(job: Job, locale: Locale): string {
   return job.title;
 }
 
+export function jobDescription(job: Job, locale: Locale): string | null {
+  if (locale === 'en') return job.description_en || null;
+  return job.description || null;
+}
+
+export function jobEstablishment(job: Job, locale: Locale): string | null {
+  if (locale === 'en') return job.establishment_en || job.establishment;
+  return job.establishment;
+}
+
+export function jobSchedule(job: Job, locale: Locale): string | null {
+  if (locale === 'en') return job.schedule_en || job.schedule;
+  return job.schedule;
+}
+
+export function jobDuration(job: Job, locale: Locale): string | null {
+  if (locale === 'en') return job.duration_en || job.duration;
+  return job.duration;
+}
+
+export function jobSalary(job: Job, locale: Locale): string | null {
+  if (locale === 'en') return job.salary_en || job.salary;
+  return job.salary;
+}
+
 export function jobRequirements(job: Job, locale: Locale): string | null {
   if (locale === 'en') return job.requirements_en || (job.requirements ? PUBLIC_COPY.en.jobs.fallbackRequirements : null);
   return job.requirements;
+}
+
+export function jobBenefits(job: Job, locale: Locale): string | null {
+  if (locale === 'en') return job.benefits_en || null;
+  return job.benefits || null;
 }
 
 export function jobParticularities(job: Job, locale: Locale): string | null {

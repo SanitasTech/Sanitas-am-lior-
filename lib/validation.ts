@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 const nonEmpty = (label: string) => z.string().min(1, `${label} requis`).max(500);
 const optionalString = z.string().max(2000).optional().nullable();
+const optionalLongString = z.string().max(8000).optional().nullable();
 
 // ---------------------------------------------------------------------
 // Candidate
@@ -56,6 +57,8 @@ export const extraQuestionSchema = z.object({
 export const jobSchema = z.object({
   title: nonEmpty('Titre'),
   title_en: optionalString,
+  description: optionalLongString,
+  description_en: optionalLongString,
   profession: nonEmpty('Profession'),
   job_title_id: z.string().uuid().optional().nullable(),
   country: z.string().min(1, 'Pays requis').max(120).default('Canada'),
@@ -63,18 +66,24 @@ export const jobSchema = z.object({
   region: nonEmpty('Région'),
   city: optionalString,
   establishment: optionalString,
+  establishment_en: optionalString,
   department: optionalString,
   shift: optionalString,
   schedule: optionalString,
+  schedule_en: optionalString,
   mandate_type: optionalString,
   start_date: optionalString,
   duration: optionalString,
+  duration_en: optionalString,
   salary: optionalString,
+  salary_en: optionalString,
   urgency: z.enum(['normal', 'high', 'urgent']).default('normal'),
-  requirements: optionalString,
-  requirements_en: optionalString,
-  particularities: optionalString,
-  particularities_en: optionalString,
+  requirements: optionalLongString,
+  requirements_en: optionalLongString,
+  benefits: optionalLongString,
+  benefits_en: optionalLongString,
+  particularities: optionalLongString,
+  particularities_en: optionalLongString,
   required_documents: z.array(z.string()).default([]),
   extra_questions: z.array(extraQuestionSchema).default([]),
   status: z.enum(['active', 'inactive', 'draft']).default('active'),

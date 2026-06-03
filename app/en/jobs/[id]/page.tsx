@@ -10,8 +10,14 @@ import { formatDate } from '@/lib/utils';
 import {
   dateLocale,
   displayValue,
+  jobBenefits,
+  jobDescription,
+  jobDuration,
+  jobEstablishment,
   jobParticularities,
   jobRequirements,
+  jobSalary,
+  jobSchedule,
   jobTitle,
   localizedPath,
 } from '@/lib/i18n';
@@ -54,8 +60,14 @@ export default async function EnglishJobDetailPage({ params }: { params: { id: s
   if (!job) notFound();
 
   const interestedHref = `${localizedPath('en', 'apply')}?mandat_id=${job.id}`;
+  const description = jobDescription(job, 'en');
+  const benefits = jobBenefits(job, 'en');
   const requirements = jobRequirements(job, 'en');
   const particularities = jobParticularities(job, 'en');
+  const establishment = jobEstablishment(job, 'en');
+  const schedule = jobSchedule(job, 'en');
+  const duration = jobDuration(job, 'en');
+  const salary = jobSalary(job, 'en');
   const country = job.country || 'Canada';
   const isInternational = country !== 'Canada';
   const eligibleCountries = job.eligible_countries || [];
@@ -101,18 +113,27 @@ export default async function EnglishJobDetailPage({ params }: { params: { id: s
               <h1 className="mt-3 text-display-lg text-fg">{jobTitle(job, 'en')}</h1>
 
               <div className="mt-6 text-[15px] text-fg-muted">
-                {[job.establishment, job.city, job.region, isInternational ? displayValue('en', country) : null].filter(Boolean).join(' · ')}
+                {[establishment, job.city, job.region, isInternational ? displayValue('en', country) : null].filter(Boolean).join(' · ')}
               </div>
+
+              {description && (
+                <section className="mt-10">
+                  <h2 className="text-[20px] font-semibold text-fg">Description</h2>
+                  <p className="mt-3 max-w-prose text-[15.5px] leading-relaxed text-fg whitespace-pre-line">
+                    {description}
+                  </p>
+                </section>
+              )}
 
               <dl className="mt-10 grid gap-x-8 gap-y-5 sm:grid-cols-2">
                 {isInternational && <Detail label="Country" value={displayValue('en', country)} />}
                 <Detail label="Department" value={displayValue('en', job.department)} />
                 <Detail label="Shift" value={displayValue('en', job.shift)} />
-                <Detail label="Schedule" value={job.schedule} />
+                <Detail label="Schedule" value={schedule} />
                 <Detail label="Assignment type" value={displayValue('en', job.mandate_type)} />
                 <Detail label="Start date" value={formatDate(job.start_date, dateLocale('en'))} />
-                <Detail label="Duration" value={job.duration} />
-                <Detail label="Compensation" value={job.salary} />
+                <Detail label="Duration" value={duration} />
+                <Detail label="Compensation" value={salary} />
                 <Detail label={isInternational ? 'Region / territory' : 'Region'} value={job.region} />
               </dl>
 
@@ -131,6 +152,15 @@ export default async function EnglishJobDetailPage({ params }: { params: { id: s
                   <h2 className="text-[20px] font-semibold text-fg">Requirements</h2>
                   <p className="mt-3 max-w-prose text-[15.5px] leading-relaxed text-fg whitespace-pre-line">
                     {requirements}
+                  </p>
+                </section>
+              )}
+
+              {benefits && (
+                <section className="mt-10">
+                  <h2 className="text-[20px] font-semibold text-fg">Benefits</h2>
+                  <p className="mt-3 max-w-prose text-[15.5px] leading-relaxed text-fg whitespace-pre-line">
+                    {benefits}
                   </p>
                 </section>
               )}
@@ -167,7 +197,7 @@ export default async function EnglishJobDetailPage({ params }: { params: { id: s
               <div className="card p-6 shadow-card">
                 <p className="text-[12.5px] font-semibold uppercase tracking-wider text-fg-subtle">Summary</p>
                 <dl className="mt-4 space-y-3.5 text-[14px]">
-                  <SidebarItem label="Facility" value={job.establishment} />
+                  <SidebarItem label="Facility" value={establishment} />
                   {isInternational && <SidebarItem label="Country" value={displayValue('en', country)} />}
                   <SidebarItem label="City" value={job.city} />
                   <SidebarItem label={isInternational ? 'Territory' : 'Region'} value={job.region} />

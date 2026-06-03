@@ -1,6 +1,16 @@
 import type { Metadata } from 'next';
 import { COMPANY } from '@/lib/constants';
-import { displayValue, jobTitle, type Locale } from '@/lib/i18n';
+import {
+  displayValue,
+  jobBenefits,
+  jobDescription,
+  jobParticularities,
+  jobRequirements,
+  jobSalary,
+  jobSchedule,
+  jobTitle,
+  type Locale,
+} from '@/lib/i18n';
 import type { Job } from '@/types';
 
 function normalizePublicSiteUrl(value: string) {
@@ -235,14 +245,14 @@ export function jobMetaDescription(job: Job, locale: Locale): string {
           `${profession} assignment${department ? ` in ${department}` : ''}`,
           location,
           shift ? `${shift} shift` : '',
-          job.salary || '',
+          jobSalary(job, locale) || '',
           'Apply with Agence Sanitas.',
         ]
       : [
           `Mandat ${profession}${department ? ` en ${department}` : ''}`,
           location,
           shift ? `quart ${shift.toLowerCase()}` : '',
-          job.salary || '',
+          jobSalary(job, locale) || '',
           'Postulez avec Agence Sanitas.',
         ];
 
@@ -268,9 +278,11 @@ export function jobPostingJsonLd(job: Job, locale: Locale) {
     job.eligible_countries && job.eligible_countries.length > 0 ? job.eligible_countries : ['Canada'];
   const description = [
     title,
+    jobDescription(job, locale),
     jobMetaDescription(job, locale),
-    locale === 'en' ? job.requirements_en || job.requirements : job.requirements,
-    locale === 'en' ? job.particularities_en || job.particularities : job.particularities,
+    jobRequirements(job, locale),
+    jobBenefits(job, locale),
+    jobParticularities(job, locale),
   ]
     .filter(Boolean)
     .join('\n\n');
@@ -297,8 +309,8 @@ export function jobPostingJsonLd(job: Job, locale: Locale) {
     },
     industry: 'Healthcare staffing',
     occupationalCategory: displayValue(locale, job.profession),
-    workHours: job.schedule || job.shift || undefined,
-    baseSalary: baseSalaryFromText(job.salary),
+    workHours: jobSchedule(job, locale) || job.shift || undefined,
+    baseSalary: baseSalaryFromText(jobSalary(job, locale)),
     jobLocation: {
       '@type': 'Place',
       address: {

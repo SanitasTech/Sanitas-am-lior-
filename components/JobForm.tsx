@@ -27,22 +27,30 @@ interface JobFormProps {
 interface State {
   title: string;
   title_en: string;
+  description: string;
+  description_en: string;
   profession: string;
   country: string;
   eligible_countries: string[];
   region: string;
   city: string;
   establishment: string;
+  establishment_en: string;
   department: string;
   shift: string;
   schedule: string;
+  schedule_en: string;
   mandate_type: string;
   start_date: string;
   duration: string;
+  duration_en: string;
   salary: string;
+  salary_en: string;
   urgency: 'normal' | 'high' | 'urgent';
   requirements: string;
   requirements_en: string;
+  benefits: string;
+  benefits_en: string;
   particularities: string;
   particularities_en: string;
   required_documents: string[];
@@ -64,6 +72,8 @@ export default function JobForm({ initial, mode }: JobFormProps) {
   const [form, setForm] = useState<State>({
     title: initial?.title || '',
     title_en: initial?.title_en || '',
+    description: initial?.description || '',
+    description_en: initial?.description_en || '',
     profession: initial?.profession || '',
     country: initialCountry,
     eligible_countries:
@@ -73,16 +83,22 @@ export default function JobForm({ initial, mode }: JobFormProps) {
     region: initial?.region || '',
     city: initial?.city || '',
     establishment: initial?.establishment || '',
+    establishment_en: initial?.establishment_en || '',
     department: initial?.department || '',
     shift: initial?.shift || '',
     schedule: initial?.schedule || '',
+    schedule_en: initial?.schedule_en || '',
     mandate_type: initial?.mandate_type || '',
     start_date: initial?.start_date || '',
     duration: initial?.duration || '',
+    duration_en: initial?.duration_en || '',
     salary: initial?.salary || '',
+    salary_en: initial?.salary_en || '',
     urgency: (initial?.urgency as State['urgency']) ?? 'normal',
     requirements: initial?.requirements || '',
     requirements_en: initial?.requirements_en || '',
+    benefits: initial?.benefits || '',
+    benefits_en: initial?.benefits_en || '',
     particularities: initial?.particularities || '',
     particularities_en: initial?.particularities_en || '',
     required_documents: initial?.required_documents || [],
@@ -162,22 +178,30 @@ export default function JobForm({ initial, mode }: JobFormProps) {
         ...(mode === 'edit' && initial?.id ? { id: initial.id } : {}),
         title: form.title.trim(),
         title_en: form.title_en || null,
+        description: form.description || null,
+        description_en: form.description_en || null,
         profession: form.profession,
         country: form.country,
         eligible_countries: isInternationalCountry(form.country) ? form.eligible_countries : [],
         region: form.region,
         city: form.city || null,
         establishment: form.establishment || null,
+        establishment_en: form.establishment_en || null,
         department: form.department || null,
         shift: form.shift || null,
         schedule: form.schedule || null,
+        schedule_en: form.schedule_en || null,
         mandate_type: form.mandate_type || null,
         start_date: form.start_date || null,
         duration: form.duration || null,
+        duration_en: form.duration_en || null,
         salary: form.salary || null,
+        salary_en: form.salary_en || null,
         urgency: form.urgency,
         requirements: form.requirements || null,
         requirements_en: form.requirements_en || null,
+        benefits: form.benefits || null,
+        benefits_en: form.benefits_en || null,
         particularities: form.particularities || null,
         particularities_en: form.particularities_en || null,
         required_documents: form.required_documents,
@@ -245,6 +269,28 @@ export default function JobForm({ initial, mode }: JobFormProps) {
           <Field label="Titre anglais">
             <input className="input" value={form.title_en} onChange={(e) => set('title_en', e.target.value)} />
           </Field>
+          <div className="sm:col-span-2">
+            <Field label="Description publique - français">
+              <textarea
+                className="textarea"
+                rows={5}
+                value={form.description}
+                onChange={(e) => set('description', e.target.value)}
+                placeholder="Texte principal visible sur la fiche du poste en français."
+              />
+            </Field>
+          </div>
+          <div className="sm:col-span-2">
+            <Field label="Public description - English">
+              <textarea
+                className="textarea"
+                rows={5}
+                value={form.description_en}
+                onChange={(e) => set('description_en', e.target.value)}
+                placeholder="Main public description shown on the English job page."
+              />
+            </Field>
+          </div>
           <Field label="Profession" required>
             <select className="input" value={form.profession} onChange={(e) => set('profession', e.target.value)}>
               <option value="">Choisir</option>
@@ -281,6 +327,9 @@ export default function JobForm({ initial, mode }: JobFormProps) {
           <Field label="Établissement">
             <input className="input" value={form.establishment} onChange={(e) => set('establishment', e.target.value)} />
           </Field>
+          <Field label="Établissement anglais">
+            <input className="input" value={form.establishment_en} onChange={(e) => set('establishment_en', e.target.value)} />
+          </Field>
           <Field label="Département">
             <select className="input" value={form.department} onChange={(e) => set('department', e.target.value)}>
               <option value="">Choisir</option>
@@ -296,6 +345,9 @@ export default function JobForm({ initial, mode }: JobFormProps) {
           <Field label="Horaire détaillé">
             <input className="input" value={form.schedule} onChange={(e) => set('schedule', e.target.value)} placeholder="Ex. 7h à 15h30" />
           </Field>
+          <Field label="Detailed schedule - English">
+            <input className="input" value={form.schedule_en} onChange={(e) => set('schedule_en', e.target.value)} placeholder="Ex. 7 a.m. to 3:30 p.m." />
+          </Field>
           <Field label="Type de mandat">
             <select className="input" value={form.mandate_type} onChange={(e) => set('mandate_type', e.target.value)}>
               <option value="">Choisir</option>
@@ -308,8 +360,14 @@ export default function JobForm({ initial, mode }: JobFormProps) {
           <Field label="Durée">
             <input className="input" value={form.duration} onChange={(e) => set('duration', e.target.value)} placeholder="Ex. 3 mois" />
           </Field>
+          <Field label="Duration - English">
+            <input className="input" value={form.duration_en} onChange={(e) => set('duration_en', e.target.value)} placeholder="Ex. 3 months" />
+          </Field>
           <Field label="Rémunération">
             <input className="input" value={form.salary} onChange={(e) => set('salary', e.target.value)} placeholder="Ex. Selon convention + primes" />
+          </Field>
+          <Field label="Compensation - English">
+            <input className="input" value={form.salary_en} onChange={(e) => set('salary_en', e.target.value)} placeholder="Ex. CAD $4,000-$7,500/month" />
           </Field>
           <Field label="Urgence">
             <select className="input" value={form.urgency} onChange={(e) => set('urgency', e.target.value as State['urgency'])}>
@@ -349,16 +407,22 @@ export default function JobForm({ initial, mode }: JobFormProps) {
           </Field>
         )}
 
-        <Field label="Exigences">
+        <Field label="Exigences - français">
           <textarea className="textarea" rows={4} value={form.requirements} onChange={(e) => set('requirements', e.target.value)} />
         </Field>
-        <Field label="Exigences anglaises">
+        <Field label="Requirements - English">
           <textarea className="textarea" rows={4} value={form.requirements_en} onChange={(e) => set('requirements_en', e.target.value)} />
         </Field>
-        <Field label="Particularités">
+        <Field label="Avantages - français">
+          <textarea className="textarea" rows={4} value={form.benefits} onChange={(e) => set('benefits', e.target.value)} />
+        </Field>
+        <Field label="Benefits - English">
+          <textarea className="textarea" rows={4} value={form.benefits_en} onChange={(e) => set('benefits_en', e.target.value)} />
+        </Field>
+        <Field label="Particularités - français">
           <textarea className="textarea" rows={4} value={form.particularities} onChange={(e) => set('particularities', e.target.value)} />
         </Field>
-        <Field label="Particularites anglaises">
+        <Field label="Notes - English">
           <textarea className="textarea" rows={4} value={form.particularities_en} onChange={(e) => set('particularities_en', e.target.value)} />
         </Field>
       </section>
