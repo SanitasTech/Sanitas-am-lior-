@@ -4,7 +4,7 @@ import SeoJsonLd from '@/components/SeoJsonLd';
 import ContactForm from '@/components/ContactForm';
 import ContactInfo from '@/components/ContactInfo';
 import { DecorativeBlob, PeopleIcon, ClipboardIcon, ChatIcon } from '@/components/Icons';
-import { breadcrumbJsonLd, publicPageMetadata, webPageJsonLd } from '@/lib/seo';
+import { breadcrumbJsonLd, contactPageJsonLd, publicPageMetadata } from '@/lib/seo';
 
 export const metadata = publicPageMetadata({
   title: 'Contact Agence Sanitas | Candidates and facilities',
@@ -24,7 +24,7 @@ export default function EnglishContactPage() {
         data={{
           '@context': 'https://schema.org',
           '@graph': [
-            webPageJsonLd({
+            contactPageJsonLd({
               name: 'Contact Agence Sanitas',
               description:
                 'Contact details and form for candidates, healthcare professionals and facilities in Quebec.',

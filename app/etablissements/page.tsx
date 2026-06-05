@@ -4,7 +4,7 @@ import EstablishmentRequestForm from '@/components/EstablishmentRequestForm';
 import ContactInfo from '@/components/ContactInfo';
 import Photo from '@/components/Photo';
 import { DecorativeBlob } from '@/components/Icons';
-import { breadcrumbJsonLd, publicPageMetadata, webPageJsonLd } from '@/lib/seo';
+import { breadcrumbJsonLd, publicPageMetadata, serviceJsonLd, webPageJsonLd } from '@/lib/seo';
 
 export const metadata = publicPageMetadata({
   title: 'Agence de placement personnel de santé au Québec',
@@ -51,6 +51,14 @@ export default function EtablissementsPage() {
               description:
                 'Page pour les établissements de santé au Québec qui souhaitent demander du personnel qualifié à Agence Sanitas.',
               url: '/etablissements',
+            }),
+            serviceJsonLd({
+              name: 'Placement de personnel de santé pour établissements au Québec',
+              description:
+                'Service de recrutement et de placement pour établissements de santé ayant des besoins urgents, ponctuels, récurrents ou planifiés.',
+              url: '/etablissements',
+              serviceType: 'Healthcare staffing for facilities',
+              audience: 'facilities',
             }),
             breadcrumbJsonLd([
               { name: 'Accueil', url: '/' },

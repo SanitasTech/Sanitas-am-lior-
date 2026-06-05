@@ -4,7 +4,7 @@ import PublicLayout from '@/components/PublicLayout';
 import SeoJsonLd from '@/components/SeoJsonLd';
 import SeoLandingPage from '@/components/SeoLandingPage';
 import { getLocalSeoPage, getLocalSeoSlugs } from '@/lib/local-seo-pages';
-import { breadcrumbJsonLd, publicPageMetadata, webPageJsonLd } from '@/lib/seo';
+import { breadcrumbJsonLd, publicPageMetadata, serviceJsonLd, webPageJsonLd } from '@/lib/seo';
 
 export const dynamicParams = false;
 
@@ -42,6 +42,14 @@ export default function EnglishLocalSeoPage({ params }: { params: { seoSlug: str
               description: page.metaDescription,
               url: `/en/${page.slug}`,
               locale: 'en',
+            }),
+            serviceJsonLd({
+              name: page.title,
+              description: page.intro,
+              url: `/en/${page.slug}`,
+              locale: 'en',
+              serviceType: page.title.toLowerCase().includes('jobs') ? 'Healthcare job matching' : 'Healthcare staffing',
+              audience: page.title.toLowerCase().includes('jobs') ? 'candidates' : 'facilities',
             }),
             breadcrumbJsonLd([
               { name: 'Home', url: '/en' },

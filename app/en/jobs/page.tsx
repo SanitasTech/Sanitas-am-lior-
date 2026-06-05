@@ -6,7 +6,14 @@ import JobCard from '@/components/JobCard';
 import PopularSearchLinks from '@/components/PopularSearchLinks';
 import { DecorativeBlob } from '@/components/Icons';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { breadcrumbJsonLd, itemListJsonLd, jobMetaDescription, publicPageMetadata, webPageJsonLd } from '@/lib/seo';
+import {
+  breadcrumbJsonLd,
+  collectionPageJsonLd,
+  itemListJsonLd,
+  jobMetaDescription,
+  publicPageMetadata,
+  serviceJsonLd,
+} from '@/lib/seo';
 import type { Job } from '@/types';
 import { urgencyOrder } from '@/lib/utils';
 
@@ -80,12 +87,21 @@ export default async function EnglishJobsPage({ searchParams }: Props) {
         data={{
           '@context': 'https://schema.org',
           '@graph': [
-            webPageJsonLd({
+            collectionPageJsonLd({
               name: 'Healthcare jobs and assignments in Quebec',
               description:
                 'Active healthcare assignments in Quebec for nurses, licensed practical nurses, PABs, ASSS and specialized workers.',
               url: '/en/jobs',
               locale: 'en',
+            }),
+            serviceJsonLd({
+              name: 'Healthcare assignment search in Quebec',
+              description:
+                'Job matching service for healthcare professionals seeking active assignments in Quebec or international mandates.',
+              url: '/en/jobs',
+              locale: 'en',
+              serviceType: 'Healthcare job matching',
+              audience: 'candidates',
             }),
             breadcrumbJsonLd([
               { name: 'Home', url: '/en' },

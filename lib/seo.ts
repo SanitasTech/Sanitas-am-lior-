@@ -248,6 +248,100 @@ export function webPageJsonLd({
   };
 }
 
+export function collectionPageJsonLd({
+  name,
+  description,
+  url,
+  locale = 'fr',
+}: {
+  name: string;
+  description: string;
+  url: string;
+  locale?: Locale;
+}) {
+  return {
+    '@type': ['WebPage', 'CollectionPage'],
+    '@id': `${absoluteUrl(url)}#collection`,
+    url: absoluteUrl(url),
+    name,
+    description,
+    inLanguage: locale === 'en' ? 'en-CA' : 'fr-CA',
+    isPartOf: { '@id': `${SITE_URL}/#website` },
+    publisher: { '@id': `${SITE_URL}/#organization` },
+    about: HEALTHCARE_SERVICE_AREAS.map((name) => ({ '@type': 'Thing', name })),
+  };
+}
+
+export function serviceJsonLd({
+  name,
+  description,
+  url,
+  locale = 'fr',
+  serviceType = 'Healthcare staffing',
+  audience = 'candidates',
+  areaServed = ['Québec', 'Canada'],
+}: {
+  name: string;
+  description: string;
+  url: string;
+  locale?: Locale;
+  serviceType?: string;
+  audience?: 'candidates' | 'facilities' | 'both';
+  areaServed?: string[];
+}) {
+  const audienceType =
+    audience === 'facilities'
+      ? 'Healthcare facilities and institutions'
+      : audience === 'both'
+        ? 'Healthcare candidates and healthcare facilities'
+        : 'Healthcare candidates';
+
+  return {
+    '@type': 'Service',
+    '@id': `${absoluteUrl(url)}#service`,
+    name,
+    description,
+    url: absoluteUrl(url),
+    serviceType,
+    inLanguage: locale === 'en' ? 'en-CA' : 'fr-CA',
+    provider: { '@id': `${SITE_URL}/#organization` },
+    areaServed: areaServed.map((name) => ({
+      '@type': name === 'Canada' ? 'Country' : 'AdministrativeArea',
+      name,
+    })),
+    audience: {
+      '@type': audience === 'facilities' ? 'BusinessAudience' : 'PeopleAudience',
+      audienceType,
+    },
+  };
+}
+
+export function contactPageJsonLd({
+  name,
+  description,
+  url,
+  locale = 'fr',
+}: {
+  name: string;
+  description: string;
+  url: string;
+  locale?: Locale;
+}) {
+  return {
+    '@type': ['WebPage', 'ContactPage'],
+    '@id': `${absoluteUrl(url)}#contact`,
+    url: absoluteUrl(url),
+    name,
+    description,
+    inLanguage: locale === 'en' ? 'en-CA' : 'fr-CA',
+    isPartOf: { '@id': `${SITE_URL}/#website` },
+    publisher: { '@id': `${SITE_URL}/#organization` },
+    mainEntity: {
+      '@id': `${SITE_URL}/#organization`,
+    },
+  };
+}
+
 export function itemListJsonLd(items: Array<{ name: string; url: string; description?: string }>) {
   return {
     '@type': 'ItemList',

@@ -4,7 +4,7 @@ import EstablishmentRequestForm from '@/components/EstablishmentRequestForm';
 import ContactInfo from '@/components/ContactInfo';
 import Photo from '@/components/Photo';
 import { DecorativeBlob } from '@/components/Icons';
-import { breadcrumbJsonLd, publicPageMetadata, webPageJsonLd } from '@/lib/seo';
+import { breadcrumbJsonLd, publicPageMetadata, serviceJsonLd, webPageJsonLd } from '@/lib/seo';
 
 export const metadata = publicPageMetadata({
   title: 'Healthcare staffing agency in Quebec for facilities',
@@ -42,6 +42,15 @@ export default function EnglishFacilitiesPage() {
                 'Page for healthcare facilities in Quebec that want to request qualified staff from Agence Sanitas.',
               url: '/en/facilities',
               locale: 'en',
+            }),
+            serviceJsonLd({
+              name: 'Healthcare staffing for facilities in Quebec',
+              description:
+                'Recruitment and staffing service for healthcare facilities with urgent, temporary, recurring or planned staffing needs.',
+              url: '/en/facilities',
+              locale: 'en',
+              serviceType: 'Healthcare staffing for facilities',
+              audience: 'facilities',
             }),
             breadcrumbJsonLd([
               { name: 'Home', url: '/en' },

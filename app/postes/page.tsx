@@ -6,7 +6,14 @@ import JobCard from '@/components/JobCard';
 import PopularSearchLinks from '@/components/PopularSearchLinks';
 import { DecorativeBlob } from '@/components/Icons';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { breadcrumbJsonLd, itemListJsonLd, jobMetaDescription, publicPageMetadata, webPageJsonLd } from '@/lib/seo';
+import {
+  breadcrumbJsonLd,
+  collectionPageJsonLd,
+  itemListJsonLd,
+  jobMetaDescription,
+  publicPageMetadata,
+  serviceJsonLd,
+} from '@/lib/seo';
 import type { Job } from '@/types';
 import { urgencyOrder } from '@/lib/utils';
 
@@ -79,11 +86,19 @@ export default async function PostesPage({ searchParams }: Props) {
         data={{
           '@context': 'https://schema.org',
           '@graph': [
-            webPageJsonLd({
+            collectionPageJsonLd({
               name: 'Mandats et emplois en santé au Québec',
               description:
                 'Mandats actifs en santé au Québec pour infirmières, infirmières auxiliaires, PAB, ASSS et autres professionnels.',
               url: '/postes',
+            }),
+            serviceJsonLd({
+              name: 'Recherche de mandats en santé au Québec',
+              description:
+                'Service de mise en relation entre professionnels de la santé et mandats actifs au Québec ou à l’international.',
+              url: '/postes',
+              serviceType: 'Healthcare job matching',
+              audience: 'candidates',
             }),
             breadcrumbJsonLd([
               { name: 'Accueil', url: '/' },
