@@ -17,12 +17,24 @@ const socialImage = '/opengraph-image';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  applicationName: 'Agence Sanitas',
+  category: 'Healthcare recruitment',
   title: {
     default: 'Agence Sanitas | Placement en sant\u00e9 au Qu\u00e9bec',
     template: '%s | Agence Sanitas',
   },
   description:
     'Agence de placement en sant\u00e9 bas\u00e9e \u00e0 Laval. Mandats adapt\u00e9s pour les professionnels de la sant\u00e9 et soutien aux \u00e9tablissements partout au Qu\u00e9bec.',
+  keywords: [
+    'agence de placement sant\u00e9 Qu\u00e9bec',
+    'mandats infirmiers Qu\u00e9bec',
+    'emplois infirmi\u00e8res Qu\u00e9bec',
+    'emplois PAB Qu\u00e9bec',
+    'recrutement personnel sant\u00e9 Qu\u00e9bec',
+    'healthcare staffing Quebec',
+    'nursing agency jobs Quebec',
+    'Agence Sanitas',
+  ],
   openGraph: {
     title: 'Agence Sanitas',
     description:

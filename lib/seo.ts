@@ -24,6 +24,20 @@ export const SITE_URL = normalizePublicSiteUrl(
 
 export const SOCIAL_IMAGE_PATH = '/opengraph-image';
 
+const HEALTHCARE_SERVICE_AREAS = [
+  'Mandats infirmiers au Québec',
+  'Nursing assignments in Quebec',
+  'Placement infirmier',
+  'Placement infirmière auxiliaire',
+  'Placement PAB',
+  'Placement ASSS',
+  'Personnel de santé temporaire',
+  'Healthcare staffing for Quebec facilities',
+  'Recrutement personnel de santé Québec',
+  'Mandats en région éloignée',
+  'International registered nurse opportunities',
+];
+
 export function absoluteUrl(path = '/'): string {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
   return `${SITE_URL}${normalizedPath === '/' ? '' : normalizedPath}`;
@@ -107,6 +121,7 @@ export function organizationJsonLd() {
     priceRange: '$$',
     description:
       'Agence de placement en santé basée à Laval, spécialisée dans les mandats pour professionnels de la santé au Québec.',
+    slogan: 'Mandats en santé au Québec pour professionnels de la santé.',
     address: {
       '@type': 'PostalAddress',
       streetAddress: `${COMPANY.address.line2}, ${COMPANY.address.line1}`,
@@ -119,14 +134,27 @@ export function organizationJsonLd() {
       { '@type': 'AdministrativeArea', name: 'Québec' },
       { '@type': 'Country', name: 'Canada' },
     ],
-    knowsAbout: [
-      'Placement infirmier au Quebec',
-      'Mandats infirmiers',
-      'Placement PAB',
-      'Personnel de sante',
-      'Recrutement en sante',
-      'Healthcare staffing in Quebec',
-    ],
+    availableLanguage: ['fr-CA', 'en-CA'],
+    knowsAbout: HEALTHCARE_SERVICE_AREAS,
+    keywords: HEALTHCARE_SERVICE_AREAS.join(', '),
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: 'Services de recrutement et mandats en santé',
+      itemListElement: [
+        offerCatalogItem(
+          'Mandats pour candidats en santé',
+          'Accès aux mandats pour infirmières, infirmières auxiliaires, PAB, ASSS et autres professionnels de la santé.'
+        ),
+        offerCatalogItem(
+          'Recherche de personnel pour établissements',
+          'Accompagnement des établissements de santé pour les besoins ponctuels, urgents, récurrents ou planifiés.'
+        ),
+        offerCatalogItem(
+          'Mandats infirmiers internationaux',
+          'Opportunités internationales pour infirmiers et infirmières autorisés selon les critères du mandat.'
+        ),
+      ],
+    },
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',
@@ -142,6 +170,14 @@ export function organizationJsonLd() {
         email: COMPANY.email,
         contactType: 'recruitment',
         areaServed: 'CA',
+        availableLanguage: ['fr-CA', 'en-CA'],
+      },
+      {
+        '@type': 'ContactPoint',
+        telephone: COMPANY.phone,
+        email: COMPANY.email,
+        contactType: 'customer service',
+        areaServed: ['CA', 'QC'],
         availableLanguage: ['fr-CA', 'en-CA'],
       },
     ],
@@ -160,13 +196,31 @@ export function websiteJsonLd() {
     '@type': 'WebSite',
     '@id': `${SITE_URL}/#website`,
     name: COMPANY.name,
+    alternateName: ['Agence de placement Sanitas', 'Sanitas healthcare staffing'],
     url: SITE_URL,
     publisher: { '@id': `${SITE_URL}/#organization` },
     inLanguage: ['fr-CA', 'en-CA'],
+    about: HEALTHCARE_SERVICE_AREAS.map((name) => ({ '@type': 'Thing', name })),
     potentialAction: {
       '@type': 'SearchAction',
       target: `${SITE_URL}/postes?profession={search_term_string}`,
       'query-input': 'required name=search_term_string',
+    },
+  };
+}
+
+function offerCatalogItem(name: string, description: string) {
+  return {
+    '@type': 'Offer',
+    itemOffered: {
+      '@type': 'Service',
+      name,
+      description,
+      provider: { '@id': `${SITE_URL}/#organization` },
+      areaServed: [
+        { '@type': 'AdministrativeArea', name: 'Québec' },
+        { '@type': 'Country', name: 'Canada' },
+      ],
     },
   };
 }
@@ -276,20 +330,26 @@ export function jobPostingJsonLd(job: Job, locale: Locale) {
   const country = job.country || 'Canada';
   const applicantCountries =
     job.eligible_countries && job.eligible_countries.length > 0 ? job.eligible_countries : ['Canada'];
+  const jobUrl = absoluteUrl(locale === 'en' ? `/en/jobs/${job.id}` : `/postes/${job.id}`);
+  const requirements = jobRequirements(job, locale);
+  const benefits = jobBenefits(job, locale);
+  const particularities = jobParticularities(job, locale);
   const description = [
     title,
     jobDescription(job, locale),
     jobMetaDescription(job, locale),
-    jobRequirements(job, locale),
-    jobBenefits(job, locale),
-    jobParticularities(job, locale),
+    requirements,
+    benefits,
+    particularities,
   ]
     .filter(Boolean)
     .join('\n\n');
 
   return {
     '@type': 'JobPosting',
-    '@id': `${absoluteUrl(locale === 'en' ? `/en/jobs/${job.id}` : `/postes/${job.id}`)}#job`,
+    '@id': `${jobUrl}#job`,
+    url: jobUrl,
+    mainEntityOfPage: jobUrl,
     identifier: {
       '@type': 'PropertyValue',
       name: COMPANY.name,
@@ -309,6 +369,10 @@ export function jobPostingJsonLd(job: Job, locale: Locale) {
     },
     industry: 'Healthcare staffing',
     occupationalCategory: displayValue(locale, job.profession),
+    qualifications: requirements || undefined,
+    benefits: benefits || undefined,
+    jobBenefits: benefits || undefined,
+    responsibilities: particularities || undefined,
     workHours: jobSchedule(job, locale) || job.shift || undefined,
     baseSalary: baseSalaryFromText(jobSalary(job, locale)),
     jobLocation: {
@@ -324,26 +388,66 @@ export function jobPostingJsonLd(job: Job, locale: Locale) {
       '@type': 'Country',
       name: displayValue(locale, name),
     })),
+    applicationContact: {
+      '@type': 'ContactPoint',
+      telephone: COMPANY.phone,
+      email: COMPANY.email,
+      contactType: 'recruitment',
+      availableLanguage: locale === 'en' ? ['en-CA', 'fr-CA'] : ['fr-CA', 'en-CA'],
+    },
   };
 }
 
 function baseSalaryFromText(salary?: string | null) {
   if (!salary) return undefined;
-  const match = salary.replace(',', '.').match(/(\d+(?:\.\d+)?)/);
-  if (!match) return undefined;
-  const value = Number(match[1]);
-  if (!Number.isFinite(value)) return undefined;
+  const numbers = (salary.match(/\d[\d\s,.]*/g) || [])
+    .map(parseSalaryNumber)
+    .filter((value) => Number.isFinite(value) && value > 0);
+  if (numbers.length === 0) return undefined;
   const isMaximum = /jusqu|up to|max/i.test(salary);
+  const minValue = Math.min(...numbers);
+  const maxValue = Math.max(...numbers);
+  const hasRange = numbers.length > 1 && minValue !== maxValue;
 
   return {
     '@type': 'MonetaryAmount',
     currency: 'CAD',
     value: {
       '@type': 'QuantitativeValue',
-      ...(isMaximum ? { maxValue: value } : { value }),
-      unitText: /h|heure|hour/i.test(salary) ? 'HOUR' : 'DAY',
+      ...(hasRange ? { minValue, maxValue } : isMaximum ? { maxValue } : { value: maxValue }),
+      unitText: salaryUnitText(salary),
     },
   };
+}
+
+function parseSalaryNumber(raw: string): number {
+  let value = raw.trim().replace(/\s/g, '');
+  const hasComma = value.includes(',');
+  const hasDot = value.includes('.');
+
+  if (hasComma && hasDot) {
+    value =
+      value.lastIndexOf('.') > value.lastIndexOf(',')
+        ? value.replace(/,/g, '')
+        : value.replace(/\./g, '').replace(',', '.');
+  } else if (hasComma) {
+    const decimalPart = value.split(',').pop() || '';
+    value = decimalPart.length === 3 ? value.replace(/,/g, '') : value.replace(',', '.');
+  } else if (hasDot) {
+    const decimalPart = value.split('.').pop() || '';
+    if (decimalPart.length === 3) value = value.replace(/\./g, '');
+  }
+
+  return Number(value);
+}
+
+function salaryUnitText(salary: string): 'HOUR' | 'DAY' | 'WEEK' | 'MONTH' | 'YEAR' {
+  const value = salary.toLowerCase();
+  if (/\/\s*h|\bh\b|\bhr\b|heure|hour/.test(value)) return 'HOUR';
+  if (/mois|mensuel|monthly|month|\/\s*mo/.test(value)) return 'MONTH';
+  if (/semaine|weekly|week/.test(value)) return 'WEEK';
+  if (/annee|année|annuel|annual|year|\/\s*yr/.test(value)) return 'YEAR';
+  return 'DAY';
 }
 
 function employmentTypeForMandate(mandateType?: string | null): string {
