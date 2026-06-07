@@ -1,13 +1,16 @@
-Campaign,Asset type,Text,Final URL,Description 1,Description 2
-Mandats infirmiers Quebec - Francais requis,Sitelink,Voir les mandats infirmiers,https://www.agencesanitas.com/postes?profession=Infirmier%28%C3%A8re%29,Mandats au Quebec,Francais requis
-Mandats infirmiers Quebec - Francais requis,Sitelink,Postuler comme infirmier,https://www.agencesanitas.com/postuler,Profil candidat rapide,Canada seulement
-Mandats infirmiers Quebec - Francais requis,Sitelink,Parler a Sanitas,https://www.agencesanitas.com/contact,Questions avant postuler,Equipe a Laval
-Mandats infirmiers Quebec - Francais requis,Sitelink,Mandats en regions,https://www.agencesanitas.com/mandats-infirmiers-region-eloignee,Regions du Quebec,Infirmiers francophones
-Mandats infirmiers Quebec - Francais requis,Callout,Francais professionnel requis,,
-Mandats infirmiers Quebec - Francais requis,Callout,Infirmiers autorises seulement,,
-Mandats infirmiers Quebec - Francais requis,Callout,Mandats au Quebec,,
-Mandats infirmiers Quebec - Francais requis,Callout,Candidats au Canada seulement,,
-Mandats infirmiers Quebec - Francais requis,Callout,Agence basee a Laval,,
-Mandats infirmiers Quebec - Francais requis,Structured snippet - Profils recherches,"Infirmiers, Infirmieres, Infirmiers autorises",,
-Mandats infirmiers Quebec - Francais requis,Structured snippet - Criteres,"Francais professionnel, Autorisation de travail, Canada, Experience sante",,
-Mandats infirmiers Quebec - Francais requis,Structured snippet - Mandats,"Urgence, CHSLD, Chirurgie, SAD, Soins intensifs, Obstetrique",,
+Campaign,Asset type,Asset,Description line 1,Description line 2,Final URL,Level
+Mandats infirmiers Quebec - Search seulement,Sitelink,Voir mandats infirmiers,Postes au Québec,Régions au choix,https://www.agencesanitas.com/postes?profession=Infirmier%28%C3%A8re%29,Campaign
+Mandats infirmiers Quebec - Search seulement,Sitelink,Postuler comme infirmier,Profil rapide,Suivi humain,https://www.agencesanitas.com/postuler,Campaign
+Mandats infirmiers Quebec - Search seulement,Sitelink,Mandats en régions,Gaspésie Abitibi,Régions éloignées,https://www.agencesanitas.com/mandats-infirmiers-region-eloignee,Campaign
+Mandats infirmiers Quebec - Search seulement,Sitelink,Parler à Sanitas,Questions avant postuler,Équipe à Laval,https://www.agencesanitas.com/contact,Campaign
+Mandats infirmiers Quebec - Search seulement,Callout,Mandats au Québec,,,,Campaign
+Mandats infirmiers Quebec - Search seulement,Callout,Infirmiers autorisés,,,,Campaign
+Mandats infirmiers Quebec - Search seulement,Callout,Infirmiers cliniciens,,,,Campaign
+Mandats infirmiers Quebec - Search seulement,Callout,Quarts au choix,,,,Campaign
+Mandats infirmiers Quebec - Search seulement,Callout,Régions au choix,,,,Campaign
+Mandats infirmiers Quebec - Search seulement,Callout,Suivi humain,,,,Campaign
+Mandats infirmiers Quebec - Search seulement,Callout,Agence basée à Laval,,,,Campaign
+Mandats infirmiers Quebec - Search seulement,Callout,Profil candidat rapide,,,,Campaign
+Mandats infirmiers Quebec - Search seulement,Structured snippet,Profils: Infirmiers, infirmières, infirmiers autorisés, infirmiers cliniciens,,,Campaign
+Mandats infirmiers Quebec - Search seulement,Structured snippet,Régions: Gaspésie, Îles-de-la-Madeleine, Bas-Saint-Laurent, Abitibi, Côte-Nord,,,Campaign
+Mandats infirmiers Quebec - Search seulement,Structured snippet,Mandats: Urgence, CHSLD, chirurgie, SAD, soins intensifs, obstétrique,,,Campaign

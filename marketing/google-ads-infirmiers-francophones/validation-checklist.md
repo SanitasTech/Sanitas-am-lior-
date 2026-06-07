@@ -1,34 +1,47 @@
 # Checklist avant activation
 
-## Annonces
-- [ ] Chaque annonce mentionne clairement `francais requis` ou `francais professionnel requis`.
-- [ ] Aucun titre ne dit `bilingue obligatoire` si l'anglais n'est pas requis.
-- [ ] Aucune annonce ne mentionne `international nurses`, `visa`, `sponsorship` ou `no French required`.
-- [ ] Les descriptions filtrent PAB, infirmieres auxiliaires, visa et formation.
-- [ ] Les titres principaux restent orientes infirmier/infirmiere seulement.
+## Reglages critiques
+- [ ] Type de campagne: Search.
+- [ ] Display Network desactive.
+- [ ] Search partners desactive au lancement.
+- [ ] Zone: Quebec seulement.
+- [ ] Location option: Presence, pas Presence or interest.
+- [ ] Budget initial principal: 15 a 20 CAD/jour.
+- [ ] Budget concurrents: 5 a 10 CAD/jour dans une campagne separee.
 
-## Ciblage
-- [ ] Zone: Canada ou Quebec selon budget.
-- [ ] Presence: personnes presentes dans la zone ciblee.
-- [ ] Langue: francais.
-- [ ] Search Network seulement au lancement.
-- [ ] Display desactive.
+## Annonces
+- [ ] Les annonces parlent d'infirmiers/infirmieres, infirmiers autorises, techniciens ou cliniciens.
+- [ ] Aucun titre ne mentionne PAB, auxiliaire, ASSS, immigration, visa ou international.
+- [ ] Aucun nom de concurrent n'apparait dans les annonces.
+- [ ] Les descriptions disent clairement Quebec, mandats infirmiers, regions/quarts au choix.
 
 ## Mots-cles
 - [ ] Les mots-cles positifs sont en expression ou exact au lancement.
-- [ ] Aucun mot-cle large non controle n'est actif au depart.
-- [ ] Les groupes anglais prudents sont separes et surveilles.
-- [ ] Les termes de recherche sont revises quotidiennement la premiere semaine.
+- [ ] Aucun broad match actif au depart.
+- [ ] Tous les mots-cles Canada, nursing, registered nurse et francophone sont retires de la campagne principale.
+- [ ] Les mots-cles regions eloignees sont dans leur propre groupe d'annonces.
+- [ ] Les mots-cles concurrents sont dans une campagne separee.
 
 ## Negatifs
 - [ ] PAB ajoute en negatif.
 - [ ] Infirmiere auxiliaire / LPN ajoute en negatif.
+- [ ] ASSS ajoute en negatif.
+- [ ] Travailleur social ajoute en negatif.
 - [ ] Formation, cours, ecole, stage ajoutes en negatif.
-- [ ] Visa, immigration, sponsorship, international nurse ajoutes en negatif.
-- [ ] Sans francais / no French required / english only ajoutes en negatif.
+- [ ] Visa, immigration, sponsorship, international, etranger ajoutes en negatif.
+- [ ] Nursing, registered nurse, nurse canada, english nurse ajoutes en negatif.
 
 ## Conversion
 - [ ] La conversion principale mesure une candidature envoyee, pas seulement une visite.
-- [ ] Les UTM sont presents sur l'URL finale.
-- [ ] Les leads entrants sont verifies: infirmier/infirmiere, Canada, francais professionnel.
-- [ ] Si plus de 20% des leads sont non admissibles, durcir titres, negatifs et page de destination.
+- [ ] `NEXT_PUBLIC_GOOGLE_ADS_ID` est configure sur le site avec l'ID `AW-...`.
+- [ ] L'evenement `ads_conversion_Envoi_de_formulaire_pou_1` est conserve sur `/merci?type=posting` et `/merci?type=spontaneous`.
+- [ ] Les UTM sont presents sur les URL finales.
+- [ ] Les leads entrants sont verifies: infirmier/infirmiere du Quebec, pas PAB, pas auxiliaire, pas hors cible.
+
+## Apres 48 a 72 h
+- [ ] Exporter Search terms.
+- [ ] Exporter Keywords.
+- [ ] Exporter Ads.
+- [ ] Exporter Assets.
+- [ ] Exporter Locations.
+- [ ] Exporter Conversions.

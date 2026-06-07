@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import GoogleAdsTag from '@/components/GoogleAdsTag';
 import { Playfair_Display } from 'next/font/google';
 import SeoJsonLd from '@/components/SeoJsonLd';
 import { SITE_URL, organizationJsonLd, websiteJsonLd } from '@/lib/seo';
@@ -13,6 +14,7 @@ const playfair = Playfair_Display({
 });
 
 const facebookAppId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID;
+const googleAdsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 const socialImage = '/opengraph-image';
 
 export const metadata: Metadata = {
@@ -66,6 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr-CA" className={playfair.variable}>
       <body className="min-h-screen antialiased">
+        <GoogleAdsTag tagId={googleAdsId} />
         <SeoJsonLd
           id="sanitas-global-schema"
           data={{

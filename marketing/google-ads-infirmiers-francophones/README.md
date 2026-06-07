@@ -1,55 +1,52 @@
-# Campagne Google Ads - Infirmiers francophones au Canada
+# Campagne Google Ads - Mandats infirmiers au Quebec
 
 ## Objectif
-Attirer uniquement des candidatures d'infirmiers/infirmieres qualifies, deja au Canada, autorises a travailler au Canada et capables de communiquer en francais dans un contexte professionnel de sante au Quebec.
+Attirer des candidatures d'infirmiers et infirmieres du Quebec pour des mandats en sante. La campagne vise les infirmiers techniciens, infirmiers autorises, infirmiers tout court et infirmiers cliniciens.
 
-La conversion principale doit etre uniquement une candidature d'infirmier/infirmiere qualifie(e), deja au Canada, parlant francais, et non PAB, non infirmiere auxiliaire, non candidat hors pays.
+La campagne ne doit pas chercher a attirer: PAB, infirmiers auxiliaires, ASSS, travailleurs sociaux, candidats a l'etranger, candidats cherchant une formation, un visa ou de l'immigration.
 
-## Reglage recommande
-- Type: Search uniquement.
-- Reseau: Google Search seulement au lancement; eviter Display.
-- Zone: Canada, avec priorite Quebec si le budget est limite.
-- Option de presence: personnes presentes dans les zones ciblees, pas seulement interessees.
-- Langue Google Ads: francais. Ne pas compter uniquement sur ce filtre; le texte d'annonce et les mots-cles doivent filtrer aussi.
-- Strategie de depart: maximiser les clics avec limite CPC ou maximiser les conversions seulement si le suivi de conversion est deja fiable.
-- Landing actuelle sans changement de site: `https://www.agencesanitas.com/emplois-infirmieres-quebec`.
-- URL finale avec UTM:
-  `https://www.agencesanitas.com/emplois-infirmieres-quebec?utm_source=google&utm_medium=cpc&utm_campaign=mandats_infirmiers_francophones&utm_content={creative}&utm_term={keyword}`
+## Reglages obligatoires dans Google Ads
+- Type: Search.
+- Reseau: Google Search seulement.
+- A desactiver: Display Network et Search partners.
+- Zone: Quebec seulement.
+- Location option: Presence, soit personnes presentes ou regulierement presentes dans la zone ciblee.
+- Budget de depart: 15 a 20 CAD/jour pour la campagne principale.
+- Strategie de depart: maximiser les clics avec limite CPC, ou maximiser les conversions seulement quand le suivi de conversion est confirme.
+- Landing principale: `https://www.agencesanitas.com/emplois-infirmieres-quebec`.
 
-## Ciblage inclus
-- Infirmiers / infirmieres.
-- Deja au Quebec ou au Canada.
-- Autorises a travailler au Canada.
-- Francais professionnel requis.
-- Idealement OIIQ ou admissible selon les criteres applicables.
-- Disponibles pour des mandats infirmiers au Quebec.
-
-## Ciblage exclu
-- PAB.
-- Infirmieres auxiliaires / LPN.
-- ASSS.
-- Etudiants ou personnes cherchant une formation.
-- Candidats hors Canada.
-- Candidats non francophones.
-- Recherches de visa, parrainage, immigration ou recrutement international.
-- Candidats cherchant un emploi infirmier en anglais seulement.
-
-## Structure
-- Campagne: `Mandats infirmiers Quebec - Francais requis`.
+## Structure recommandee
+- Campagne principale: `Mandats infirmiers Quebec - Search seulement`.
 - Groupes d'annonces:
-  - `Infirmiers francophones Quebec`
   - `Mandats infirmiers Quebec`
-  - `Infirmiers autorises Canada`
-  - `Infirmieres OIIQ Quebec`
-  - `Mandats infirmiers regions Quebec`
+  - `Infirmiers autorises et cliniciens`
+  - `Agence placement infirmiere`
+  - `Mandats regions eloignees`
+- Campagne test separee: `Concurrents - agences infirmières Québec`.
 
 ## Fichiers
-- `responsive-search-ads.csv`: annonces responsives avec titres et descriptions.
-- `keywords.csv`: mots-cles positifs exacts et expressions.
-- `negative-keywords.csv`: mots-cles negatifs a ajouter au niveau campagne.
-- `assets.csv`: sitelinks, accroches et extraits structures.
-- `landing-copy.md`: texte de landing dediee si une page campagne est creee plus tard.
+- `keywords.csv`: mots-cles positifs en exact et expression seulement.
+- `negative-keywords.csv`: mots-cles negatifs critiques au niveau campagne.
+- `responsive-search-ads.csv`: annonces responsives sans mention de concurrents.
+- `assets.csv`: sitelinks, callouts et extraits structures.
+- `competitor-keywords.csv`: mots-cles concurrents pour une campagne separee a petit budget.
+- `landing-copy.md`: texte de landing si une page campagne dediee est creee plus tard.
 - `validation-checklist.md`: controles avant activation.
 
 ## Regle de qualite
-Chaque annonce doit filtrer avant le clic: infirmier/infirmiere seulement, Canada seulement, francais professionnel requis.
+La campagne doit payer pour de l'intention infirmiere au Quebec, pas pour du Display, du Canada large, du PAB, de l'auxiliaire, de la formation ou de l'international.
+
+## Suivi apres relance
+Apres 48 a 72 h, exporter:
+- Search terms
+- Keywords
+- Ads
+- Assets
+- Locations
+- Conversions
+
+Seuils initiaux:
+- CTR Search idealement au-dessus de 3%.
+- Search terms visibles et exploitables.
+- Aucun terme PAB, auxiliaire, immigration, formation ou international.
+- Conversion `Submit lead form` active.
