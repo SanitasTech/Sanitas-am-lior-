@@ -31,7 +31,7 @@ export default function Footer({ locale = 'fr' }: { locale?: Locale }) {
           { href: '/emplois-infirmieres-auxiliaires-quebec', label: 'Emplois infirmières auxiliaires' },
           { href: '/emplois-pab-quebec', label: 'Emplois PAB Québec' },
           { href: '/emplois-asss-quebec', label: 'Emplois ASSS Québec' },
-          { href: '/mandats-infirmiers-region-eloignee', label: 'Mandats en région éloignée' },
+          { href: '/mandats-infirmiers-region-eloignee', label: 'Mandats en régions éloignées' },
           { href: '/agence-placement-sante-laval', label: 'Agence placement santé Laval' },
           { href: '/recrutement-personnel-sante-quebec', label: 'Recrutement personnel santé' },
           { href: '/faq-candidats', label: 'FAQ candidats' },

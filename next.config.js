@@ -25,6 +25,8 @@ const nextConfig = {
       { source: '/employeurs', destination: '/etablissements', permanent: true },
       { source: '/services', destination: '/recrutement-personnel-sante-quebec', permanent: true },
       { source: '/prime-de-reference', destination: '/emplois-infirmieres-quebec', permanent: true },
+      { source: '/mandats-infirmiers-regions-eloignees', destination: '/mandats-infirmiers-region-eloignee', permanent: true },
+      { source: '/regions-eloignees', destination: '/mandats-infirmiers-region-eloignee', permanent: true },
       { source: '/privacy-policy', destination: '/politique-confidentialite', permanent: true },
     ];
   },

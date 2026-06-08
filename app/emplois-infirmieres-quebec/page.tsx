@@ -70,7 +70,7 @@ export default function NurseJobsQuebecPage() {
         intro="Agence Sanitas aide les infirmières et infirmiers du Québec à trouver des mandats compatibles avec leur titre, leurs régions, leurs départements, leurs quarts et leurs disponibilités."
         highlights={[
           'Profils ciblés: infirmières techniciennes, infirmiers autorisés et infirmières cliniciennes.',
-          'Régions prioritaires: Gaspésie, Îles-de-la-Madeleine, Bas-Saint-Laurent, Abitibi, Côte-Nord, Laurentides et autres régions du Québec.',
+          'Régions éloignées prioritaires: Baie-James, Grand Nord, Outaouais, Gaspésie, Îles-de-la-Madeleine, Bas-Saint-Laurent, Abitibi et Côte-Nord.',
           'Départements fréquents: urgence, soins intensifs, bloc opératoire, obstétrique, chirurgie, CHSLD, SAD et santé mentale.',
         ]}
         sections={[
@@ -82,7 +82,7 @@ export default function NurseJobsQuebecPage() {
           {
             title: 'Régions et départements sans faux match',
             body:
-              'Votre dossier permet d’indiquer les combinaisons qui vont ensemble, par exemple Gaspésie avec urgence, Abitibi avec CHSLD ou Côte-Nord avec soins intensifs.',
+              'Votre dossier permet d’indiquer les combinaisons qui vont ensemble, par exemple Baie-James avec urgence, Gaspésie avec obstétrique, Abitibi avec CHSLD ou Côte-Nord avec soins intensifs.',
           },
           {
             title: 'Postuler sans répéter votre profil',
@@ -99,6 +99,9 @@ export default function NurseJobsQuebecPage() {
         secondaryCta={{ label: 'Postuler comme infirmier', href: '/postuler' }}
         relatedLinks={[
           { label: 'Infirmières cliniciennes', href: clinicianJobsHref },
+          { label: 'Mandats en régions éloignées', href: '/mandats-infirmiers-region-eloignee' },
+          { label: 'Mandats Baie-James', href: '/mandat-infirmiere-baie-james' },
+          { label: 'Mandats Grand Nord', href: '/mandat-infirmiere-grand-nord' },
           { label: 'Mandats Gaspésie', href: '/mandat-infirmiere-gaspesie' },
           { label: 'Mandats Bas-Saint-Laurent', href: '/mandat-infirmiere-bas-saint-laurent' },
           { label: 'Mandats Côte-Nord', href: '/mandat-infirmiere-cote-nord' },

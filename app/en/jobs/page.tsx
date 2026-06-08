@@ -124,7 +124,8 @@ export default async function EnglishJobsPage({ searchParams }: Props) {
           <h1 className="mt-2 text-display-lg text-fg">Healthcare assignments</h1>
           <p className="mt-4 max-w-prose text-[16px] leading-relaxed text-fg-muted">
             Filter open roles by profession, country, region, city, facility, department, shift or
-            assignment type. These active openings come from Agence Sanitas.
+            assignment type. Nursing searches are also organized by remote Quebec regions, department
+            and assignment type.
           </p>
         </div>
       </section>

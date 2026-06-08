@@ -32,6 +32,9 @@ const HEALTHCARE_SERVICE_AREAS = [
   'Infirmière technicienne Québec',
   'Infirmière clinicienne Québec',
   'Infirmière OIIQ emploi',
+  'Mandats infirmiers Baie-James',
+  'Mandats infirmiers Grand Nord',
+  'Mandats infirmiers Outaouais',
   'Mandats infirmiers Gaspésie',
   'Mandats infirmiers Abitibi',
   'Mandats infirmiers Côte-Nord',
@@ -50,7 +53,7 @@ const HEALTHCARE_SERVICE_AREAS = [
   'Personnel de santé temporaire',
   'Healthcare staffing for Quebec facilities',
   'Recrutement personnel de santé Québec',
-  'Mandats en région éloignée',
+  'Mandats en régions éloignées',
   'International registered nurse opportunities',
 ];
 

@@ -123,7 +123,7 @@ export default async function PostesPage({ searchParams }: Props) {
           <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-fg-muted">
             Filtrez les postes par profession, pays, région, ville, établissement, département,
             quart ou type de mandat. Pour les infirmières du Québec, les recherches clés sont
-            maintenant regroupées par région éloignée, département et type de mandat.
+            maintenant regroupées par régions éloignées, département et type de mandat.
           </p>
         </div>
       </section>
@@ -140,8 +140,8 @@ export default async function PostesPage({ searchParams }: Props) {
             <PriorityLink
               href="/mandats-infirmiers-region-eloignee"
               eyebrow="Régions éloignées"
-              title="Gaspésie, Abitibi, Côte-Nord et Bas-Saint-Laurent"
-              body="Accès rapide aux mandats infirmiers en région éloignée et aux besoins prioritaires."
+              title="Baie-James, Grand Nord, Gaspésie et Côte-Nord"
+              body="Accès rapide aux mandats infirmiers en régions éloignées et aux besoins prioritaires."
             />
             <PriorityLink
               href="/mandats-infirmiers-urgence-quebec"

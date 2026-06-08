@@ -24,7 +24,7 @@ export default function NursingAgencyJobsQuebecPage() {
         intro="Agence Sanitas helps nurses find assignments that match their title, regions, departments, shifts and availability."
         highlights={[
           'Profiles sought: registered nurses, technical nurses and clinical nurses.',
-          'Priority regions include Gaspesie, Magdalen Islands, Bas-Saint-Laurent, Abitibi, Cote-Nord and other Quebec regions.',
+          'Priority remote regions include Baie-James, Northern Quebec, Outaouais, Gaspesie, Magdalen Islands, Bas-Saint-Laurent, Abitibi and Cote-Nord.',
           'Common departments include emergency, intensive care, operating room, obstetrics, surgical nursing and long-term care.',
         ]}
         sections={[
@@ -54,8 +54,10 @@ export default function NursingAgencyJobsQuebecPage() {
         relatedTitle="Useful links"
         relatedLinks={[
           { label: 'Clinical nurse jobs', href: clinicianJobsHref },
-          { label: 'Gaspesie assignments', href: '/en/nursing-assignments-gaspesie' },
           { label: 'Remote nursing assignments', href: '/en/remote-region-nursing-assignments-quebec' },
+          { label: 'Baie-James assignments', href: '/en/nursing-assignments-baie-james' },
+          { label: 'Northern Quebec assignments', href: '/en/nursing-assignments-northern-quebec' },
+          { label: 'Gaspesie assignments', href: '/en/nursing-assignments-gaspesie' },
           { label: 'Emergency nursing assignments', href: '/en/emergency-nursing-assignments-quebec' },
           { label: 'All jobs', href: '/en/jobs' },
         ]}

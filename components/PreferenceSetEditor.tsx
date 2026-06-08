@@ -187,14 +187,14 @@ export default function PreferenceSetEditor({
               />
             </Field>
 
-            <Field label={tr(locale, 'Contraintes propres a ce groupe', 'Constraints for this group')}>
+            <Field label={tr(locale, 'Contraintes propres à ce groupe', 'Constraints for this group')}>
               <textarea
                 className="textarea"
                 value={set.constraints || ''}
                 onChange={(event) => patchSet(index, { constraints: event.target.value })}
                 placeholder={tr(
                   locale,
-                  'Ex. pas de nuit en region eloignee, hebergement requis',
+                  'Ex. pas de nuit en régions éloignées, hébergement requis',
                   'Ex. no night shifts in remote regions, housing required'
                 )}
               />

@@ -8,7 +8,7 @@ const CORE_LINKS: Record<Locale, Array<{ label: string; href: string }>> = {
     { label: 'Emplois infirmières auxiliaires', href: '/emplois-infirmieres-auxiliaires-quebec' },
     { label: 'Emplois PAB Québec', href: '/emplois-pab-quebec' },
     { label: 'Emplois ASSS Québec', href: '/emplois-asss-quebec' },
-    { label: 'Mandats en région éloignée', href: '/mandats-infirmiers-region-eloignee' },
+    { label: 'Mandats en régions éloignées', href: '/mandats-infirmiers-region-eloignee' },
   ],
   en: [
     { label: 'Nursing jobs Quebec', href: '/en/nursing-agency-jobs-quebec' },
@@ -21,6 +21,9 @@ const CORE_LINKS: Record<Locale, Array<{ label: string; href: string }>> = {
 
 const ADS_SEARCH_CLUSTERS: Record<Locale, Array<{ label: string; href: string }>> = {
   fr: [
+    { label: 'Mandats infirmiers Baie-James', href: '/mandat-infirmiere-baie-james' },
+    { label: 'Mandats infirmiers Grand Nord', href: '/mandat-infirmiere-grand-nord' },
+    { label: 'Mandats infirmiers Outaouais', href: '/mandat-infirmiere-outaouais' },
     { label: 'Mandats infirmiers Gaspésie', href: '/mandat-infirmiere-gaspesie' },
     { label: 'Mandats infirmiers Abitibi', href: '/mandat-infirmiere-abitibi' },
     { label: 'Mandats infirmiers Côte-Nord', href: '/mandat-infirmiere-cote-nord' },
@@ -33,6 +36,9 @@ const ADS_SEARCH_CLUSTERS: Record<Locale, Array<{ label: string; href: string }>
     { label: 'Mandats infirmiers CHSLD', href: '/mandats-infirmiers-chsld-quebec' },
   ],
   en: [
+    { label: 'Nursing assignments Baie-James', href: '/en/nursing-assignments-baie-james' },
+    { label: 'Nursing assignments Northern Quebec', href: '/en/nursing-assignments-northern-quebec' },
+    { label: 'Nursing assignments Outaouais', href: '/en/nursing-assignments-outaouais' },
     { label: 'Nursing assignments Gaspesie', href: '/en/nursing-assignments-gaspesie' },
     { label: 'Nursing assignments Abitibi', href: '/en/nursing-assignments-abitibi' },
     { label: 'Nursing assignments Cote-Nord', href: '/en/nursing-assignments-cote-nord' },

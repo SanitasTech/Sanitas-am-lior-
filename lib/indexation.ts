@@ -32,7 +32,7 @@ export const INDEXABLE_STATIC_ROUTES: IndexableRoute[] = [
   {
     fr: '/mandats-infirmiers-region-eloignee',
     en: '/en/remote-region-nursing-assignments-quebec',
-    priority: 0.85,
+    priority: 0.9,
     changeFrequency: 'weekly',
   },
   { fr: '/agence-placement-sante-laval', en: '/en/healthcare-staffing-laval', priority: 0.85, changeFrequency: 'monthly' },

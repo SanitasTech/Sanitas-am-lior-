@@ -36,6 +36,8 @@ type NurseRegionTarget = {
   enSlug: string;
   label: string;
   enLabel: string;
+  frLocationPhrase?: string;
+  enLocationPhrase?: string;
   regionFilter: string;
   cityFilter?: string;
   priority: number;
@@ -52,6 +54,34 @@ type NurseDepartmentTarget = {
 
 const NURSE_REGION_TARGETS: NurseRegionTarget[] = [
   {
+    slug: 'mandat-infirmiere-baie-james',
+    enSlug: 'nursing-assignments-baie-james',
+    label: 'Baie-James',
+    enLabel: 'Baie-James',
+    frLocationPhrase: 'à la Baie-James',
+    regionFilter: 'Nord-du-Québec',
+    cityFilter: 'Baie-James',
+    priority: 0.85,
+  },
+  {
+    slug: 'mandat-infirmiere-grand-nord',
+    enSlug: 'nursing-assignments-northern-quebec',
+    label: 'Grand Nord',
+    enLabel: 'Northern Quebec',
+    frLocationPhrase: 'dans le Grand Nord',
+    enLocationPhrase: 'in Northern Quebec',
+    regionFilter: 'Nord-du-Québec',
+    priority: 0.85,
+  },
+  {
+    slug: 'mandat-infirmiere-outaouais',
+    enSlug: 'nursing-assignments-outaouais',
+    label: 'Outaouais',
+    enLabel: 'Outaouais',
+    regionFilter: 'Outaouais',
+    priority: 0.84,
+  },
+  {
     slug: 'mandat-infirmiere-gaspesie',
     enSlug: 'nursing-assignments-gaspesie',
     label: 'Gaspésie',
@@ -64,6 +94,8 @@ const NURSE_REGION_TARGETS: NurseRegionTarget[] = [
     enSlug: 'nursing-assignments-magdalen-islands',
     label: 'Îles-de-la-Madeleine',
     enLabel: 'Magdalen Islands',
+    frLocationPhrase: 'aux Îles-de-la-Madeleine',
+    enLocationPhrase: 'in the Magdalen Islands',
     regionFilter: 'Gaspésie–Îles-de-la-Madeleine',
     cityFilter: 'Îles-de-la-Madeleine',
     priority: 0.84,
@@ -73,6 +105,7 @@ const NURSE_REGION_TARGETS: NurseRegionTarget[] = [
     enSlug: 'nursing-assignments-bas-saint-laurent',
     label: 'Bas-Saint-Laurent',
     enLabel: 'Bas-Saint-Laurent',
+    frLocationPhrase: 'au Bas-Saint-Laurent',
     regionFilter: 'Bas-Saint-Laurent',
     priority: 0.84,
   },
@@ -89,6 +122,7 @@ const NURSE_REGION_TARGETS: NurseRegionTarget[] = [
     enSlug: 'nursing-assignments-cote-nord',
     label: 'Côte-Nord',
     enLabel: 'Cote-Nord',
+    frLocationPhrase: 'sur la Côte-Nord',
     regionFilter: 'Côte-Nord',
     priority: 0.84,
   },
@@ -148,6 +182,8 @@ const NURSE_DEPARTMENT_TARGETS: NurseDepartmentTarget[] = [
 function createNurseRegionSeoPage(target: NurseRegionTarget): LocalSeoPagePair {
   const frFilters: Record<string, string> = { profession: nurse, region: target.regionFilter };
   const enFilters: Record<string, string> = { profession: nurse, region: target.regionFilter };
+  const frLocation = target.frLocationPhrase || `en ${target.label}`;
+  const enLocation = target.enLocationPhrase || `in ${target.enLabel}`;
   if (target.cityFilter) {
     frFilters.city = target.cityFilter;
     enFilters.city = target.cityFilter;
@@ -159,13 +195,13 @@ function createNurseRegionSeoPage(target: NurseRegionTarget): LocalSeoPagePair {
       slug: target.slug,
       metaTitle: `Mandat infirmière ${target.label} | Agence Sanitas`,
       metaDescription:
-        `Mandats infirmiers en ${target.label} avec Agence Sanitas. Postulez comme infirmière autorisée, technicienne ou clinicienne au Québec.`,
+        `Mandats infirmiers ${frLocation} avec Agence Sanitas. Postulez comme infirmière autorisée, technicienne ou clinicienne au Québec.`,
       eyebrow: 'Mandats infirmiers régionaux',
-      title: `Mandats infirmiers en ${target.label}`,
+      title: `Mandats infirmiers ${frLocation}`,
       intro:
-        `Agence Sanitas recrute des infirmières et infirmiers du Québec pour des mandats en ${target.label}. Indiquez vos départements, quarts, disponibilités et préférences dans un dossier unique.`,
+        `Agence Sanitas recrute des infirmières et infirmiers du Québec pour des mandats ${frLocation}. Indiquez vos départements, quarts, disponibilités et préférences dans un dossier unique.`,
       highlights: [
-        `Recherche ciblée pour les mandats infirmiers en ${target.label}.`,
+        `Recherche ciblée pour les mandats infirmiers ${frLocation}.`,
         'Profils visés: infirmières techniciennes, infirmières autorisées et infirmières cliniciennes.',
         'Français professionnel, autorisation de travail et dossier candidat complet facilitent le suivi recruteur.',
       ],
@@ -191,11 +227,11 @@ function createNurseRegionSeoPage(target: NurseRegionTarget): LocalSeoPagePair {
             'Vous pouvez envoyer votre profil en ligne ou appeler Sanitas si vous préférez discuter du mandat avant de confirmer votre intérêt.',
         },
       ],
-      primaryCta: { label: `Voir les mandats en ${target.label}`, href: jobsHref('fr', frFilters) },
+      primaryCta: { label: `Voir les mandats ${frLocation}`, href: jobsHref('fr', frFilters) },
       secondaryCta: { label: 'Postuler comme infirmier', href: '/postuler' },
       relatedLinks: [
         { label: 'Emplois infirmières Québec', href: '/emplois-infirmieres-quebec' },
-        { label: 'Mandats en région éloignée', href: '/mandats-infirmiers-region-eloignee' },
+        { label: 'Mandats en régions éloignées', href: '/mandats-infirmiers-region-eloignee' },
         { label: 'Mandats infirmiers urgence', href: '/mandats-infirmiers-urgence-quebec' },
       ],
     },
@@ -203,13 +239,13 @@ function createNurseRegionSeoPage(target: NurseRegionTarget): LocalSeoPagePair {
       slug: target.enSlug,
       metaTitle: `Nursing assignments ${target.enLabel} | Agence Sanitas`,
       metaDescription:
-        `Nursing assignments in ${target.enLabel} with Agence Sanitas. Apply as a registered, technical or clinical nurse for Quebec healthcare mandates.`,
+        `Nursing assignments ${enLocation} with Agence Sanitas. Apply as a registered, technical or clinical nurse for Quebec healthcare mandates.`,
       eyebrow: 'Regional nursing assignments',
-      title: `Nursing assignments in ${target.enLabel}`,
+      title: `Nursing assignments ${enLocation}`,
       intro:
-        `Agence Sanitas recruits nurses for healthcare assignments in ${target.enLabel}. Share your departments, shifts, availability and preferences in one reusable profile.`,
+        `Agence Sanitas recruits nurses for healthcare assignments ${enLocation}. Share your departments, shifts, availability and preferences in one reusable profile.`,
       highlights: [
-        `Targeted search for nursing assignments in ${target.enLabel}.`,
+        `Targeted search for nursing assignments ${enLocation}.`,
         'Profiles sought: registered nurses, technical nurses and clinical nurses.',
         'Professional French, work authorization and a complete candidate file help recruiter follow-up.',
       ],
@@ -235,7 +271,7 @@ function createNurseRegionSeoPage(target: NurseRegionTarget): LocalSeoPagePair {
             'You can submit your profile online or call Sanitas if you prefer to discuss the assignment before confirming interest.',
         },
       ],
-      primaryCta: { label: `View ${target.enLabel} nursing jobs`, href: jobsHref('en', enFilters) },
+      primaryCta: { label: `View nursing jobs ${enLocation}`, href: jobsHref('en', enFilters) },
       secondaryCta: { label: 'Apply as a nurse', href: '/en/apply' },
       relatedLinks: [
         { label: 'Nursing jobs Quebec', href: '/en/nursing-agency-jobs-quebec' },
@@ -292,7 +328,7 @@ function createNurseDepartmentSeoPage(target: NurseDepartmentTarget): LocalSeoPa
       relatedLinks: [
         { label: 'Emplois infirmières Québec', href: '/emplois-infirmieres-quebec' },
         { label: 'Mandats Gaspésie', href: '/mandat-infirmiere-gaspesie' },
-        { label: 'Mandats en région éloignée', href: '/mandats-infirmiers-region-eloignee' },
+        { label: 'Mandats en régions éloignées', href: '/mandats-infirmiers-region-eloignee' },
       ],
     },
     en: {
@@ -481,7 +517,7 @@ export const LOCAL_SEO_PAGES: LocalSeoPagePair[] = [
       secondaryCta: { label: 'Créer mon profil', href: '/postuler' },
       relatedLinks: [
         { label: 'Emplois infirmières Montréal', href: '/emplois-infirmieres-montreal' },
-        { label: 'Mandats en région éloignée', href: '/mandats-infirmiers-region-eloignee' },
+        { label: 'Mandats en régions éloignées', href: '/mandats-infirmiers-region-eloignee' },
         { label: 'FAQ candidats', href: '/faq-candidats' },
       ],
     },
