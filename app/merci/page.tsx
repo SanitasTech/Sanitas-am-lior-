@@ -16,17 +16,18 @@ export const metadata: Metadata = {
 };
 
 interface Props {
-  searchParams: { type?: string };
+  searchParams: { type?: string; application_id?: string; app?: string };
 }
 
 export default function MerciPage({ searchParams }: Props) {
   const isPosting = searchParams.type === 'posting';
   const shouldTrackCandidateLead =
     searchParams.type === 'posting' || searchParams.type === 'spontaneous';
+  const transactionId = searchParams.application_id || searchParams.app || null;
 
   return (
     <PublicLayout>
-      {shouldTrackCandidateLead ? <GoogleAdsConversionEvent /> : null}
+      {shouldTrackCandidateLead ? <GoogleAdsConversionEvent transactionId={transactionId} /> : null}
       <section className="relative section pt-16 pb-24 overflow-hidden">
         <DecorativeBlob className="absolute -top-40 left-1/2 -translate-x-1/2 h-[600px] w-[600px] text-accent pointer-events-none" />
         <div className="container-page max-w-2xl relative">

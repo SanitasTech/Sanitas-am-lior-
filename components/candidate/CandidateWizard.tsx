@@ -359,7 +359,9 @@ export default function CandidateWizard({
         );
       }
       clearDraft(storageKey);
-      router.push(`${localizedPath(locale, 'thanks')}?type=${mode}`);
+      const thanksParams = new URLSearchParams({ type: mode });
+      if (json.application_id) thanksParams.set('application_id', String(json.application_id));
+      router.push(`${localizedPath(locale, 'thanks')}?${thanksParams.toString()}`);
     } catch (e: unknown) {
       setSubmitError(
         e instanceof Error

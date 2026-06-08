@@ -10,10 +10,12 @@ export default function GoogleAdsConversionEvent({
   eventName = DEFAULT_EVENT_NAME,
   conversionId = DEFAULT_CONVERSION_ID,
   conversionLabel = DEFAULT_CONVERSION_LABEL,
+  transactionId,
 }: {
   eventName?: string;
   conversionId?: string;
   conversionLabel?: string;
+  transactionId?: string | null;
 }) {
   useEffect(() => {
     const win = window as typeof window & {
@@ -28,19 +30,26 @@ export default function GoogleAdsConversionEvent({
         win.dataLayer?.push(args);
       });
 
-    if (conversionId && conversionLabel) {
-      const normalizedConversionId = conversionId.startsWith('AW-')
-        ? conversionId
-        : `AW-${conversionId}`;
+    const eventParams = {
+      ...(transactionId ? { transaction_id: transactionId } : {}),
+    };
+
+    const cleanedConversionId = conversionId?.trim();
+    const cleanedConversionLabel = conversionLabel?.trim();
+
+    if (cleanedConversionId && cleanedConversionLabel) {
+      const normalizedConversionId = cleanedConversionId.startsWith('AW-')
+        ? cleanedConversionId
+        : `AW-${cleanedConversionId}`;
 
       win.gtag('event', 'conversion', {
-        send_to: `${normalizedConversionId}/${conversionLabel}`,
+        send_to: `${normalizedConversionId}/${cleanedConversionLabel}`,
+        ...eventParams,
       });
-      return;
     }
 
-    win.gtag('event', eventName, {});
-  }, [conversionId, conversionLabel, eventName]);
+    win.gtag('event', eventName, eventParams);
+  }, [conversionId, conversionLabel, eventName, transactionId]);
 
   return null;
 }

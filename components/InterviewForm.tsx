@@ -360,7 +360,9 @@ export default function InterviewForm({ mode, job, initial, initialDocuments }: 
       if (!res.ok || !json.ok) {
         throw new Error(json.error || "Impossible d'enregistrer la candidature.");
       }
-      router.push(`/merci?type=${mode}`);
+      const thanksParams = new URLSearchParams({ type: mode });
+      if (json.application_id) thanksParams.set('application_id', String(json.application_id));
+      router.push(`/merci?${thanksParams.toString()}`);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Erreur inconnue.');
     } finally {
