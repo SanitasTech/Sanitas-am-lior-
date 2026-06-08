@@ -15,6 +15,7 @@ import PreferenceSetEditor from '@/components/PreferenceSetEditor';
 import SegmentedChoices from '@/components/SegmentedChoices';
 import {
   CONTACT_PREFS,
+  INTERNATIONAL_WORK_AUTH,
   LANGUAGES,
   PERMIT_STATUSES,
   PROFESSIONS,
@@ -192,6 +193,15 @@ export function StepIdentity({
           label={isInternationalPosting ? tr(locale, 'Pays de résidence', 'Country of residence') : tr(locale, 'Région', 'Region')}
           required
           error={errors.region_residence}
+          helper={
+            isInternationalPosting
+              ? tr(
+                  locale,
+                  'Sélectionne le pays depuis lequel tu postules actuellement.',
+                  'Select the country where you currently live.'
+                )
+              : undefined
+          }
         >
           <select
             className="input"
@@ -239,9 +249,16 @@ export function StepIdentity({
 
 export function StepWork({ form, setForm, errors, mode, job, locale }: StepProps) {
   const isPosting = mode === 'posting';
+  const isInternationalPosting =
+    isPosting && isInternationalCountry(job?.country || DEFAULT_JOB_COUNTRY);
   const needsPermitField =
     form.qualified_professions.some((p) => professionRequiresPermit(p)) ||
     professionRequiresPermit(form.profession);
+  const professionOptions =
+    isInternationalPosting && job?.profession
+      ? PROFESSIONS.filter((profession) => professionListCovers([profession], job.profession))
+      : PROFESSIONS;
+  const workAuthorizationOptions = isInternationalPosting ? INTERNATIONAL_WORK_AUTH : WORK_AUTH;
 
   return (
     <div className="space-y-6">
@@ -269,6 +286,15 @@ export function StepWork({ form, setForm, errors, mode, job, locale }: StepProps
             {tr(locale, 'Mandat sélectionné', 'Selected assignment')}
           </p>
           <p className="mt-1 text-[15px] font-medium text-fg">{displayValue(locale, job.profession)}</p>
+          {isInternationalPosting && (
+            <p className="mt-2 text-[13px] leading-relaxed text-fg-muted">
+              {tr(
+                locale,
+                `Mandat international situé en ${displayValue(locale, job.country || '')}. Le CV et les informations de spécialité permettront de valider la suite du processus.`,
+                `International assignment located in ${displayValue(locale, job.country || '')}. Your resume and specialty details will be used to confirm the next steps.`
+              )}
+            </p>
+          )}
         </div>
       )}
 
@@ -283,7 +309,7 @@ export function StepWork({ form, setForm, errors, mode, job, locale }: StepProps
         )}
       >
         <SegmentedChoices
-          options={PROFESSIONS}
+          options={professionOptions.length > 0 ? professionOptions : PROFESSIONS}
           value={form.qualified_professions}
           multi
           onChange={(value) => {
@@ -356,12 +382,29 @@ export function StepWork({ form, setForm, errors, mode, job, locale }: StepProps
       </Field>
 
       <Field
-        label={tr(locale, 'Autorisation de travailler au Canada', 'Authorization to work in Canada')}
+        label={
+          isInternationalPosting
+            ? tr(
+                locale,
+                `Disponibilité pour travailler en ${displayValue(locale, job?.country || '')}`,
+                `Availability to work in ${displayValue(locale, job?.country || '')}`
+              )
+            : tr(locale, 'Autorisation de travailler au Canada', 'Authorization to work in Canada')
+        }
         required
         error={errors.work_authorization}
+        helper={
+          isInternationalPosting
+            ? tr(
+                locale,
+                "Indique si cette opportunité internationale est réaliste pour toi. L'équipe confirmera les étapes exactes après réception du CV.",
+                'Tell us whether this international opportunity is realistic for you. The team will confirm the exact steps after reviewing your resume.'
+              )
+            : undefined
+        }
       >
         <SegmentedChoices
-          options={WORK_AUTH}
+          options={workAuthorizationOptions}
           value={form.work_authorization}
           onChange={(v) => setField(setForm, 'work_authorization', v as string)}
         />
@@ -381,6 +424,7 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
   const mandateRegionOptions =
     isInternationalPosting && job?.region ? [job.region] : QUEBEC_REGIONS;
   const needsWeekendCheck = isPosting && mandateRequiresWeekendCheck(job?.mandate_type);
+  const requiresShiftChoice = !isInternationalPosting || !!job?.shift;
 
   function updateRegionChoice(idx: number, patch: Partial<RegionChoice>) {
     setForm((current) => ({
@@ -411,7 +455,13 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
         eyebrow={tr(locale, 'Étape 3', 'Step 3')}
         title={tr(locale, 'Tes disponibilités', 'Your availability')}
         description={
-          isPosting
+          isInternationalPosting
+            ? tr(
+                locale,
+                'Confirme ton délai de départ et tes disponibilités pratiques. Les détails employeur seront validés après analyse de ton CV.',
+                'Confirm your relocation timing and practical availability. Employer details will be confirmed after your resume is reviewed.'
+              )
+            : isPosting
             ? tr(
                 locale,
                 'Confirme quand tu peux commencer et les quarts que tu acceptes pour ce mandat.',
@@ -424,6 +474,30 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
               )
         }
       />
+
+      {isInternationalPosting && (
+        <div className="rounded-xl border border-accent/30 bg-accent-soft/25 p-4">
+          <p className="text-[12px] font-semibold uppercase tracking-wider text-accent">
+            {tr(locale, 'Mandat international', 'International assignment')}
+          </p>
+          <dl className="mt-3 grid gap-3 text-[14px] sm:grid-cols-3">
+            <div>
+              <dt className="text-fg-subtle">{tr(locale, 'Pays', 'Country')}</dt>
+              <dd className="font-medium text-fg">{displayValue(locale, job?.country || '')}</dd>
+            </div>
+            <div>
+              <dt className="text-fg-subtle">{tr(locale, 'Ville / territoire', 'City / territory')}</dt>
+              <dd className="font-medium text-fg">{job?.region || job?.city || '—'}</dd>
+            </div>
+            <div>
+              <dt className="text-fg-subtle">{tr(locale, 'Candidats admissibles', 'Eligible applicants')}</dt>
+              <dd className="font-medium text-fg">
+                {(job?.eligible_countries || []).map((country) => displayValue(locale, country)).join(', ') || '—'}
+              </dd>
+            </div>
+          </dl>
+        </div>
+      )}
 
       <Field
         label={tr(locale, 'Tu peux commencer', 'You can start')}
@@ -462,50 +536,50 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
         locale={locale}
       />
 
-      <PreferenceSetEditor
-        value={form.preference_sets}
-        locale={locale}
-        regionOptions={mandateRegionOptions}
-        regionLabel={
-          isInternationalPosting
-            ? tr(locale, 'Territoire pour ce groupe', 'Territory for this group')
-            : undefined
-        }
-        wholeRegionLabel={
-          isInternationalPosting
-            ? tr(locale, 'Tout ce territoire me convient', 'This whole territory works for me')
-            : undefined
-        }
-        addRegionLabel={
-          isInternationalPosting
-            ? tr(locale, '+ Ajouter un autre territoire', '+ Add another territory')
-            : undefined
-        }
-        onChange={(preferenceSets) => {
-          const first = preferenceSets[0];
-          setForm((current) => ({
-            ...current,
-            preference_sets: preferenceSets,
-            qualified_professions:
-              first?.professions && first.professions.length > 0
-                ? first.professions
-                : current.qualified_professions,
-            shifts_accepted:
-              first?.shifts && first.shifts.length > 0 ? first.shifts : current.shifts_accepted,
-            region_choices:
-              first?.regions && first.regions.length > 0 ? first.regions : current.region_choices,
-            preferred_departments:
-              first?.departments && first.departments.length > 0
-                ? first.departments
-                : current.preferred_departments,
-          }));
-        }}
-      />
+      {!isInternationalPosting && (
+        <PreferenceSetEditor
+          value={form.preference_sets}
+          locale={locale}
+          regionOptions={mandateRegionOptions}
+          onChange={(preferenceSets) => {
+            const first = preferenceSets[0];
+            setForm((current) => ({
+              ...current,
+              preference_sets: preferenceSets,
+              qualified_professions:
+                first?.professions && first.professions.length > 0
+                  ? first.professions
+                  : current.qualified_professions,
+              shifts_accepted:
+                first?.shifts && first.shifts.length > 0 ? first.shifts : current.shifts_accepted,
+              region_choices:
+                first?.regions && first.regions.length > 0 ? first.regions : current.region_choices,
+              preferred_departments:
+                first?.departments && first.departments.length > 0
+                  ? first.departments
+                  : current.preferred_departments,
+            }));
+          }}
+        />
+      )}
 
       <Field
-        label={tr(locale, 'Quarts que tu acceptes', 'Shifts you accept')}
-        required
+        label={
+          requiresShiftChoice
+            ? tr(locale, 'Quarts que tu acceptes', 'Shifts you accept')
+            : tr(locale, 'Préférence d’horaire, si déjà connue', 'Schedule preference, if already known')
+        }
+        required={requiresShiftChoice}
         error={errors.shifts_accepted}
+        helper={
+          requiresShiftChoice
+            ? undefined
+            : tr(
+                locale,
+                'Optionnel pour ce mandat international. Tu peux laisser vide si l’horaire sera validé plus tard.',
+                'Optional for this international assignment. You can leave it blank if the schedule will be confirmed later.'
+              )
+        }
       >
         <SegmentedChoices
           options={SHIFTS}
@@ -525,6 +599,7 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
         </Field>
       )}
 
+      {!isInternationalPosting && (
       <div data-error={!!errors.region_choices} className="space-y-3">
         <p className="label">
           {isInternationalPosting
@@ -630,31 +705,36 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
           </button>
         )}
       </div>
+      )}
 
-      <DepartmentGroups
-        value={form.preferred_departments}
-        onChange={(value) => setField(setForm, 'preferred_departments', value)}
-        label={
-          isPosting
-            ? tr(locale, 'Départements similaires acceptés', 'Similar departments accepted')
-            : tr(locale, 'Départements souhaités', 'Preferred departments')
-        }
-      />
-
-      <Field label={tr(locale, 'Tu as un véhicule personnel ?', 'Do you have a personal vehicle?')}>
-        <SegmentedChoices
-          options={['Oui', 'Non']}
-          value={form.transport_available === 'Oui, véhicule personnel' ? 'Oui' : form.transport_available === 'Non' ? 'Non' : ''}
-          onChange={(v) => {
-            const value = v as string;
-            setField(
-              setForm,
-              'transport_available',
-              value === 'Oui' ? 'Oui, véhicule personnel' : value === 'Non' ? 'Non' : ''
-            );
-          }}
+      {!isInternationalPosting && (
+        <DepartmentGroups
+          value={form.preferred_departments}
+          onChange={(value) => setField(setForm, 'preferred_departments', value)}
+          label={
+            isPosting
+              ? tr(locale, 'Départements similaires acceptés', 'Similar departments accepted')
+              : tr(locale, 'Départements souhaités', 'Preferred departments')
+          }
         />
-      </Field>
+      )}
+
+      {!isInternationalPosting && (
+        <Field label={tr(locale, 'Tu as un véhicule personnel ?', 'Do you have a personal vehicle?')}>
+          <SegmentedChoices
+            options={['Oui', 'Non']}
+            value={form.transport_available === 'Oui, véhicule personnel' ? 'Oui' : form.transport_available === 'Non' ? 'Non' : ''}
+            onChange={(v) => {
+              const value = v as string;
+              setField(
+                setForm,
+                'transport_available',
+                value === 'Oui' ? 'Oui, véhicule personnel' : value === 'Non' ? 'Non' : ''
+              );
+            }}
+          />
+        </Field>
+      )}
     </div>
   );
 }
@@ -828,6 +908,8 @@ function ExtraQuestionField({
 
 export function StepReview({ form, setForm, errors, mode, job, locale }: StepProps) {
   const isPosting = mode === 'posting';
+  const isInternationalPosting =
+    isPosting && isInternationalCountry(job?.country || DEFAULT_JOB_COUNTRY);
   const en = locale === 'en';
 
   return (
@@ -852,7 +934,11 @@ export function StepReview({ form, setForm, errors, mode, job, locale }: StepPro
           value={[form.phone, form.email].filter(Boolean).join(' · ') || '—'}
         />
         <ReviewRow
-          label={tr(locale, 'Résidence', 'Residence')}
+          label={
+            isInternationalPosting
+              ? tr(locale, 'Résidence actuelle', 'Current residence')
+              : tr(locale, 'Résidence', 'Residence')
+          }
           value={[form.city_residence, form.region_residence].filter(Boolean).join(', ') || '—'}
         />
         <ReviewRow
@@ -868,11 +954,17 @@ export function StepReview({ form, setForm, errors, mode, job, locale }: StepPro
           value={displayValue(locale, form.years_experience) || '—'}
         />
         <ReviewRow
-          label={tr(locale, 'Quarts', 'Shifts')}
+          label={
+            isInternationalPosting
+              ? tr(locale, 'Horaire préféré', 'Preferred schedule')
+              : tr(locale, 'Quarts', 'Shifts')
+          }
           value={
             form.shifts_accepted.length > 0
               ? form.shifts_accepted.map((s) => displayValue(locale, s)).join(', ')
-              : '—'
+              : isInternationalPosting
+                ? tr(locale, 'À confirmer', 'To confirm')
+                : '—'
           }
         />
         <ReviewRow

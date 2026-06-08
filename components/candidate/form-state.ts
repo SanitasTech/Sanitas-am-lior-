@@ -6,7 +6,12 @@
 // Conserve la forme de l'ancien FormState pour ne pas casser l'API
 // `/api/applications` côté serveur.
 
-import { professionRequiresPDSB, professionRequiresPermit } from '@/lib/constants';
+import {
+  INTERNATIONAL_WORK_AUTH,
+  isInternationalCountry,
+  professionRequiresPDSB,
+  professionRequiresPermit,
+} from '@/lib/constants';
 import {
   makePreferenceSetForJob,
   makePreferenceSetFromFlat,
@@ -129,6 +134,22 @@ export function makeInitialFormState(
   initialDocuments?: Record<string, Pick<DocumentRecord, 'id' | 'status' | 'file_name' | 'file_path'>>
 ): FormState {
   const isPosting = mode === 'posting';
+  const isInternationalPosting = isPosting && isInternationalCountry(job?.country);
+  const eligibleResidenceCountries = job?.eligible_countries || [];
+  const initialResidence = initial.region_residence || '';
+  const regionResidence =
+    isInternationalPosting && eligibleResidenceCountries.length > 0
+      ? eligibleResidenceCountries.includes(initialResidence)
+        ? initialResidence
+        : ''
+      : initialResidence;
+  const internationalWorkAuth = new Set<string>(INTERNATIONAL_WORK_AUTH);
+  const workAuthorization =
+    isInternationalPosting && initial.work_authorization
+      ? internationalWorkAuth.has(initial.work_authorization)
+        ? initial.work_authorization
+        : ''
+      : initial.work_authorization || '';
   const flatCandidate = {
     ...initial,
     profession: isPosting ? job?.profession || initial.profession || '' : initial.profession || '',
@@ -164,7 +185,7 @@ export function makeInitialFormState(
     preferred_contact: initial.preferred_contact || '',
     best_contact_time: initial.best_contact_time || '',
     city_residence: initial.city_residence || '',
-    region_residence: initial.region_residence || '',
+    region_residence: regionResidence,
     postal_code: initial.postal_code || '',
     profession: isPosting
       ? job?.profession || initial.profession || ''
@@ -174,7 +195,7 @@ export function makeInitialFormState(
     permit_status: initial.permit_status || '',
     permit_number: initial.permit_number || '',
     languages: initial.languages || [],
-    work_authorization: initial.work_authorization || '',
+    work_authorization: workAuthorization,
     mobility: initial.mobility || '',
     start_availability: initial.start_availability || '',
     preferred_hours: initial.preferred_hours || '',

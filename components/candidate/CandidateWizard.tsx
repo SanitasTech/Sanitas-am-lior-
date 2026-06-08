@@ -11,6 +11,11 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { localizedPath, type Locale } from '@/lib/i18n';
 import {
+  DEFAULT_JOB_COUNTRY,
+  INTERNATIONAL_WORK_AUTH,
+  isInternationalCountry,
+} from '@/lib/constants';
+import {
   validateAvailabilityStep,
   validateDocumentsStep,
   validateIdentityStep,
@@ -85,6 +90,8 @@ export default function CandidateWizard({
 }: CandidateWizardProps) {
   const router = useRouter();
   const isPosting = mode === 'posting';
+  const isInternationalPosting =
+    isPosting && isInternationalCountry(job?.country || DEFAULT_JOB_COUNTRY);
 
   const initialForm = useMemo(
     () => makeInitialFormState(mode, initial, job, initialDocuments),
@@ -175,6 +182,11 @@ export default function CandidateWizard({
       .filter((q: ExtraQuestion) => q.required)
       .map((q) => q.id);
 
+    const validInternationalWorkAuthorization =
+      !isInternationalPosting ||
+      INTERNATIONAL_WORK_AUTH.includes(
+        form.work_authorization as (typeof INTERNATIONAL_WORK_AUTH)[number]
+      );
     const stepInput = {
       first_name: form.first_name,
       last_name: form.last_name,
@@ -185,7 +197,7 @@ export default function CandidateWizard({
       qualified_professions: form.qualified_professions,
       years_experience: form.years_experience,
       languages: form.languages,
-      work_authorization: form.work_authorization,
+      work_authorization: validInternationalWorkAuthorization ? form.work_authorization : '',
       start_availability: form.start_availability,
       shifts_accepted: form.shifts_accepted,
       region_choices: form.region_choices,
@@ -197,15 +209,24 @@ export default function CandidateWizard({
 
     switch (currentStep) {
       case 'identity':
-        return validateIdentityStep(stepInput);
+        return validateIdentityStep(stepInput, {
+          locale,
+          residenceKind: isInternationalPosting ? 'country' : 'region',
+        });
       case 'work':
-        return validateWorkStep(stepInput, mode);
+        return validateWorkStep(stepInput, mode, {
+          locale,
+          internationalWorkAuthorization: isInternationalPosting,
+        });
       case 'availability':
-        return validateAvailabilityStep(stepInput, mode);
+        return validateAvailabilityStep(stepInput, mode, {
+          locale,
+          requireShifts: !isInternationalPosting || !!job?.shift,
+        });
       case 'documents':
-        return validateDocumentsStep(stepInput);
+        return validateDocumentsStep(stepInput, { locale });
       case 'review':
-        return validateReviewStep(stepInput);
+        return validateReviewStep(stepInput, { locale });
       default:
         return {};
     }

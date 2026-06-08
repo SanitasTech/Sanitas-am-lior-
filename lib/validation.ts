@@ -397,62 +397,111 @@ type StepErrors = Record<string, string>;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export function validateIdentityStep(input: StepInput): StepErrors {
+type ValidationLocale = 'fr' | 'en';
+
+interface StepValidationOptions {
+  locale?: ValidationLocale;
+  residenceKind?: 'region' | 'country';
+  requireShifts?: boolean;
+  internationalWorkAuthorization?: boolean;
+}
+
+function t(locale: ValidationLocale | undefined, fr: string, en: string): string {
+  return locale === 'en' ? en : fr;
+}
+
+export function validateIdentityStep(
+  input: StepInput,
+  options: StepValidationOptions = {}
+): StepErrors {
+  const locale = options.locale;
+  const residenceKind = options.residenceKind || 'region';
   const errors: StepErrors = {};
-  if (!input.first_name?.trim()) errors.first_name = 'Ton prénom est requis';
-  if (!input.last_name?.trim()) errors.last_name = 'Ton nom est requis';
+  if (!input.first_name?.trim()) errors.first_name = t(locale, 'Ton prénom est requis', 'Your first name is required');
+  if (!input.last_name?.trim()) errors.last_name = t(locale, 'Ton nom est requis', 'Your last name is required');
   const hasPhone = !!input.phone?.trim();
   const hasEmail = !!input.email?.trim();
-  if (!hasPhone && !hasEmail) errors.phone = 'Téléphone ou courriel — au moins un des deux';
-  if (hasEmail && !EMAIL_RE.test(input.email!.trim())) errors.email = 'Courriel invalide';
-  if (!input.city_residence?.trim()) errors.city_residence = 'Ta ville est requise';
-  if (!input.region_residence) errors.region_residence = 'Ta région est requise';
+  if (!hasPhone && !hasEmail) {
+    errors.phone = t(locale, 'Téléphone ou courriel, au moins un des deux', 'Phone or email, at least one is required');
+  }
+  if (hasEmail && !EMAIL_RE.test(input.email!.trim())) {
+    errors.email = t(locale, 'Courriel invalide', 'Invalid email address');
+  }
+  if (!input.city_residence?.trim()) errors.city_residence = t(locale, 'Ta ville est requise', 'Your city is required');
+  if (!input.region_residence) {
+    errors.region_residence =
+      residenceKind === 'country'
+        ? t(locale, 'Choisis ton pays de résidence', 'Select your country of residence')
+        : t(locale, 'Ta région est requise', 'Your region is required');
+  }
   return errors;
 }
 
-export function validateWorkStep(input: StepInput, mode: 'posting' | 'spontaneous'): StepErrors {
+export function validateWorkStep(
+  input: StepInput,
+  mode: 'posting' | 'spontaneous',
+  options: StepValidationOptions = {}
+): StepErrors {
+  const locale = options.locale;
   const errors: StepErrors = {};
   if (!input.qualified_professions || input.qualified_professions.length === 0) {
     errors.qualified_professions = mode === 'posting'
-      ? 'Confirme le ou les titres pour lesquels tu es qualifié(e)'
-      : 'Choisis au moins un titre pour lequel tu es qualifié(e)';
+      ? t(locale, 'Confirme le ou les titres pour lesquels tu es qualifié(e)', 'Confirm the title or titles you are qualified for')
+      : t(locale, 'Choisis au moins un titre pour lequel tu es qualifié(e)', 'Choose at least one title you are qualified for');
   }
-  if (!input.years_experience) errors.years_experience = 'Indique ton expérience';
-  if (!input.work_authorization) errors.work_authorization = 'Précise ton autorisation de travail';
+  if (!input.years_experience) errors.years_experience = t(locale, 'Indique ton expérience', 'Select your experience');
+  if (!input.work_authorization) {
+    errors.work_authorization = options.internationalWorkAuthorization
+      ? t(locale, 'Confirme ta disponibilité pour ce mandat international', 'Confirm your availability for this international assignment')
+      : t(locale, 'Précise ton autorisation de travail', 'Confirm your work authorization');
+  }
   if (!input.languages || input.languages.length === 0) {
-    errors.languages = 'Choisis au moins une langue de travail';
+    errors.languages = t(locale, 'Choisis au moins une langue de travail', 'Choose at least one working language');
   }
   return errors;
 }
 
 export function validateAvailabilityStep(
   input: StepInput,
-  mode: 'posting' | 'spontaneous'
+  mode: 'posting' | 'spontaneous',
+  options: StepValidationOptions = {}
 ): StepErrors {
+  const locale = options.locale;
+  const requireShifts = options.requireShifts ?? true;
   const errors: StepErrors = {};
-  if (!input.start_availability) errors.start_availability = 'Indique quand tu peux commencer';
-  if (!input.shifts_accepted || input.shifts_accepted.length === 0) {
-    errors.shifts_accepted = 'Choisis au moins un quart de travail';
+  if (!input.start_availability) errors.start_availability = t(locale, 'Indique quand tu peux commencer', 'Select when you can start');
+  if (requireShifts && (!input.shifts_accepted || input.shifts_accepted.length === 0)) {
+    errors.shifts_accepted = t(locale, 'Choisis au moins un quart de travail', 'Choose at least one shift');
   }
   if (mode === 'spontaneous') {
     const hasRegion = (input.region_choices || []).some((r) => r.region);
-    if (!hasRegion) errors.region_choices = 'Choisis au moins une région où tu veux travailler';
+    if (!hasRegion) {
+      errors.region_choices = t(locale, 'Choisis au moins une région où tu veux travailler', 'Choose at least one region where you want to work');
+    }
   }
   return errors;
 }
 
-export function validateDocumentsStep(input: StepInput): StepErrors {
+export function validateDocumentsStep(
+  input: StepInput,
+  options: StepValidationOptions = {}
+): StepErrors {
+  const locale = options.locale;
   const errors: StepErrors = {};
-  if (!input.cvReady) errors.cv = 'Téléverse ton CV pour continuer';
+  if (!input.cvReady) errors.cv = t(locale, 'Téléverse ton CV pour continuer', 'Upload your resume to continue');
   for (const id of input.required_extra_question_ids || []) {
     const value = input.extra_answers?.[id];
-    if (value == null || value === '') errors[`q_${id}`] = 'Cette réponse est requise';
+    if (value == null || value === '') errors[`q_${id}`] = t(locale, 'Cette réponse est requise', 'This answer is required');
   }
   return errors;
 }
 
-export function validateReviewStep(input: StepInput): StepErrors {
+export function validateReviewStep(
+  input: StepInput,
+  options: StepValidationOptions = {}
+): StepErrors {
+  const locale = options.locale;
   const errors: StepErrors = {};
-  if (!input.consent_data) errors.consent_data = 'Le consentement est obligatoire pour envoyer';
+  if (!input.consent_data) errors.consent_data = t(locale, 'Le consentement est obligatoire pour envoyer', 'Consent is required to send your application');
   return errors;
 }

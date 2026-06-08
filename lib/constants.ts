@@ -224,6 +224,12 @@ export const CONTACT_PREFS = ['Téléphone', 'SMS', 'Courriel', 'WhatsApp'] as c
 export const CONTACT_TIMES = ['Matin', 'Après-midi', 'Soir', 'Peu importe'] as const;
 export const LANGUAGES = ['Français', 'Anglais', 'Autre'] as const;
 export const WORK_AUTH = ['Oui', 'Non', 'Permis de travail', 'À discuter'] as const;
+export const INTERNATIONAL_WORK_AUTH = [
+  'Oui, disponible pour relocalisation',
+  'À confirmer',
+  "Besoin d'accompagnement",
+  'À discuter',
+] as const;
 export const PERMIT_STATUSES = ['Oui, valide', 'En renouvellement', 'Non'] as const;
 export const YEARS_EXPERIENCE = [
   'Moins de 1 an',
