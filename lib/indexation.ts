@@ -22,6 +22,12 @@ export const INDEXABLE_STATIC_ROUTES: IndexableRoute[] = [
   { fr: '/politique-confidentialite', en: '/en/privacy-policy', priority: 0.3, changeFrequency: 'yearly' },
   { fr: '/emplois-infirmieres-quebec', en: '/en/nursing-agency-jobs-quebec', priority: 0.9, changeFrequency: 'weekly' },
   {
+    fr: '/agence-infirmiere-quebec',
+    en: '/en/nursing-agency-quebec',
+    priority: 0.93,
+    changeFrequency: 'weekly',
+  },
+  {
     fr: '/emplois-infirmieres-auxiliaires-quebec',
     en: '/en/licensed-practical-nurse-jobs-quebec',
     priority: 0.88,

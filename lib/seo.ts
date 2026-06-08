@@ -46,6 +46,14 @@ const HEALTHCARE_SERVICE_AREAS = [
   'Mandats infirmiers obstétrique',
   'Mandats infirmiers CHSLD',
   'Nursing assignments in Quebec',
+  'Agence infirmiere Quebec',
+  'Agence infirmiere au Quebec',
+  'Agence de placement infirmier Quebec',
+  'Agence placement infirmiere Quebec',
+  'Placement infirmier Quebec',
+  'Personnel infirmier Quebec',
+  'Nursing agency Quebec',
+  'Quebec nursing agency',
   'Placement infirmier',
   'Placement infirmière auxiliaire',
   'Placement PAB',
@@ -150,7 +158,7 @@ export function organizationJsonLd() {
     logo: absoluteUrl(SOCIAL_IMAGE_PATH),
     priceRange: '$$',
     description:
-      'Agence de placement en santé basée à Laval, spécialisée dans les mandats pour professionnels de la santé au Québec.',
+      'Agence de placement en santé basée à Laval, spécialisée dans les mandats infirmiers et le recrutement de professionnels de la santé au Québec.',
     slogan: 'Mandats en santé au Québec pour professionnels de la santé.',
     address: {
       '@type': 'PostalAddress',
@@ -171,6 +179,10 @@ export function organizationJsonLd() {
       '@type': 'OfferCatalog',
       name: 'Services de recrutement et mandats en santé',
       itemListElement: [
+        offerCatalogItem(
+          'Agence infirmière au Québec',
+          'Placement infirmier et accompagnement de mandats pour infirmières autorisées, techniciennes et cliniciennes au Québec.'
+        ),
         offerCatalogItem(
           'Mandats pour candidats en santé',
           'Accès aux mandats pour infirmières, infirmières auxiliaires, PAB, ASSS et autres professionnels de la santé.'

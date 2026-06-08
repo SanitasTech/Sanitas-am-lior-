@@ -98,6 +98,7 @@ export default function NurseJobsQuebecPage() {
         primaryCta={{ label: 'Voir les mandats infirmiers', href: nurseJobsHref }}
         secondaryCta={{ label: 'Postuler comme infirmier', href: '/postuler' }}
         relatedLinks={[
+          { label: 'Agence infirmière Québec', href: '/agence-infirmiere-quebec' },
           { label: 'Infirmières cliniciennes', href: clinicianJobsHref },
           { label: 'Mandats en régions éloignées', href: '/mandats-infirmiers-region-eloignee' },
           { label: 'Mandats Baie-James', href: '/mandat-infirmiere-baie-james' },

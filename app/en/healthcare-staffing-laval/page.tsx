@@ -50,6 +50,7 @@ export default function HealthcareStaffingLavalPage() {
         secondaryCta={{ label: 'Request staff', href: '/en/facilities' }}
         relatedTitle="Useful links"
         relatedLinks={[
+          { label: 'Nursing agency Quebec', href: '/en/nursing-agency-quebec' },
           { label: 'Nursing jobs Quebec', href: '/en/nursing-agency-jobs-quebec' },
           { label: 'Healthcare recruitment Quebec', href: '/en/healthcare-recruitment-quebec' },
           { label: 'Contact', href: '/en/contact' },

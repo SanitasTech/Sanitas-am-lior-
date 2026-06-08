@@ -48,6 +48,7 @@ export default function HealthcareRecruitmentQuebecPage() {
         primaryCta={{ label: 'Demander du personnel', href: '/etablissements' }}
         secondaryCta={{ label: 'Nous contacter', href: '/contact' }}
         relatedLinks={[
+          { label: 'Agence infirmière Québec', href: '/agence-infirmiere-quebec' },
           { label: 'Agence placement santé Laval', href: '/agence-placement-sante-laval' },
           { label: 'À propos', href: '/a-propos' },
           { label: 'Postes candidats', href: '/postes' },

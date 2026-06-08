@@ -48,6 +48,7 @@ export default function LavalHealthcareStaffingPage() {
         primaryCta={{ label: 'Voir les postes', href: '/postes' }}
         secondaryCta={{ label: 'Demander du personnel', href: '/etablissements' }}
         relatedLinks={[
+          { label: 'Agence infirmière Québec', href: '/agence-infirmiere-quebec' },
           { label: 'Emplois infirmières', href: '/emplois-infirmieres-quebec' },
           { label: 'Recrutement personnel santé', href: '/recrutement-personnel-sante-quebec' },
           { label: 'Contact', href: '/contact' },

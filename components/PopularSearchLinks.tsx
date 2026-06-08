@@ -4,6 +4,7 @@ import type { Locale } from '@/lib/i18n';
 
 const CORE_LINKS: Record<Locale, Array<{ label: string; href: string }>> = {
   fr: [
+    { label: 'Agence infirmière Québec', href: '/agence-infirmiere-quebec' },
     { label: 'Emplois infirmières Québec', href: '/emplois-infirmieres-quebec' },
     { label: 'Emplois infirmières auxiliaires', href: '/emplois-infirmieres-auxiliaires-quebec' },
     { label: 'Emplois PAB Québec', href: '/emplois-pab-quebec' },
@@ -11,6 +12,7 @@ const CORE_LINKS: Record<Locale, Array<{ label: string; href: string }>> = {
     { label: 'Mandats en régions éloignées', href: '/mandats-infirmiers-region-eloignee' },
   ],
   en: [
+    { label: 'Nursing agency Quebec', href: '/en/nursing-agency-quebec' },
     { label: 'Nursing jobs Quebec', href: '/en/nursing-agency-jobs-quebec' },
     { label: 'LPN jobs Quebec', href: '/en/licensed-practical-nurse-jobs-quebec' },
     { label: 'PAB jobs Quebec', href: '/en/pab-jobs-quebec' },

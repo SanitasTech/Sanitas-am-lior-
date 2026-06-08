@@ -28,6 +28,10 @@ export const metadata: Metadata = {
   description:
     'Agence de placement infirmi\u00e8re et sant\u00e9 bas\u00e9e \u00e0 Laval. Mandats infirmiers au Qu\u00e9bec pour infirmi\u00e8res autoris\u00e9es, techniciennes, cliniciennes et professionnels de la sant\u00e9.',
   keywords: [
+    'agence infirmi\u00e8re Qu\u00e9bec',
+    'agence infirmiere quebec',
+    'agence de placement infirmier Qu\u00e9bec',
+    'placement infirmier Qu\u00e9bec',
     'agence de placement sant\u00e9 Qu\u00e9bec',
     'mandats infirmiers Qu\u00e9bec',
     'emploi infirmi\u00e8re Qu\u00e9bec',

@@ -53,6 +53,7 @@ export default function NursingAgencyJobsQuebecPage() {
         secondaryCta={{ label: 'Submit my profile', href: '/en/apply' }}
         relatedTitle="Useful links"
         relatedLinks={[
+          { label: 'Nursing agency Quebec', href: '/en/nursing-agency-quebec' },
           { label: 'Clinical nurse jobs', href: clinicianJobsHref },
           { label: 'Remote nursing assignments', href: '/en/remote-region-nursing-assignments-quebec' },
           { label: 'Baie-James assignments', href: '/en/nursing-assignments-baie-james' },

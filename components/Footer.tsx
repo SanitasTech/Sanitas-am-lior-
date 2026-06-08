@@ -15,6 +15,7 @@ export default function Footer({ locale = 'fr' }: { locale?: Locale }) {
   const seoLinks =
     locale === 'en'
       ? [
+          { href: '/en/nursing-agency-quebec', label: 'Nursing agency Quebec' },
           { href: '/en/nursing-agency-jobs-quebec', label: 'Nursing jobs Quebec' },
           { href: '/en/licensed-practical-nurse-jobs-quebec', label: 'LPN jobs Quebec' },
           { href: '/en/pab-jobs-quebec', label: 'PAB jobs Quebec' },
@@ -27,6 +28,7 @@ export default function Footer({ locale = 'fr' }: { locale?: Locale }) {
           { href: '/en/facility-faq', label: 'Facility FAQ' },
         ]
       : [
+          { href: '/agence-infirmiere-quebec', label: 'Agence infirmière Québec' },
           { href: '/emplois-infirmieres-quebec', label: 'Emplois infirmières Québec' },
           { href: '/emplois-infirmieres-auxiliaires-quebec', label: 'Emplois infirmières auxiliaires' },
           { href: '/emplois-pab-quebec', label: 'Emplois PAB Québec' },

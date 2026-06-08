@@ -50,6 +50,7 @@ export default function HealthcareRecruitmentQuebecPage() {
         secondaryCta={{ label: 'Contact us', href: '/en/contact' }}
         relatedTitle="Useful links"
         relatedLinks={[
+          { label: 'Nursing agency Quebec', href: '/en/nursing-agency-quebec' },
           { label: 'Healthcare staffing Laval', href: '/en/healthcare-staffing-laval' },
           { label: 'About Sanitas', href: '/en/about' },
           { label: 'Jobs for candidates', href: '/en/jobs' },
