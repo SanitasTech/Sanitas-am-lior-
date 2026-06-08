@@ -5,7 +5,7 @@ import { DecorativeBlob } from '@/components/Icons';
 import { publicPageMetadata } from '@/lib/seo';
 
 export const metadata = publicPageMetadata({
-  title: "À propos d'Agence Sanitas | Placement santé Laval",
+  title: 'À propos | Placement santé Laval',
   description:
     "Découvrez Agence Sanitas, agence de placement en santé basée à Laval, au service des professionnels et des établissements du Québec.",
   path: '/a-propos',

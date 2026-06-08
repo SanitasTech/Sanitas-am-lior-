@@ -25,9 +25,9 @@ import type { Job } from '@/types';
 import { urgencyOrder } from '@/lib/utils';
 
 export const metadata = publicPageMetadata({
-  title: 'Agence de placement en santé au Québec | Mandats infirmières et PAB',
+  title: 'Agence de placement infirmière au Québec | Mandats en santé',
   description:
-    'Agence Sanitas aide les infirmières, PAB, ASSS et professionnels de la santé à trouver des mandats au Québec, et accompagne les établissements.',
+    'Agence Sanitas aide les infirmières autorisées, techniciennes, cliniciennes et professionnels de la santé à trouver des mandats au Québec.',
   path: '/',
   frPath: '/',
   enPath: '/en',
@@ -52,6 +52,7 @@ const PHOTOS = {
 type QuickProfession = { label: string; filter: string | null };
 const QUICK_PROFESSIONS: QuickProfession[] = [
   { label: 'Infirmier(ère)', filter: 'Infirmier(ère)' },
+  { label: 'Infirmier(ère) clinicien(ne)', filter: 'Infirmier(ère) clinicien(ne)' },
   { label: 'Infirmier(ère) auxiliaire', filter: 'Infirmier(ère) auxiliaire' },
   { label: 'Préposé(e) aux bénéficiaires', filter: 'Préposé(e) aux bénéficiaires' },
   { label: 'ASSS', filter: 'Auxiliaire aux services de santé et sociaux (ASSS)' },
@@ -182,23 +183,23 @@ export default async function HomePage() {
           <div className="max-w-3xl">
             <p className="inline-flex items-center gap-2 rounded-full bg-bg/15 backdrop-blur px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.15em] text-bg ring-1 ring-bg/20">
               <span className="h-1.5 w-1.5 rounded-full bg-bg" aria-hidden />
-              Agence de placement en santé · Laval, Québec
+              Agence de placement infirmière · Laval, Québec
             </p>
 
             <h1 className="mt-6 text-[clamp(2.75rem,6vw,5rem)] leading-[1.02] tracking-[-0.025em] font-semibold text-bg">
-              Des mandats en santé
+              Des mandats infirmiers
               <br />
               <span className="font-serif italic font-normal text-bg tracking-[-0.08em]">
-                adaptés à{' '}
+                et en santé adaptés à{' '}
                 <span className="text-[oklch(0.72_0.09_220)]">votre</span>{' '}
                 réalité.
               </span>
             </h1>
 
             <p className="mt-8 max-w-2xl text-[18.5px] sm:text-[20px] leading-relaxed text-bg/85">
-              Choisissez vos régions, vos établissements, vos départements et vos horaires
-              préférés. Sanitas vous aide à trouver des opportunités qui correspondent vraiment
-              à ce que vous recherchez.
+              Infirmières autorisées, techniciennes, cliniciennes et autres professionnels de la
+              santé: choisissez vos régions, vos départements et vos horaires. Sanitas vous aide
+              à trouver des mandats compatibles au Québec.
             </p>
 
             {/* CTAs : audience-segmentés, libellés agrandis pour identification immédiate */}
@@ -209,10 +210,10 @@ export default async function HomePage() {
                 </p>
                 <div className="flex flex-wrap gap-2.5">
                   <Link
-                    href="/postes"
+                    href="/emplois-infirmieres-quebec"
                     className="inline-flex items-center justify-center rounded-full bg-bg px-5 py-2.5 text-[15px] font-medium text-fg transition-all hover:opacity-90"
                   >
-                    Voir les postes ouverts
+                    Voir les mandats infirmiers
                   </Link>
                   <Link
                     href="/postuler"
@@ -349,10 +350,11 @@ export default async function HomePage() {
               <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
                 Pour les candidats
               </p>
-              <h2 className="mt-2 text-display-lg text-fg">Professionnels de la santé</h2>
+              <h2 className="mt-2 text-display-lg text-fg">Infirmiers et professionnels de la santé</h2>
               <p className="mt-4 text-[17.5px] leading-relaxed text-fg-muted max-w-prose">
                 Trouvez des mandats compatibles avec votre profession, vos disponibilités, vos
-                régions et vos préférences. Du temporaire au long terme, du jour au quart de nuit.
+                régions et vos préférences. Les infirmiers autorisés, techniciens et cliniciens
+                peuvent cibler leurs départements, quarts et régions du Québec.
               </p>
 
               <ul className="mt-8 flex flex-wrap gap-2">
@@ -373,7 +375,7 @@ export default async function HomePage() {
               </ul>
 
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="/postes" className="btn-primary">Voir les postes</Link>
+                <Link href="/emplois-infirmieres-quebec" className="btn-primary">Mandats infirmiers</Link>
                 <Link href="/postuler" className="btn-secondary">Créer mon profil</Link>
               </div>
             </div>

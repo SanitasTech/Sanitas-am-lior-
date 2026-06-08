@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { unstable_noStore as noStore } from 'next/cache';
 import PublicLayout from '@/components/PublicLayout';
 import SeoJsonLd from '@/components/SeoJsonLd';
@@ -18,9 +19,9 @@ import type { Job } from '@/types';
 import { urgencyOrder } from '@/lib/utils';
 
 export const metadata = publicPageMetadata({
-  title: 'Emplois en santé | Mandats Québec et internationaux',
+  title: 'Mandats infirmiers au Québec | Emplois en santé Sanitas',
   description:
-    'Consultez les mandats actifs en santé avec Agence Sanitas, au Québec et à l’international. Filtrez par profession, pays, région, département, quart et type de mandat.',
+    'Consultez les mandats infirmiers et emplois en santé actifs avec Agence Sanitas. Filtrez par profession, région, département, quart, pays et type de mandat.',
   path: '/postes',
   frPath: '/postes',
   enPath: '/en/jobs',
@@ -87,13 +88,13 @@ export default async function PostesPage({ searchParams }: Props) {
           '@context': 'https://schema.org',
           '@graph': [
             collectionPageJsonLd({
-              name: 'Mandats et emplois en santé au Québec',
+              name: 'Mandats infirmiers et emplois en santé',
               description:
-                'Mandats actifs en santé au Québec pour infirmières, infirmières auxiliaires, PAB, ASSS et autres professionnels.',
+                'Mandats actifs au Québec et à l’international pour infirmières, infirmières cliniciennes et autres professionnels de la santé.',
               url: '/postes',
             }),
             serviceJsonLd({
-              name: 'Recherche de mandats en santé au Québec',
+              name: 'Recherche de mandats infirmiers et emplois en santé',
               description:
                 'Service de mise en relation entre professionnels de la santé et mandats actifs au Québec ou à l’international.',
               url: '/postes',
@@ -118,11 +119,37 @@ export default async function PostesPage({ searchParams }: Props) {
         <DecorativeBlob className="absolute -top-32 -right-40 h-[450px] w-[450px] text-accent pointer-events-none" />
         <div className="container-page relative">
           <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">Postes</p>
-          <h1 className="mt-2 text-display-lg text-fg">Mandats en santé</h1>
-          <p className="mt-4 max-w-prose text-[16px] leading-relaxed text-fg-muted">
+          <h1 className="mt-2 text-display-lg text-fg">Mandats infirmiers et emplois en santé</h1>
+          <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-fg-muted">
             Filtrez les postes par profession, pays, région, ville, établissement, département,
-            quart ou type de mandat. Les postes affichés sont actifs et provenant d'Agence Sanitas.
+            quart ou type de mandat. Pour les infirmières du Québec, les recherches clés sont
+            maintenant regroupées par région éloignée, département et type de mandat.
           </p>
+        </div>
+      </section>
+
+      <section className="pb-10">
+        <div className="container-page">
+          <div className="grid gap-4 md:grid-cols-3">
+            <PriorityLink
+              href="/emplois-infirmieres-quebec"
+              eyebrow="Infirmiers au Québec"
+              title="Emplois infirmières, autorisées et cliniciennes"
+              body="Page cible pour les mandats infirmiers au Québec, avec régions, départements et quarts."
+            />
+            <PriorityLink
+              href="/mandats-infirmiers-region-eloignee"
+              eyebrow="Régions éloignées"
+              title="Gaspésie, Abitibi, Côte-Nord et Bas-Saint-Laurent"
+              body="Accès rapide aux mandats infirmiers en région éloignée et aux besoins prioritaires."
+            />
+            <PriorityLink
+              href="/mandats-infirmiers-urgence-quebec"
+              eyebrow="Départements"
+              title="Urgence, soins intensifs, bloc opératoire"
+              body="Recherche par département pour les profils infirmiers spécialisés."
+            />
+          </div>
         </div>
       </section>
 
@@ -162,5 +189,27 @@ export default async function PostesPage({ searchParams }: Props) {
         </div>
       </section>
     </PublicLayout>
+  );
+}
+
+function PriorityLink({
+  href,
+  eyebrow,
+  title,
+  body,
+}: {
+  href: string;
+  eyebrow: string;
+  title: string;
+  body: string;
+}) {
+  return (
+    <Link href={href} className="card group p-5 transition hover:-translate-y-0.5 hover:shadow-card">
+      <p className="text-[12px] font-semibold uppercase tracking-wider text-accent">{eyebrow}</p>
+      <h2 className="mt-2 text-[18px] font-semibold leading-snug text-fg group-hover:text-accent">
+        {title}
+      </h2>
+      <p className="mt-3 text-[14.5px] leading-relaxed text-fg-muted">{body}</p>
+    </Link>
   );
 }

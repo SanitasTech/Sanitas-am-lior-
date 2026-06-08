@@ -7,7 +7,7 @@ import { DecorativeBlob, PeopleIcon, ClipboardIcon, ChatIcon } from '@/component
 import { breadcrumbJsonLd, contactPageJsonLd, publicPageMetadata } from '@/lib/seo';
 
 export const metadata = publicPageMetadata({
-  title: 'Contact Agence Sanitas | Candidates and facilities',
+  title: 'Contact healthcare recruitment | Candidates and facilities',
   description:
     'Contact Agence Sanitas in Laval to apply, ask a question or request healthcare staffing support in Quebec.',
   path: '/en/contact',

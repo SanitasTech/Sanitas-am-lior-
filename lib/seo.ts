@@ -26,6 +26,22 @@ export const SOCIAL_IMAGE_PATH = '/opengraph-image';
 
 const HEALTHCARE_SERVICE_AREAS = [
   'Mandats infirmiers au Québec',
+  'Emploi infirmière Québec',
+  'Emploi infirmier Québec',
+  'Infirmière autorisée Québec',
+  'Infirmière technicienne Québec',
+  'Infirmière clinicienne Québec',
+  'Infirmière OIIQ emploi',
+  'Mandats infirmiers Gaspésie',
+  'Mandats infirmiers Abitibi',
+  'Mandats infirmiers Côte-Nord',
+  'Mandats infirmiers Bas-Saint-Laurent',
+  'Mandats infirmiers Îles-de-la-Madeleine',
+  'Mandats infirmiers urgence',
+  'Mandats infirmiers soins intensifs',
+  'Mandats infirmiers bloc opératoire',
+  'Mandats infirmiers obstétrique',
+  'Mandats infirmiers CHSLD',
   'Nursing assignments in Quebec',
   'Placement infirmier',
   'Placement infirmière auxiliaire',
@@ -53,6 +69,15 @@ export function languageAlternates(frPath: string, enPath: string) {
   };
 }
 
+function publicSearchTitle(title: string): string {
+  const cleaned = title
+    .replace(/\s*\|\s*Agence Sanitas\s*$/i, '')
+    .replace(/\s+Sanitas\s*$/i, '')
+    .trim();
+
+  return cleaned || title;
+}
+
 export function publicPageMetadata({
   title,
   description,
@@ -70,15 +95,17 @@ export function publicPageMetadata({
   enPath: string;
   imageAlt?: string;
 }): Metadata {
+  const searchTitle = publicSearchTitle(title);
+
   return {
-    title,
+    title: searchTitle,
     description,
     alternates: {
       canonical: absoluteUrl(path),
       languages: languageAlternates(frPath, enPath),
     },
     openGraph: {
-      title,
+      title: searchTitle,
       description,
       url: absoluteUrl(path),
       locale: locale === 'en' ? 'en_CA' : 'fr_CA',
@@ -100,7 +127,7 @@ export function publicPageMetadata({
     },
     twitter: {
       card: 'summary_large_image',
-      title,
+      title: searchTitle,
       description,
       images: [SOCIAL_IMAGE_PATH],
     },

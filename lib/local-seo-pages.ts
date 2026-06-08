@@ -31,7 +31,323 @@ function jobsHref(locale: Locale, filters: Record<string, string>) {
 const nurse = 'Infirmier(ère)';
 const pab = 'Préposé(e) aux bénéficiaires';
 
+type NurseRegionTarget = {
+  slug: string;
+  enSlug: string;
+  label: string;
+  enLabel: string;
+  regionFilter: string;
+  cityFilter?: string;
+  priority: number;
+};
+
+type NurseDepartmentTarget = {
+  slug: string;
+  enSlug: string;
+  label: string;
+  enLabel: string;
+  departmentFilter: string;
+  priority: number;
+};
+
+const NURSE_REGION_TARGETS: NurseRegionTarget[] = [
+  {
+    slug: 'mandat-infirmiere-gaspesie',
+    enSlug: 'nursing-assignments-gaspesie',
+    label: 'Gaspésie',
+    enLabel: 'Gaspesie',
+    regionFilter: 'Gaspésie–Îles-de-la-Madeleine',
+    priority: 0.86,
+  },
+  {
+    slug: 'mandat-infirmiere-iles-de-la-madeleine',
+    enSlug: 'nursing-assignments-magdalen-islands',
+    label: 'Îles-de-la-Madeleine',
+    enLabel: 'Magdalen Islands',
+    regionFilter: 'Gaspésie–Îles-de-la-Madeleine',
+    cityFilter: 'Îles-de-la-Madeleine',
+    priority: 0.84,
+  },
+  {
+    slug: 'mandat-infirmiere-bas-saint-laurent',
+    enSlug: 'nursing-assignments-bas-saint-laurent',
+    label: 'Bas-Saint-Laurent',
+    enLabel: 'Bas-Saint-Laurent',
+    regionFilter: 'Bas-Saint-Laurent',
+    priority: 0.84,
+  },
+  {
+    slug: 'mandat-infirmiere-abitibi',
+    enSlug: 'nursing-assignments-abitibi',
+    label: 'Abitibi',
+    enLabel: 'Abitibi',
+    regionFilter: 'Abitibi-Témiscamingue',
+    priority: 0.84,
+  },
+  {
+    slug: 'mandat-infirmiere-cote-nord',
+    enSlug: 'nursing-assignments-cote-nord',
+    label: 'Côte-Nord',
+    enLabel: 'Cote-Nord',
+    regionFilter: 'Côte-Nord',
+    priority: 0.84,
+  },
+];
+
+const NURSE_DEPARTMENT_TARGETS: NurseDepartmentTarget[] = [
+  {
+    slug: 'mandats-infirmiers-urgence-quebec',
+    enSlug: 'emergency-nursing-assignments-quebec',
+    label: 'urgence',
+    enLabel: 'emergency',
+    departmentFilter: 'Urgence',
+    priority: 0.84,
+  },
+  {
+    slug: 'mandats-infirmiers-soins-intensifs-quebec',
+    enSlug: 'intensive-care-nursing-assignments-quebec',
+    label: 'soins intensifs',
+    enLabel: 'intensive care',
+    departmentFilter: 'Soins intensifs',
+    priority: 0.84,
+  },
+  {
+    slug: 'mandats-infirmiers-bloc-operatoire-quebec',
+    enSlug: 'operating-room-nursing-assignments-quebec',
+    label: 'bloc opératoire',
+    enLabel: 'operating room',
+    departmentFilter: 'Bloc opératoire',
+    priority: 0.83,
+  },
+  {
+    slug: 'mandats-infirmiers-obstetrique-quebec',
+    enSlug: 'obstetrics-nursing-assignments-quebec',
+    label: 'obstétrique',
+    enLabel: 'obstetrics',
+    departmentFilter: 'Obstétrique',
+    priority: 0.83,
+  },
+  {
+    slug: 'mandats-infirmiers-chirurgie-quebec',
+    enSlug: 'surgical-nursing-assignments-quebec',
+    label: 'chirurgie',
+    enLabel: 'surgical nursing',
+    departmentFilter: 'Chirurgie',
+    priority: 0.82,
+  },
+  {
+    slug: 'mandats-infirmiers-chsld-quebec',
+    enSlug: 'chsld-nursing-assignments-quebec',
+    label: 'CHSLD',
+    enLabel: 'long-term care',
+    departmentFilter: "Centre d'hébergement et de soins de longue durée",
+    priority: 0.82,
+  },
+];
+
+function createNurseRegionSeoPage(target: NurseRegionTarget): LocalSeoPagePair {
+  const frFilters: Record<string, string> = { profession: nurse, region: target.regionFilter };
+  const enFilters: Record<string, string> = { profession: nurse, region: target.regionFilter };
+  if (target.cityFilter) {
+    frFilters.city = target.cityFilter;
+    enFilters.city = target.cityFilter;
+  }
+
+  return {
+    priority: target.priority,
+    fr: {
+      slug: target.slug,
+      metaTitle: `Mandat infirmière ${target.label} | Agence Sanitas`,
+      metaDescription:
+        `Mandats infirmiers en ${target.label} avec Agence Sanitas. Postulez comme infirmière autorisée, technicienne ou clinicienne au Québec.`,
+      eyebrow: 'Mandats infirmiers régionaux',
+      title: `Mandats infirmiers en ${target.label}`,
+      intro:
+        `Agence Sanitas recrute des infirmières et infirmiers du Québec pour des mandats en ${target.label}. Indiquez vos départements, quarts, disponibilités et préférences dans un dossier unique.`,
+      highlights: [
+        `Recherche ciblée pour les mandats infirmiers en ${target.label}.`,
+        'Profils visés: infirmières techniciennes, infirmières autorisées et infirmières cliniciennes.',
+        'Français professionnel, autorisation de travail et dossier candidat complet facilitent le suivi recruteur.',
+      ],
+      sections: [
+        {
+          title: 'Choisir la bonne combinaison',
+          body:
+            'Votre profil Sanitas permet de préciser si cette région va avec certains départements, quarts ou contraintes de mobilité.',
+        },
+        {
+          title: 'Mandats infirmiers actifs',
+          body:
+            'Les postes peuvent être filtrés par région, département, quart et type de mandat pour repérer rapidement les besoins compatibles.',
+        },
+        {
+          title: 'Suivi par un recruteur',
+          body:
+            'Un recruteur peut valider vos disponibilités, votre expérience, vos documents et vos préférences avant de vous proposer.',
+        },
+        {
+          title: 'Postuler ou appeler',
+          body:
+            'Vous pouvez envoyer votre profil en ligne ou appeler Sanitas si vous préférez discuter du mandat avant de confirmer votre intérêt.',
+        },
+      ],
+      primaryCta: { label: `Voir les mandats en ${target.label}`, href: jobsHref('fr', frFilters) },
+      secondaryCta: { label: 'Postuler comme infirmier', href: '/postuler' },
+      relatedLinks: [
+        { label: 'Emplois infirmières Québec', href: '/emplois-infirmieres-quebec' },
+        { label: 'Mandats en région éloignée', href: '/mandats-infirmiers-region-eloignee' },
+        { label: 'Mandats infirmiers urgence', href: '/mandats-infirmiers-urgence-quebec' },
+      ],
+    },
+    en: {
+      slug: target.enSlug,
+      metaTitle: `Nursing assignments ${target.enLabel} | Agence Sanitas`,
+      metaDescription:
+        `Nursing assignments in ${target.enLabel} with Agence Sanitas. Apply as a registered, technical or clinical nurse for Quebec healthcare mandates.`,
+      eyebrow: 'Regional nursing assignments',
+      title: `Nursing assignments in ${target.enLabel}`,
+      intro:
+        `Agence Sanitas recruits nurses for healthcare assignments in ${target.enLabel}. Share your departments, shifts, availability and preferences in one reusable profile.`,
+      highlights: [
+        `Targeted search for nursing assignments in ${target.enLabel}.`,
+        'Profiles sought: registered nurses, technical nurses and clinical nurses.',
+        'Professional French, work authorization and a complete candidate file help recruiter follow-up.',
+      ],
+      sections: [
+        {
+          title: 'Choose the right combination',
+          body:
+            'Your Sanitas profile can specify whether this region fits only with certain departments, shifts or mobility constraints.',
+        },
+        {
+          title: 'Active nursing assignments',
+          body:
+            'Jobs can be filtered by region, department, shift and assignment type to quickly identify compatible needs.',
+        },
+        {
+          title: 'Recruiter follow-up',
+          body:
+            'A recruiter can validate your availability, experience, documents and preferences before proposing an assignment.',
+        },
+        {
+          title: 'Apply or call',
+          body:
+            'You can submit your profile online or call Sanitas if you prefer to discuss the assignment before confirming interest.',
+        },
+      ],
+      primaryCta: { label: `View ${target.enLabel} nursing jobs`, href: jobsHref('en', enFilters) },
+      secondaryCta: { label: 'Apply as a nurse', href: '/en/apply' },
+      relatedLinks: [
+        { label: 'Nursing jobs Quebec', href: '/en/nursing-agency-jobs-quebec' },
+        { label: 'Remote nursing assignments', href: '/en/remote-region-nursing-assignments-quebec' },
+        { label: 'Emergency nursing assignments', href: '/en/emergency-nursing-assignments-quebec' },
+      ],
+    },
+  };
+}
+
+function createNurseDepartmentSeoPage(target: NurseDepartmentTarget): LocalSeoPagePair {
+  const filters = { profession: nurse, department: target.departmentFilter };
+
+  return {
+    priority: target.priority,
+    fr: {
+      slug: target.slug,
+      metaTitle: `Mandats infirmiers ${target.label} au Québec | Agence Sanitas`,
+      metaDescription:
+        `Mandats infirmiers en ${target.label} au Québec. Agence Sanitas recrute des infirmières autorisées, techniciennes et cliniciennes.`,
+      eyebrow: 'Départements infirmiers',
+      title: `Mandats infirmiers en ${target.label} au Québec`,
+      intro:
+        `Pour les infirmières et infirmiers qui recherchent des mandats en ${target.label}, Sanitas permet de préciser les régions, quarts, documents et contraintes associés à ce type de mandat.`,
+      highlights: [
+        `Mandats ciblés en ${target.label} selon les besoins actifs.`,
+        'Recherche par profession infirmière, région, quart, mobilité et documents requis.',
+        'Dossier candidat unique pour accélérer la validation par le recruteur.',
+      ],
+      sections: [
+        {
+          title: 'Cibler le bon département',
+          body:
+            'Le profil candidat distingue les départements acceptés pour éviter de proposer un mandat qui ne correspond pas à votre expérience ou à vos préférences.',
+        },
+        {
+          title: 'Régions et quarts compatibles',
+          body:
+            'Vous pouvez lier vos départements à des régions et à des quarts précis, par exemple jour, soir ou nuit.',
+        },
+        {
+          title: 'Documents et permis',
+          body:
+            'Le CV, le permis et les documents requis sont suivis pour réduire les délais lorsqu’un mandat compatible apparaît.',
+        },
+        {
+          title: 'Action rapide',
+          body:
+            'Si votre profil est complet, Sanitas peut traiter votre intérêt plus vite et vous contacter pour confirmer les détails du mandat.',
+        },
+      ],
+      primaryCta: { label: `Voir les mandats en ${target.label}`, href: jobsHref('fr', filters) },
+      secondaryCta: { label: 'Créer mon profil infirmier', href: '/postuler' },
+      relatedLinks: [
+        { label: 'Emplois infirmières Québec', href: '/emplois-infirmieres-quebec' },
+        { label: 'Mandats Gaspésie', href: '/mandat-infirmiere-gaspesie' },
+        { label: 'Mandats en région éloignée', href: '/mandats-infirmiers-region-eloignee' },
+      ],
+    },
+    en: {
+      slug: target.enSlug,
+      metaTitle: `${target.enLabel} nursing assignments Quebec | Agence Sanitas`,
+      metaDescription:
+        `${target.enLabel} nursing assignments in Quebec. Agence Sanitas recruits registered, technical and clinical nurses.`,
+      eyebrow: 'Nursing departments',
+      title: `${target.enLabel} nursing assignments in Quebec`,
+      intro:
+        `For nurses looking for ${target.enLabel} assignments, Sanitas helps clarify regions, shifts, documents and constraints linked to this type of mandate.`,
+      highlights: [
+        `Targeted ${target.enLabel} assignments based on active needs.`,
+        'Search by nursing profession, region, shift, mobility and required documents.',
+        'One candidate profile to accelerate recruiter validation.',
+      ],
+      sections: [
+        {
+          title: 'Target the right department',
+          body:
+            'The candidate profile separates accepted departments to avoid proposing an assignment that does not match your experience or preferences.',
+        },
+        {
+          title: 'Compatible regions and shifts',
+          body:
+            'You can connect departments with specific regions and shifts, such as day, evening or night.',
+        },
+        {
+          title: 'Documents and permits',
+          body:
+            'CV, permits and required documents are tracked to reduce delays when a compatible mandate appears.',
+        },
+        {
+          title: 'Fast action',
+          body:
+            'If your profile is complete, Sanitas can process your interest faster and contact you to confirm mandate details.',
+        },
+      ],
+      primaryCta: { label: `View ${target.enLabel} assignments`, href: jobsHref('en', filters) },
+      secondaryCta: { label: 'Create my nurse profile', href: '/en/apply' },
+      relatedLinks: [
+        { label: 'Nursing jobs Quebec', href: '/en/nursing-agency-jobs-quebec' },
+        { label: 'Gaspesie assignments', href: '/en/nursing-assignments-gaspesie' },
+        { label: 'Remote nursing assignments', href: '/en/remote-region-nursing-assignments-quebec' },
+      ],
+    },
+  };
+}
+
+const NURSE_REGION_SEO_PAGES = NURSE_REGION_TARGETS.map(createNurseRegionSeoPage);
+const NURSE_DEPARTMENT_SEO_PAGES = NURSE_DEPARTMENT_TARGETS.map(createNurseDepartmentSeoPage);
+
 export const LOCAL_SEO_PAGES: LocalSeoPagePair[] = [
+  ...NURSE_REGION_SEO_PAGES,
+  ...NURSE_DEPARTMENT_SEO_PAGES,
   {
     priority: 0.82,
     fr: {
@@ -613,6 +929,6 @@ export function getLocalSeoRoutes() {
     fr: `/${page.fr.slug}`,
     en: `/en/${page.en.slug}`,
     priority: page.priority,
-    changeFrequency: 'monthly' as const,
+    changeFrequency: page.priority >= 0.82 ? 'weekly' as const : 'monthly' as const,
   }));
 }

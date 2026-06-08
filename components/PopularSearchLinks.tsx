@@ -19,8 +19,31 @@ const CORE_LINKS: Record<Locale, Array<{ label: string; href: string }>> = {
   ],
 };
 
+const ADS_SEARCH_CLUSTERS: Record<Locale, Array<{ label: string; href: string }>> = {
+  fr: [
+    { label: 'Mandats infirmiers Gaspésie', href: '/mandat-infirmiere-gaspesie' },
+    { label: 'Mandats infirmiers Abitibi', href: '/mandat-infirmiere-abitibi' },
+    { label: 'Mandats infirmiers Côte-Nord', href: '/mandat-infirmiere-cote-nord' },
+    { label: 'Mandats infirmiers Bas-Saint-Laurent', href: '/mandat-infirmiere-bas-saint-laurent' },
+    { label: 'Mandats infirmiers Îles-de-la-Madeleine', href: '/mandat-infirmiere-iles-de-la-madeleine' },
+    { label: 'Mandats infirmiers urgence', href: '/mandats-infirmiers-urgence-quebec' },
+    { label: 'Mandats infirmiers soins intensifs', href: '/mandats-infirmiers-soins-intensifs-quebec' },
+    { label: 'Mandats infirmiers bloc opératoire', href: '/mandats-infirmiers-bloc-operatoire-quebec' },
+    { label: 'Mandats infirmiers obstétrique', href: '/mandats-infirmiers-obstetrique-quebec' },
+    { label: 'Mandats infirmiers CHSLD', href: '/mandats-infirmiers-chsld-quebec' },
+  ],
+  en: [
+    { label: 'Nursing assignments Gaspesie', href: '/en/nursing-assignments-gaspesie' },
+    { label: 'Nursing assignments Abitibi', href: '/en/nursing-assignments-abitibi' },
+    { label: 'Nursing assignments Cote-Nord', href: '/en/nursing-assignments-cote-nord' },
+    { label: 'Emergency nursing assignments', href: '/en/emergency-nursing-assignments-quebec' },
+    { label: 'Intensive care nursing', href: '/en/intensive-care-nursing-assignments-quebec' },
+    { label: 'Operating room nursing', href: '/en/operating-room-nursing-assignments-quebec' },
+  ],
+};
+
 export default function PopularSearchLinks({ locale = 'fr' }: { locale?: Locale }) {
-  const links = [...CORE_LINKS[locale], ...LOCAL_SEO_FOOTER_LINKS[locale]];
+  const links = [...CORE_LINKS[locale], ...ADS_SEARCH_CLUSTERS[locale], ...LOCAL_SEO_FOOTER_LINKS[locale]];
 
   return (
     <section className="rounded-2xl border border-border bg-surface p-5 sm:p-6">

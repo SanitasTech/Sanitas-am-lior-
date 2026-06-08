@@ -5,7 +5,7 @@ import { DecorativeBlob } from '@/components/Icons';
 import { publicPageMetadata } from '@/lib/seo';
 
 export const metadata = publicPageMetadata({
-  title: 'About Agence Sanitas | Healthcare staffing in Laval',
+  title: 'About | Healthcare staffing in Laval',
   description:
     'Learn about Agence Sanitas, a Laval-based healthcare staffing agency serving professionals and facilities across Quebec.',
   path: '/en/about',

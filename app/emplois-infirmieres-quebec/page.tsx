@@ -1,14 +1,39 @@
+import Link from 'next/link';
 import PublicLayout from '@/components/PublicLayout';
 import SeoJsonLd from '@/components/SeoJsonLd';
 import SeoLandingPage from '@/components/SeoLandingPage';
-import { breadcrumbJsonLd, publicPageMetadata } from '@/lib/seo';
+import { breadcrumbJsonLd, faqPageJsonLd, publicPageMetadata, serviceJsonLd } from '@/lib/seo';
 
 const nurseJobsHref = `/postes?profession=${encodeURIComponent('Infirmier(ère)')}`;
+const clinicianJobsHref = `/postes?profession=${encodeURIComponent('Infirmier(ère) clinicien(ne)')}`;
+
+const FAQ = [
+  {
+    question: 'Quels profils infirmiers sont recherchés par Agence Sanitas ?',
+    answer:
+      'Agence Sanitas recherche des infirmières et infirmiers du Québec, notamment infirmiers autorisés, infirmières techniciennes et infirmières cliniciennes, selon les mandats disponibles.',
+  },
+  {
+    question: 'Est-ce que le français est requis pour les mandats infirmiers au Québec ?',
+    answer:
+      'Oui. Les candidats doivent pouvoir communiquer en français dans un contexte professionnel de santé au Québec.',
+  },
+  {
+    question: 'Puis-je choisir mes régions et mes départements ?',
+    answer:
+      'Oui. Le dossier candidat permet de préciser les régions, départements, quarts, disponibilités et contraintes pour éviter les propositions incompatibles.',
+  },
+  {
+    question: 'Quels départements infirmiers sont souvent recherchés ?',
+    answer:
+      'Les besoins peuvent inclure urgence, soins intensifs, bloc opératoire, obstétrique, chirurgie, CHSLD, soins à domicile, médecine et santé mentale selon les postes actifs.',
+  },
+];
 
 export const metadata = publicPageMetadata({
-  title: 'Emplois et mandats infirmiers au Québec',
+  title: 'Emploi infirmière Québec | Mandats infirmiers Sanitas',
   description:
-    'Trouvez des mandats infirmiers au Québec avec Agence Sanitas. Choisissez vos régions, départements, quarts et disponibilités.',
+    'Mandats infirmiers au Québec pour infirmières autorisées, techniciennes et cliniciennes. Régions éloignées, urgence, soins intensifs, bloc opératoire, obstétrique et CHSLD.',
   path: '/emplois-infirmieres-quebec',
   frPath: '/emplois-infirmieres-quebec',
   enPath: '/en/nursing-agency-jobs-quebec',
@@ -26,48 +51,86 @@ export default function NurseJobsQuebecPage() {
               { name: 'Accueil', url: '/' },
               { name: 'Emplois infirmières Québec', url: '/emplois-infirmieres-quebec' },
             ]),
+            serviceJsonLd({
+              name: 'Mandats infirmiers au Québec',
+              description:
+                'Recherche de mandats infirmiers au Québec pour infirmières autorisées, techniciennes et cliniciennes.',
+              url: '/emplois-infirmieres-quebec',
+              serviceType: 'Healthcare nursing job matching',
+              audience: 'candidates',
+              areaServed: ['Québec'],
+            }),
+            faqPageJsonLd(FAQ),
           ],
         }}
       />
       <SeoLandingPage
-        eyebrow="Emplois infirmières"
+        eyebrow="Mandats infirmiers Québec"
         title="Emplois et mandats infirmiers au Québec"
-        intro="Agence Sanitas aide les infirmières et infirmiers à trouver des mandats compatibles avec leurs régions, leurs départements, leurs quarts et leur réalité professionnelle."
+        intro="Agence Sanitas aide les infirmières et infirmiers du Québec à trouver des mandats compatibles avec leur titre, leurs régions, leurs départements, leurs quarts et leurs disponibilités."
         highlights={[
-          'Mandats par région: Montréal, Laval, Montérégie, Laurentides, Gaspésie, Abitibi, Côte-Nord et plus.',
-          'Départements ciblés: urgence, chirurgie, médecine, obstétrique, soins intensifs, CHSLD, santé mentale et SAD.',
-          'Profil candidat réutilisable: CV, disponibilités et préférences conservés pour éviter la ressaisie.',
+          'Profils ciblés: infirmières techniciennes, infirmiers autorisés et infirmières cliniciennes.',
+          'Régions prioritaires: Gaspésie, Îles-de-la-Madeleine, Bas-Saint-Laurent, Abitibi, Côte-Nord, Laurentides et autres régions du Québec.',
+          'Départements fréquents: urgence, soins intensifs, bloc opératoire, obstétrique, chirurgie, CHSLD, SAD et santé mentale.',
         ]}
         sections={[
           {
-            title: 'Choisir les mandats qui vous conviennent',
+            title: 'Pour infirmiers autorisés, techniciens et cliniciens',
             body:
-              'Votre dossier Sanitas permet de préciser vos régions, quarts, départements et contraintes. Le recruteur peut ainsi vous proposer les mandats qui correspondent vraiment à votre profil.',
+              'Cette page cible les mandats infirmiers au Québec. Sanitas tient compte du titre admissible, de l’expérience, des documents, de l’autorisation de travail et de la capacité à communiquer en français en contexte de santé.',
           },
           {
-            title: 'Postuler rapidement aux postes actifs',
+            title: 'Régions et départements sans faux match',
             body:
-              'Si votre profil et votre CV sont complets, vous pouvez manifester votre intérêt pour un mandat sans répéter les mêmes informations à chaque fois.',
+              'Votre dossier permet d’indiquer les combinaisons qui vont ensemble, par exemple Gaspésie avec urgence, Abitibi avec CHSLD ou Côte-Nord avec soins intensifs.',
           },
           {
-            title: 'Un suivi humain',
+            title: 'Postuler sans répéter votre profil',
             body:
-              'Sanitas reste joignable par téléphone pour les candidats qui préfèrent parler directement à l’équipe avant de postuler ou de confirmer leurs disponibilités.',
+              'Une fois le dossier et le CV complétés, vous pouvez manifester votre intérêt pour un mandat sans ressaisir les mêmes informations à chaque fois.',
           },
           {
-            title: 'Mandats en région éloignée',
+            title: 'Suivi rapide par l’équipe Sanitas',
             body:
-              'Pour les infirmières ouvertes aux régions éloignées, Sanitas peut filtrer les mandats selon la région, le département, le quart, la mobilité et les documents requis.',
+              'Les recruteurs peuvent repérer les candidats compatibles par profession, région, département, quart, documents et disponibilité.',
           },
         ]}
         primaryCta={{ label: 'Voir les mandats infirmiers', href: nurseJobsHref }}
-        secondaryCta={{ label: 'Créer mon profil', href: '/postuler' }}
+        secondaryCta={{ label: 'Postuler comme infirmier', href: '/postuler' }}
         relatedLinks={[
-          { label: 'Mandats en région éloignée', href: '/mandats-infirmiers-region-eloignee' },
-          { label: 'Emplois PAB au Québec', href: '/emplois-pab-quebec' },
+          { label: 'Infirmières cliniciennes', href: clinicianJobsHref },
+          { label: 'Mandats Gaspésie', href: '/mandat-infirmiere-gaspesie' },
+          { label: 'Mandats Bas-Saint-Laurent', href: '/mandat-infirmiere-bas-saint-laurent' },
+          { label: 'Mandats Côte-Nord', href: '/mandat-infirmiere-cote-nord' },
+          { label: 'Mandats urgence', href: '/mandats-infirmiers-urgence-quebec' },
+          { label: 'Mandats soins intensifs', href: '/mandats-infirmiers-soins-intensifs-quebec' },
           { label: 'Tous les postes', href: '/postes' },
         ]}
       />
+
+      <section className="pb-20">
+        <div className="container-page max-w-4xl">
+          <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
+            <h2 className="text-[22px] font-semibold text-fg">Questions fréquentes</h2>
+            <div className="mt-6 grid gap-5 md:grid-cols-2">
+              {FAQ.map((item) => (
+                <article key={item.question}>
+                  <h3 className="text-[16px] font-semibold text-fg">{item.question}</h3>
+                  <p className="mt-2 text-[15px] leading-relaxed text-fg-muted">{item.answer}</p>
+                </article>
+              ))}
+            </div>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/postuler" className="btn-primary">
+                Créer mon dossier infirmier
+              </Link>
+              <a href="tel:+14509739696" className="btn-secondary">
+                Appeler Sanitas
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
     </PublicLayout>
   );
 }

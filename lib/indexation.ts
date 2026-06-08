@@ -9,7 +9,7 @@ export type IndexableRoute = {
   changeFrequency: SitemapItem['changeFrequency'];
 };
 
-export const STATIC_SEO_LAST_MODIFIED = new Date('2026-05-20T00:00:00.000Z');
+export const STATIC_SEO_LAST_MODIFIED = new Date('2026-06-08T00:00:00.000Z');
 
 export const INDEXABLE_STATIC_ROUTES: IndexableRoute[] = [
   { fr: '/', en: '/en', priority: 1, changeFrequency: 'weekly' },

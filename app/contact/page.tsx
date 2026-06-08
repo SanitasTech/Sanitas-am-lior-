@@ -7,7 +7,7 @@ import { DecorativeBlob, PeopleIcon, ClipboardIcon, ChatIcon } from '@/component
 import { breadcrumbJsonLd, contactPageJsonLd, publicPageMetadata } from '@/lib/seo';
 
 export const metadata = publicPageMetadata({
-  title: 'Contact Agence Sanitas | Candidats et établissements',
+  title: 'Contact recrutement santé | Candidats et établissements',
   description:
     "Contactez Agence Sanitas à Laval pour postuler, poser une question ou demander du personnel de santé au Québec.",
   path: '/contact',
