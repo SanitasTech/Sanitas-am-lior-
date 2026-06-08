@@ -116,6 +116,36 @@ export default async function EnglishJobDetailPage({ params }: { params: { id: s
                 {[establishment, job.city, job.region, isInternational ? displayValue('en', country) : null].filter(Boolean).join(' · ')}
               </div>
 
+              <section className="mt-8 rounded-2xl border border-border bg-surface p-5 shadow-sm sm:p-6">
+                <h2 className="text-[20px] font-semibold text-fg">Assignment summary</h2>
+                <dl className="mt-4 grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
+                  <Detail label="Profession" value={displayValue('en', job.profession)} />
+                  <Detail label="Department" value={displayValue('en', job.department)} />
+                  <Detail label={isInternational ? 'Region / territory' : 'Region'} value={job.region} />
+                  <Detail label="Shift" value={displayValue('en', job.shift)} />
+                  <Detail label="Compensation" value={salary} />
+                  <Detail label="Start date" value={formatDate(job.start_date, dateLocale('en'))} />
+                </dl>
+
+                {job.required_documents && job.required_documents.length > 0 && (
+                  <div className="mt-5 border-t border-border pt-4">
+                    <p className="text-[12.5px] font-medium uppercase tracking-wider text-fg-subtle">
+                      Required documents
+                    </p>
+                    <ul className="mt-3 flex flex-wrap gap-2">
+                      {job.required_documents.map((d) => (
+                        <li
+                          key={d}
+                          className="rounded-full border border-border bg-bg px-3 py-1.5 text-[13.5px] text-fg"
+                        >
+                          {displayValue('en', d)}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </section>
+
               {description && (
                 <section className="mt-10">
                   <h2 className="text-[20px] font-semibold text-fg">Description</h2>
@@ -186,6 +216,28 @@ export default async function EnglishJobDetailPage({ params }: { params: { id: s
                   </ul>
                 </section>
               )}
+
+              <section className="mt-12 rounded-2xl border border-border bg-surface p-5 shadow-sm sm:p-6">
+                <h2 className="text-[20px] font-semibold text-fg">How to apply</h2>
+                <ol className="mt-4 grid gap-3 text-[15px] leading-relaxed text-fg-muted sm:grid-cols-2">
+                  <li className="rounded-xl border border-border bg-bg p-4">
+                    <span className="block text-[13px] font-semibold uppercase tracking-wider text-accent">1</span>
+                    Sign in with Google to find or create your Sanitas candidate file.
+                  </li>
+                  <li className="rounded-xl border border-border bg-bg p-4">
+                    <span className="block text-[13px] font-semibold uppercase tracking-wider text-accent">2</span>
+                    Confirm only the details that matter for this assignment.
+                  </li>
+                  <li className="rounded-xl border border-border bg-bg p-4">
+                    <span className="block text-[13px] font-semibold uppercase tracking-wider text-accent">3</span>
+                    Upload your resume, or reuse the one already in your file.
+                  </li>
+                  <li className="rounded-xl border border-border bg-bg p-4">
+                    <span className="block text-[13px] font-semibold uppercase tracking-wider text-accent">4</span>
+                    Submit your application; Sanitas will contact you about next steps.
+                  </li>
+                </ol>
+              </section>
 
               <div className="mt-12 flex flex-wrap gap-3">
                 <Link href={interestedHref} className="btn-primary">I want this assignment</Link>

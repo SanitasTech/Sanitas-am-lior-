@@ -39,8 +39,13 @@ export default function JobCard({ job, variant = 'default', locale = 'fr' }: Job
           <p className="text-[13px] font-medium uppercase tracking-wider text-fg-subtle">
             {displayValue(locale, job.profession)}
           </p>
-          <h3 className="mt-1 text-[20px] font-semibold tracking-tight text-fg leading-snug">
-            {jobTitle(job, locale)}
+          <h3 className="mt-1 text-[20px] font-semibold tracking-tight leading-snug">
+            <Link
+              href={localizedJobPath(locale, job.id)}
+              className="text-fg transition-colors hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-accent"
+            >
+              {jobTitle(job, locale)}
+            </Link>
           </h3>
         </div>
         <div className="flex flex-col items-end gap-2">

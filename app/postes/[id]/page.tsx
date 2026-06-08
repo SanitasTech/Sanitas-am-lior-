@@ -113,6 +113,36 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                 {[establishment, job.city, job.region, isInternational ? displayValue('fr', country) : null].filter(Boolean).join(' · ')}
               </div>
 
+              <section className="mt-8 rounded-2xl border border-border bg-surface p-5 shadow-sm sm:p-6">
+                <h2 className="text-[20px] font-semibold text-fg">Résumé du mandat</h2>
+                <dl className="mt-4 grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
+                  <Detail label="Profession" value={displayValue('fr', job.profession)} />
+                  <Detail label="Département" value={job.department} />
+                  <Detail label={isInternational ? 'Région / territoire' : 'Région'} value={job.region} />
+                  <Detail label="Quart" value={job.shift} />
+                  <Detail label="Rémunération" value={salary} />
+                  <Detail label="Date de début" value={formatDate(job.start_date)} />
+                </dl>
+
+                {job.required_documents && job.required_documents.length > 0 && (
+                  <div className="mt-5 border-t border-border pt-4">
+                    <p className="text-[12.5px] font-medium uppercase tracking-wider text-fg-subtle">
+                      Documents requis
+                    </p>
+                    <ul className="mt-3 flex flex-wrap gap-2">
+                      {job.required_documents.map((d) => (
+                        <li
+                          key={d}
+                          className="rounded-full border border-border bg-bg px-3 py-1.5 text-[13.5px] text-fg"
+                        >
+                          {displayValue('fr', d)}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </section>
+
               {description && (
                 <section className="mt-10">
                   <h2 className="text-[20px] font-semibold text-fg">Description</h2>
@@ -186,6 +216,28 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                   </ul>
                 </section>
               )}
+
+              <section className="mt-12 rounded-2xl border border-border bg-surface p-5 shadow-sm sm:p-6">
+                <h2 className="text-[20px] font-semibold text-fg">Comment postuler</h2>
+                <ol className="mt-4 grid gap-3 text-[15px] leading-relaxed text-fg-muted sm:grid-cols-2">
+                  <li className="rounded-xl border border-border bg-bg p-4">
+                    <span className="block text-[13px] font-semibold uppercase tracking-wider text-accent">1</span>
+                    Connectez-vous avec Google pour retrouver ou créer votre dossier Sanitas.
+                  </li>
+                  <li className="rounded-xl border border-border bg-bg p-4">
+                    <span className="block text-[13px] font-semibold uppercase tracking-wider text-accent">2</span>
+                    Confirmez seulement les informations utiles au mandat.
+                  </li>
+                  <li className="rounded-xl border border-border bg-bg p-4">
+                    <span className="block text-[13px] font-semibold uppercase tracking-wider text-accent">3</span>
+                    Ajoutez votre CV, ou réutilisez celui déjà dans votre dossier.
+                  </li>
+                  <li className="rounded-xl border border-border bg-bg p-4">
+                    <span className="block text-[13px] font-semibold uppercase tracking-wider text-accent">4</span>
+                    Envoyez votre candidature; Sanitas vous contactera pour la suite.
+                  </li>
+                </ol>
+              </section>
 
               <div className="mt-12 flex flex-wrap gap-3">
                 <Link href={interestedHref} className="btn-primary">
