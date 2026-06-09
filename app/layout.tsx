@@ -15,6 +15,7 @@ const playfair = Playfair_Display({
 
 const facebookAppId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID;
 const googleAdsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
+const googleAnalyticsId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
 const socialImage = '/opengraph-image';
 
 export const metadata: Metadata = {
@@ -84,7 +85,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr-CA" className={playfair.variable}>
       <body className="min-h-screen antialiased">
-        <GoogleAdsTag tagId={googleAdsId} />
+        <GoogleAdsTag tagId={googleAdsId} analyticsId={googleAnalyticsId} />
         <SeoJsonLd
           id="sanitas-global-schema"
           data={{
