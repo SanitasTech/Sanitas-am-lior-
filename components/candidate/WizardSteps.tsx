@@ -87,6 +87,7 @@ export function StepIdentity({
   onJumpToReview,
 }: StepProps) {
   const en = locale === 'en';
+  const isPosting = mode === 'posting';
   const isInternationalPosting =
     mode === 'posting' && isInternationalCountry(job?.country || DEFAULT_JOB_COUNTRY);
   const residenceOptions =
@@ -97,12 +98,20 @@ export function StepIdentity({
     <div className="space-y-6">
       <StepIntro
         eyebrow={tr(locale, 'Étape 1', 'Step 1')}
-        title={tr(locale, 'Parlons de toi', 'Tell us about you')}
-        description={tr(
-          locale,
-          'Ces infos servent à te recontacter rapidement. Téléphone ou courriel suffit, choisis ce que tu préfères.',
-          'These details let us reach you quickly. Phone or email — pick what works.'
-        )}
+        title={isPosting ? tr(locale, 'Tes coordonnées', 'Your contact details') : tr(locale, 'Parlons de toi', 'Tell us about you')}
+        description={
+          isPosting
+            ? tr(
+                locale,
+                'On commence par ce qui permet au recruteur de te joindre. Le reste du formulaire reste centré sur ce mandat.',
+                'We start with what lets the recruiter reach you. The rest of the form stays focused on this assignment.'
+              )
+            : tr(
+                locale,
+                'Ces infos servent à te recontacter rapidement. Téléphone ou courriel suffit, choisis ce que tu préfères.',
+                'These details let us reach you quickly. Phone or email — pick what works.'
+              )
+        }
       />
 
       {canJumpToReview && onJumpToReview && (
@@ -255,7 +264,7 @@ export function StepWork({ form, setForm, errors, mode, job, locale }: StepProps
     form.qualified_professions.some((p) => professionRequiresPermit(p)) ||
     professionRequiresPermit(form.profession);
   const professionOptions =
-    isInternationalPosting && job?.profession
+    isPosting && job?.profession
       ? PROFESSIONS.filter((profession) => professionListCovers([profession], job.profession))
       : PROFESSIONS;
   const workAuthorizationOptions = isInternationalPosting ? INTERNATIONAL_WORK_AUTH : WORK_AUTH;
@@ -263,7 +272,7 @@ export function StepWork({ form, setForm, errors, mode, job, locale }: StepProps
   return (
     <div className="space-y-6">
       <StepIntro
-        eyebrow={tr(locale, 'Étape 2', 'Step 2')}
+        eyebrow={isPosting ? tr(locale, 'Étape 3', 'Step 3') : tr(locale, 'Étape 2', 'Step 2')}
         title={tr(locale, 'Ton métier', 'Your work')}
         description={
           isPosting
@@ -304,8 +313,12 @@ export function StepWork({ form, setForm, errors, mode, job, locale }: StepProps
         error={errors.qualified_professions}
         helper={tr(
           locale,
-          'Sélectionne uniquement les titres pour lesquels tu as les qualifications réelles.',
-          'Select only the titles where you actually have the qualifications.'
+          isPosting
+            ? 'On affiche seulement les titres compatibles avec le mandat. Choisis ce qui correspond réellement à ton permis ou diplôme.'
+            : 'Sélectionne uniquement les titres pour lesquels tu as les qualifications réelles.',
+          isPosting
+            ? 'Only titles compatible with this assignment are shown. Select what truly matches your license or diploma.'
+            : 'Select only the titles where you actually have the qualifications.'
         )}
       >
         <SegmentedChoices
@@ -424,7 +437,28 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
   const mandateRegionOptions =
     isInternationalPosting && job?.region ? [job.region] : QUEBEC_REGIONS;
   const needsWeekendCheck = isPosting && mandateRequiresWeekendCheck(job?.mandate_type);
-  const requiresShiftChoice = !isInternationalPosting || !!job?.shift;
+  const fixedMandateShift = isPosting && !!job?.shift;
+  const requiresShiftChoice = isPosting ? !isInternationalPosting && !job?.shift : true;
+  const availabilityDetails = (
+    <div className="grid gap-4 sm:grid-cols-2">
+      <Field label={tr(locale, 'Heures souhaitées', 'Preferred hours')}>
+        <input
+          className="input"
+          value={form.preferred_hours}
+          onChange={(e) => setField(setForm, 'preferred_hours', e.target.value)}
+          placeholder={tr(locale, 'Ex. temps plein, 24 à 32 h', 'Ex. full time, 24 to 32 h')}
+        />
+      </Field>
+      <Field label={tr(locale, 'Date exacte si tu la connais', 'Exact date if you know')}>
+        <input
+          className="input"
+          type="date"
+          value={form.exact_start_date}
+          onChange={(e) => setField(setForm, 'exact_start_date', e.target.value)}
+        />
+      </Field>
+    </div>
+  );
 
   function updateRegionChoice(idx: number, patch: Partial<RegionChoice>) {
     setForm((current) => ({
@@ -452,8 +486,8 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
   return (
     <div className="space-y-6">
       <StepIntro
-        eyebrow={tr(locale, 'Étape 3', 'Step 3')}
-        title={tr(locale, 'Tes disponibilités', 'Your availability')}
+        eyebrow={tr(locale, 'Étape 4', 'Step 4')}
+        title={isPosting ? tr(locale, 'Disponibilité pour ce mandat', 'Availability for this assignment') : tr(locale, 'Tes disponibilités', 'Your availability')}
         description={
           isInternationalPosting
             ? tr(
@@ -475,27 +509,42 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
         }
       />
 
-      {isInternationalPosting && (
-        <div className="rounded-xl border border-accent/30 bg-accent-soft/25 p-4">
-          <p className="text-[12px] font-semibold uppercase tracking-wider text-accent">
-            {tr(locale, 'Mandat international', 'International assignment')}
+      {isPosting && (
+        <div className="rounded-xl border border-border bg-muted/25 p-4">
+          <p className="text-[12px] font-semibold uppercase tracking-wider text-fg-subtle">
+            {tr(locale, 'Mandat ciblé', 'Target assignment')}
           </p>
           <dl className="mt-3 grid gap-3 text-[14px] sm:grid-cols-3">
             <div>
-              <dt className="text-fg-subtle">{tr(locale, 'Pays', 'Country')}</dt>
-              <dd className="font-medium text-fg">{displayValue(locale, job?.country || '')}</dd>
-            </div>
-            <div>
-              <dt className="text-fg-subtle">{tr(locale, 'Ville / territoire', 'City / territory')}</dt>
-              <dd className="font-medium text-fg">{job?.region || job?.city || '—'}</dd>
-            </div>
-            <div>
-              <dt className="text-fg-subtle">{tr(locale, 'Candidats admissibles', 'Eligible applicants')}</dt>
+              <dt className="text-fg-subtle">
+                {isInternationalPosting ? tr(locale, 'Pays', 'Country') : tr(locale, 'Région', 'Region')}
+              </dt>
               <dd className="font-medium text-fg">
-                {(job?.eligible_countries || []).map((country) => displayValue(locale, country)).join(', ') || '—'}
+                {isInternationalPosting
+                  ? displayValue(locale, job?.country || '')
+                  : job?.region || tr(locale, 'À confirmer', 'To confirm')}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-fg-subtle">{tr(locale, 'Département', 'Department')}</dt>
+              <dd className="font-medium text-fg">
+                {displayValue(locale, job?.department || '') || tr(locale, 'À confirmer', 'To confirm')}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-fg-subtle">{tr(locale, 'Quart', 'Shift')}</dt>
+              <dd className="font-medium text-fg">
+                {displayValue(locale, job?.shift || '') || tr(locale, 'À confirmer', 'To confirm')}
               </dd>
             </div>
           </dl>
+          <p className="mt-3 text-[13.5px] leading-relaxed text-fg-muted">
+            {tr(
+              locale,
+              'On ne te redemande pas toutes tes préférences ici. Elles pourront être complétées après l’envoi.',
+              'We are not asking for all your preferences here. You can complete them after submission.'
+            )}
+          </p>
         </div>
       )}
 
@@ -511,32 +560,19 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
         />
       </Field>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label={tr(locale, 'Heures souhaitées', 'Preferred hours')}>
-          <input
-            className="input"
-            value={form.preferred_hours}
-            onChange={(e) => setField(setForm, 'preferred_hours', e.target.value)}
-            placeholder={tr(locale, 'Ex. temps plein, 24 à 32 h', 'Ex. full time, 24 to 32 h')}
-          />
-        </Field>
-        <Field label={tr(locale, 'Date exacte si tu la connais', 'Exact date if you know')}>
-          <input
-            className="input"
-            type="date"
-            value={form.exact_start_date}
-            onChange={(e) => setField(setForm, 'exact_start_date', e.target.value)}
-          />
-        </Field>
-      </div>
+      {isPosting ? (
+        <details className="rounded-lg border border-border bg-muted/20 group">
+          <summary className="cursor-pointer list-none px-4 py-3 text-[14px] font-medium text-fg flex items-center justify-between">
+            <span>{tr(locale, 'Ajouter une précision de disponibilité (optionnel)', 'Add an availability detail (optional)')}</span>
+            <span className="text-fg-subtle text-[12px] group-open:rotate-180 transition-transform">▾</span>
+          </summary>
+          <div className="px-4 pb-4">{availabilityDetails}</div>
+        </details>
+      ) : (
+        availabilityDetails
+      )}
 
-      <InterviewSlotsField
-        slots={form.interview_slots}
-        onChange={(slots) => setField(setForm, 'interview_slots', slots)}
-        locale={locale}
-      />
-
-      {!isInternationalPosting && (
+      {!isPosting && (
         <PreferenceSetEditor
           value={form.preference_sets}
           locale={locale}
@@ -563,31 +599,49 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
         />
       )}
 
-      <Field
-        label={
-          requiresShiftChoice
-            ? tr(locale, 'Quarts que tu acceptes', 'Shifts you accept')
-            : tr(locale, 'Préférence d’horaire, si déjà connue', 'Schedule preference, if already known')
-        }
-        required={requiresShiftChoice}
-        error={errors.shifts_accepted}
-        helper={
-          requiresShiftChoice
-            ? undefined
-            : tr(
-                locale,
-                'Optionnel pour ce mandat international. Tu peux laisser vide si l’horaire sera validé plus tard.',
-                'Optional for this international assignment. You can leave it blank if the schedule will be confirmed later.'
-              )
-        }
-      >
-        <SegmentedChoices
-          options={SHIFTS}
-          value={form.shifts_accepted}
-          onChange={(v) => setField(setForm, 'shifts_accepted', v as string[])}
-          multi
-        />
-      </Field>
+      {fixedMandateShift ? (
+        <div className="rounded-xl border border-border bg-surface px-4 py-3">
+          <p className="text-[12px] font-medium uppercase tracking-wider text-fg-subtle">
+            {tr(locale, 'Quart du mandat', 'Assignment shift')}
+          </p>
+          <p className="mt-1 text-[15px] font-semibold text-fg">
+            {displayValue(locale, job?.shift || '')}
+          </p>
+          <p className="mt-1 text-[13px] leading-relaxed text-fg-muted">
+            {tr(
+              locale,
+              'Ce quart sera transmis avec ta candidature. Si tu as une contrainte, indique-la dans la précision optionnelle.',
+              'This shift will be included with your application. If you have a constraint, add it in the optional detail.'
+            )}
+          </p>
+        </div>
+      ) : (
+        <Field
+          label={
+            requiresShiftChoice
+              ? tr(locale, 'Quarts que tu acceptes', 'Shifts you accept')
+              : tr(locale, 'Préférence d’horaire, si déjà connue', 'Schedule preference, if already known')
+          }
+          required={requiresShiftChoice}
+          error={errors.shifts_accepted}
+          helper={
+            requiresShiftChoice
+              ? undefined
+              : tr(
+                  locale,
+                  'Optionnel pour ce mandat international. Tu peux laisser vide si l’horaire sera validé plus tard.',
+                  'Optional for this international assignment. You can leave it blank if the schedule will be confirmed later.'
+                )
+          }
+        >
+          <SegmentedChoices
+            options={SHIFTS}
+            value={form.shifts_accepted}
+            onChange={(v) => setField(setForm, 'shifts_accepted', v as string[])}
+            multi
+          />
+        </Field>
+      )}
 
       {needsWeekendCheck && (
         <Field label={tr(locale, 'Fin de semaine sur deux acceptable ?', 'Every second weekend acceptable?')}>
@@ -599,7 +653,13 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
         </Field>
       )}
 
-      {!isInternationalPosting && (
+      <InterviewSlotsField
+        slots={form.interview_slots}
+        onChange={(slots) => setField(setForm, 'interview_slots', slots)}
+        locale={locale}
+      />
+
+      {!isPosting && (
       <div data-error={!!errors.region_choices} className="space-y-3">
         <p className="label">
           {isInternationalPosting
@@ -707,7 +767,7 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
       </div>
       )}
 
-      {!isInternationalPosting && (
+      {!isPosting && (
         <DepartmentGroups
           value={form.preferred_departments}
           onChange={(value) => setField(setForm, 'preferred_departments', value)}
@@ -719,7 +779,7 @@ export function StepAvailability({ form, setForm, errors, mode, job, locale }: S
         />
       )}
 
-      {!isInternationalPosting && (
+      {!isPosting && (
         <Field label={tr(locale, 'Tu as un véhicule personnel ?', 'Do you have a personal vehicle?')}>
           <SegmentedChoices
             options={['Oui', 'Non']}
@@ -756,17 +816,25 @@ export function StepDocuments({
   const extraQuestions: ExtraQuestion[] =
     isPosting && job?.extra_questions ? job.extra_questions : [];
   const documentList = buildDocumentList(form, job);
+  const visibleDocumentList = isPosting
+    ? documentList.filter((document) => document.type === 'CV')
+    : documentList;
+  const hiddenOptionalCount = documentList.length - visibleDocumentList.length;
   const hasReused = (reusedDocTypes?.size ?? 0) > 0;
 
   return (
     <div className="space-y-6">
       <StepIntro
-        eyebrow={tr(locale, 'Étape 4', 'Step 4')}
-        title={tr(locale, 'Tes documents', 'Your documents')}
+        eyebrow={isPosting ? tr(locale, 'Étape 2', 'Step 2') : tr(locale, 'Étape 3', 'Step 3')}
+        title={isPosting ? tr(locale, 'CV obligatoire', 'Resume required') : tr(locale, 'CV et documents', 'Resume and documents')}
         description={tr(
           locale,
-          "Le CV est nécessaire. Les autres documents peuvent suivre plus tard — bouton « Envoyer plus tard » et notre équipe te relancera.",
-          'CV is required. Other documents can come later — tap "Send later" and our team will follow up.'
+          isPosting
+            ? 'Le CV est obligatoire pour envoyer ta candidature à ce mandat. Les autres documents pourront suivre après.'
+            : 'Le CV est obligatoire. Tu peux aussi ajouter tes documents disponibles; les autres pourront suivre plus tard.',
+          isPosting
+            ? 'Your resume is required to submit your application for this assignment. Other documents can follow afterward.'
+            : 'Your resume is required. You can also add the documents you already have; others can follow later.'
         )}
       />
 
@@ -788,7 +856,7 @@ export function StepDocuments({
       )}
 
       <div className="space-y-3" data-error={!!errors.cv}>
-        {documentList.map((doc) => (
+        {visibleDocumentList.map((doc) => (
           <DocumentUploadChoice
             key={doc.type}
             documentType={doc.type}
@@ -810,6 +878,26 @@ export function StepDocuments({
         <p className="error-text" data-error="true">
           {errors.cv}
         </p>
+      )}
+
+      {isPosting && !form.documents.CV?.file_path && (
+        <div className="rounded-xl border border-warning/30 bg-warning-soft/40 px-4 py-3 text-[13.5px] leading-relaxed text-fg-muted">
+          {tr(
+            locale,
+            'Sans CV, la candidature ne peut pas être envoyée. Si tu dois revenir plus tard, le brouillon reste sauvegardé sur cet appareil.',
+            'Without a resume, the application cannot be submitted. If you need to come back later, the draft stays saved on this device.'
+          )}
+        </div>
+      )}
+
+      {isPosting && hiddenOptionalCount > 0 && (
+        <div className="rounded-xl border border-border bg-muted/25 px-4 py-3 text-[13.5px] leading-relaxed text-fg-muted">
+          {tr(
+            locale,
+            "Les documents secondaires pourront être ajoutés après l'envoi si le recruteur en a besoin.",
+            'Secondary documents can be added after submission if the recruiter needs them.'
+          )}
+        </div>
       )}
 
       {extraQuestions.length > 0 && (
@@ -911,17 +999,120 @@ export function StepReview({ form, setForm, errors, mode, job, locale }: StepPro
   const isInternationalPosting =
     isPosting && isInternationalCountry(job?.country || DEFAULT_JOB_COUNTRY);
   const en = locale === 'en';
+  const cvIsReady = form.documents.CV?.status === 'Reçu' && !!form.documents.CV?.file_path;
+  const hasContact = !!(form.phone || form.email);
+  const hasMinimumWorkInfo =
+    form.qualified_professions.length > 0 &&
+    !!form.years_experience &&
+    form.languages.length > 0 &&
+    !!form.work_authorization;
+  const hasAvailability =
+    !!form.start_availability &&
+    (isInternationalPosting || form.shifts_accepted.length > 0 || !!job?.shift);
+  const readinessItems = isPosting
+    ? [
+        {
+          label: tr(locale, 'Contact', 'Contact'),
+          value: hasContact
+            ? tr(locale, 'Sanitas peut te joindre rapidement.', 'Sanitas can reach you quickly.')
+            : tr(locale, 'Téléphone ou courriel manquant.', 'Phone or email is missing.'),
+          ok: hasContact,
+        },
+        {
+          label: tr(locale, 'CV', 'Resume'),
+          value: cvIsReady
+            ? tr(locale, 'Le CV est reçu pour ce mandat.', 'Your resume is attached to this assignment.')
+            : tr(locale, 'Le CV est requis pour envoyer.', 'A resume is required before sending.'),
+          ok: cvIsReady,
+        },
+        {
+          label: tr(locale, 'Admissibilité minimale', 'Minimum eligibility'),
+          value: hasMinimumWorkInfo
+            ? tr(locale, 'Titre, expérience, langue et autorisation sont confirmés.', 'Title, experience, language and authorization are confirmed.')
+            : tr(locale, 'Il manque une information pour analyser ton profil.', 'One detail is missing to review your profile.'),
+          ok: hasMinimumWorkInfo,
+        },
+        {
+          label: tr(locale, 'Disponibilité', 'Availability'),
+          value: hasAvailability
+            ? tr(locale, 'Le recruteur sait quand te considérer.', 'The recruiter knows when to consider you.')
+            : tr(locale, 'Indique quand tu peux commencer.', 'Tell us when you can start.'),
+          ok: hasAvailability,
+        },
+      ]
+    : [
+        {
+          label: tr(locale, 'Contact', 'Contact'),
+          value: hasContact
+            ? tr(locale, 'Sanitas peut te joindre rapidement.', 'Sanitas can reach you quickly.')
+            : tr(locale, 'Téléphone ou courriel manquant.', 'Phone or email is missing.'),
+          ok: hasContact,
+        },
+        {
+          label: tr(locale, 'CV', 'Resume'),
+          value: cvIsReady
+            ? tr(locale, 'Ton profil est exploitable par un recruteur.', 'Your profile can be reviewed by a recruiter.')
+            : tr(locale, 'Le CV est requis pour activer ton profil.', 'A resume is required to activate your profile.'),
+          ok: cvIsReady,
+        },
+        {
+          label: tr(locale, 'Métier', 'Work'),
+          value:
+            form.qualified_professions.length > 0 && !!form.years_experience
+              ? tr(locale, 'Tes titres et ton expérience sont clairs.', 'Your titles and experience are clear.')
+              : tr(locale, 'Précise tes titres et ton expérience.', 'Add your titles and experience.'),
+          ok: form.qualified_professions.length > 0 && !!form.years_experience,
+        },
+        {
+          label: tr(locale, 'Préférences', 'Preferences'),
+          value:
+            form.region_choices.some((region) => region.region) && !!form.start_availability
+              ? tr(locale, 'On peut chercher des mandats compatibles.', 'We can search for matching assignments.')
+              : tr(locale, 'Ajoute au moins une région et ta disponibilité.', 'Add at least one region and your availability.'),
+          ok: form.region_choices.some((region) => region.region) && !!form.start_availability,
+        },
+      ];
 
   return (
     <div className="space-y-6">
       <StepIntro
         eyebrow={tr(locale, 'Dernière étape', 'Last step')}
-        title={tr(locale, 'Prêt(e) à envoyer', 'Ready to send')}
-        description={tr(
-          locale,
-          'Vérifie le résumé ci-dessous. Si tout est bon, clique sur Envoyer.',
-          'Check the summary below. If everything looks good, click Send.'
-        )}
+        title={tr(locale, 'Vérifier et envoyer', 'Review and send')}
+        description={
+          isPosting
+            ? tr(
+                locale,
+                "On vérifie seulement ce qui permet d'analyser ce mandat maintenant. Tes préférences générales pourront être complétées après l'envoi.",
+                'We are only checking what is needed to review this assignment now. Broader preferences can be completed after sending.'
+              )
+            : tr(
+                locale,
+                'On vérifie que ton profil est exploitable par un recruteur avant de l’activer.',
+                'We are checking that your profile can be reviewed by a recruiter before activating it.'
+              )
+        }
+      />
+
+      <ApplicationReadinessPanel
+        title={
+          isPosting
+            ? tr(locale, 'Ce qui part au recruteur', 'What goes to the recruiter')
+            : tr(locale, 'Ce qui rend ton profil exploitable', 'What makes your profile usable')
+        }
+        description={
+          isPosting
+            ? tr(
+                locale,
+                'La candidature est courte, mais elle doit permettre une vraie décision : rappeler, valider ou présenter.',
+                'The application is short, but it must allow a real decision: call, validate or present.'
+              )
+            : tr(
+                locale,
+                'Un profil utile contient assez d’information pour recevoir des mandats pertinents.',
+                'A useful profile has enough information to receive relevant assignments.'
+              )
+        }
+        items={readinessItems}
       />
 
       <div className="rounded-xl border border-border bg-surface divide-y divide-border">
@@ -956,6 +1147,14 @@ export function StepReview({ form, setForm, errors, mode, job, locale }: StepPro
         <ReviewRow
           label={
             isInternationalPosting
+              ? tr(locale, 'Relocalisation', 'Relocation')
+              : tr(locale, 'Autorisation', 'Authorization')
+          }
+          value={displayValue(locale, form.work_authorization) || '—'}
+        />
+        <ReviewRow
+          label={
+            isInternationalPosting
               ? tr(locale, 'Horaire préféré', 'Preferred schedule')
               : tr(locale, 'Quarts', 'Shifts')
           }
@@ -979,7 +1178,7 @@ export function StepReview({ form, setForm, errors, mode, job, locale }: StepPro
                   .filter(Boolean)
                   .map((slot) => formatSlotLabel(slot, locale))
                   .join(' · ')
-              : tr(locale, 'Pas précisé — on t’appelle quand on peut', 'None — we will call when we can')
+              : tr(locale, "Pas précisé. On t'appelle quand on peut.", 'None. We will call when we can.')
           }
         />
         <ReviewRow
@@ -991,21 +1190,7 @@ export function StepReview({ form, setForm, errors, mode, job, locale }: StepPro
         />
       </div>
 
-      {isPosting ? (
-        <Field
-          label={tr(
-            locale,
-            "Si ce mandat n'est plus disponible, veux-tu recevoir des mandats similaires ?",
-            'If this assignment is no longer available, want to receive similar ones?'
-          )}
-        >
-          <SegmentedChoices
-            options={YES_NO_DISCUSS}
-            value={form.similar_mandates}
-            onChange={(v) => setField(setForm, 'similar_mandates', v as string)}
-          />
-        </Field>
-      ) : (
+      {!isPosting && (
         <details className="rounded-lg border border-border bg-muted/20 group">
           <summary className="cursor-pointer list-none px-4 py-3 text-[14px] font-medium text-fg flex items-center justify-between">
             <span>{tr(locale, 'Informations supplémentaires (optionnel)', 'Additional info (optional)')}</span>
@@ -1072,8 +1257,12 @@ export function StepReview({ form, setForm, errors, mode, job, locale }: StepPro
           <span className="text-[14px] leading-relaxed text-fg">
             {tr(
               locale,
-              'Reçois les nouveaux mandats compatibles avec ton profil.',
-              'Get new assignments matching your profile.'
+              isPosting
+                ? "Je veux recevoir d'autres mandats compatibles si mon profil correspond."
+                : 'Reçois les nouveaux mandats compatibles avec ton profil.',
+              isPosting
+                ? 'I want to receive other matching assignments if my profile fits.'
+                : 'Get new assignments matching your profile.'
             )}
           </span>
         </label>
@@ -1214,6 +1403,48 @@ function formatSlotLabel(isoLocal: string, locale: Locale): string {
   const [, , month, day, hh, mm] = match;
   if (locale === 'en') return `${month}-${day} ${hh}:${mm}`;
   return `${day}/${month} ${hh}h${mm}`;
+}
+
+function ApplicationReadinessPanel({
+  title,
+  description,
+  items,
+}: {
+  title: string;
+  description: string;
+  items: Array<{ label: string; value: string; ok: boolean }>;
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-muted/25 p-4 sm:p-5">
+      <div>
+        <h2 className="text-[16px] font-semibold text-fg">{title}</h2>
+        <p className="mt-1 text-[13.5px] leading-relaxed text-fg-muted">{description}</p>
+      </div>
+      <div className="mt-4 grid gap-2">
+        {items.map((item) => (
+          <div
+            key={item.label}
+            className="flex items-start gap-3 rounded-lg border border-border bg-surface px-3 py-2.5"
+          >
+            <span
+              className={
+                item.ok
+                  ? 'mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success-soft text-success'
+                  : 'mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-warning-soft text-warning'
+              }
+              aria-hidden
+            >
+              {item.ok ? '✓' : '!'}
+            </span>
+            <div className="min-w-0">
+              <p className="text-[13.5px] font-semibold text-fg">{item.label}</p>
+              <p className="mt-0.5 text-[13px] leading-relaxed text-fg-muted">{item.value}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function ReviewRow({ label, value }: { label: string; value: string }) {

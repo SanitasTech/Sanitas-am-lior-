@@ -33,9 +33,9 @@ import type { Candidate, DocumentRecord, ExtraQuestion, Job } from '@/types';
 import {
   buildDocumentList,
   formToCandidate,
+  getStepOrder,
   makeInitialFormState,
   stepIndex,
-  STEP_ORDER,
   type FormState,
   type Mode,
   type StepId,
@@ -69,7 +69,7 @@ const STEP_TITLES_FR: Record<StepId, string> = {
   identity: 'Toi',
   work: 'Ton métier',
   availability: 'Tes disponibilités',
-  documents: 'Tes documents',
+  documents: 'CV et documents',
   review: 'Confirmer & envoyer',
 };
 
@@ -77,7 +77,7 @@ const STEP_TITLES_EN: Record<StepId, string> = {
   identity: 'You',
   work: 'Your work',
   availability: 'Your availability',
-  documents: 'Your documents',
+  documents: 'Resume and documents',
   review: 'Confirm & send',
 };
 
@@ -92,6 +92,7 @@ export default function CandidateWizard({
   const isPosting = mode === 'posting';
   const isInternationalPosting =
     isPosting && isInternationalCountry(job?.country || DEFAULT_JOB_COUNTRY);
+  const stepOrder = useMemo(() => getStepOrder(mode), [mode]);
 
   const initialForm = useMemo(
     () => makeInitialFormState(mode, initial, job, initialDocuments),
@@ -221,7 +222,7 @@ export default function CandidateWizard({
       case 'availability':
         return validateAvailabilityStep(stepInput, mode, {
           locale,
-          requireShifts: !isInternationalPosting || !!job?.shift,
+          requireShifts: isPosting ? !isInternationalPosting && !job?.shift : true,
         });
       case 'documents':
         return validateDocumentsStep(stepInput, { locale });
@@ -236,16 +237,16 @@ export default function CandidateWizard({
   // Navigation
   // -----------------------------------------------------------------
   function goPrev() {
-    const idx = stepIndex(step);
+    const idx = stepIndex(step, stepOrder);
     if (idx <= 0) return;
     setSubmitError(null);
     setErrors({});
-    setStep(STEP_ORDER[idx - 1]);
+    setStep(stepOrder[idx - 1]);
     scrollToTop();
   }
 
   function goNext() {
-    const idx = stepIndex(step);
+    const idx = stepIndex(step, stepOrder);
     const stepErrors = runStepValidation(step);
     setErrors(stepErrors);
     if (Object.keys(stepErrors).length > 0) {
@@ -260,8 +261,8 @@ export default function CandidateWizard({
       void handleSubmit();
       return;
     }
-    if (idx < STEP_ORDER.length - 1) {
-      setStep(STEP_ORDER[idx + 1]);
+    if (idx < stepOrder.length - 1) {
+      setStep(stepOrder[idx + 1]);
       scrollToTop();
     }
   }
@@ -280,6 +281,9 @@ export default function CandidateWizard({
     setSubmitting(true);
     try {
       const documentList = buildDocumentList(form, job);
+      const documentsForSubmission = isPosting
+        ? documentList.filter((document) => document.type === 'CV')
+        : documentList;
       const candidate = formToCandidate(initial, form);
       const syncedPreferenceSets = form.preference_sets.length > 0
         ? form.preference_sets.map((set, index) =>
@@ -353,7 +357,7 @@ export default function CandidateWizard({
         },
         completion_score: computeQuickCompletionScore(form),
         source: 'web',
-        documents: documentList.map((document) => ({
+        documents: documentsForSubmission.map((document) => ({
           document_id: form.documents[document.type]?.document_id || null,
           document_type: document.type,
           status: form.documents[document.type]?.status || 'À recevoir',
@@ -402,7 +406,7 @@ export default function CandidateWizard({
   const canJumpToReview = useMemo(() => {
     if (!isPosting) return false;
     if (step !== 'identity') return false;
-    const steps: StepId[] = ['identity', 'work', 'availability', 'documents'];
+    const steps = stepOrder.filter((s) => s !== 'review');
     for (const s of steps) {
       if (Object.keys(runStepValidation(s)).length > 0) return false;
     }
@@ -410,7 +414,7 @@ export default function CandidateWizard({
     // runStepValidation dépend de form, donc on observe form indirectement
     // via la closure ; ESLint exhaustive-deps n'aime pas, on l'ignore.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form, isPosting, step, job]);
+  }, [form, isPosting, step, job, stepOrder]);
 
   function jumpToReview() {
     setErrors({});
@@ -432,7 +436,30 @@ export default function CandidateWizard({
     canJumpToReview,
     onJumpToReview: jumpToReview,
   };
-  const titles = locale === 'en' ? STEP_TITLES_EN : STEP_TITLES_FR;
+  const titles = useMemo(() => {
+    const base = locale === 'en' ? STEP_TITLES_EN : STEP_TITLES_FR;
+    if (isPosting) {
+      return locale === 'en'
+        ? {
+            identity: 'Contact',
+            documents: 'Resume required',
+            work: 'Eligibility',
+            availability: 'Availability',
+            review: 'Send',
+          }
+        : {
+            identity: 'Contact',
+            documents: 'CV requis',
+            work: 'Admissibilité',
+            availability: 'Disponibilité',
+            review: 'Envoyer',
+          };
+    }
+    return {
+      ...base,
+      documents: base.documents,
+    };
+  }, [isPosting, locale]);
   const isLastStep = step === 'review';
   const jobLabel = isPosting && job ? job.title : null;
 
@@ -440,13 +467,14 @@ export default function CandidateWizard({
     <div className="flex min-h-[calc(100vh-4rem)] flex-col">
       <WizardHeader
         currentStep={step}
-        totalSteps={STEP_ORDER.length}
+        totalSteps={stepOrder.length}
         stepTitle={titles[step]}
         jobLabel={jobLabel}
         onBack={goPrev}
-        canGoBack={stepIndex(step) > 0}
+        canGoBack={stepIndex(step, stepOrder) > 0}
         locale={locale}
         savedAt={lastSavedAt}
+        stepOrder={stepOrder}
       />
 
       <div className="flex-1 px-4 sm:px-6 py-6">
@@ -477,7 +505,8 @@ export default function CandidateWizard({
       <WizardFooter
         onPrev={goPrev}
         onNext={goNext}
-        canPrev={stepIndex(step) > 0}
+        canPrev={stepIndex(step, stepOrder) > 0}
+        nextLabel={getWizardNextLabel(step, isPosting, locale)}
         loading={submitting}
         isLastStep={isLastStep}
         locale={locale}
@@ -526,4 +555,37 @@ function computeQuickCompletionScore(form: FormState): number {
   let total = 0;
   for (const [ok, weight] of checks) if (ok) total += weight;
   return Math.min(100, total);
+}
+
+function getWizardNextLabel(step: StepId, isPosting: boolean, locale: Locale): string {
+  const en = locale === 'en';
+  if (step === 'review') return en ? 'Send my application' : 'Envoyer ma candidature';
+
+  if (isPosting) {
+    switch (step) {
+      case 'identity':
+        return en ? 'Add my resume' : 'Ajouter mon CV';
+      case 'documents':
+        return en ? 'Confirm eligibility' : 'Valider mon admissibilité';
+      case 'work':
+        return en ? 'Share availability' : 'Indiquer mes disponibilités';
+      case 'availability':
+        return en ? 'Review and send' : 'Vérifier et envoyer';
+      default:
+        return en ? 'Next' : 'Suivant';
+    }
+  }
+
+  switch (step) {
+    case 'identity':
+      return en ? 'Describe my work' : 'Décrire mon métier';
+    case 'work':
+      return en ? 'Add my resume' : 'Ajouter mon CV';
+    case 'documents':
+      return en ? 'Set preferences' : 'Choisir mes préférences';
+    case 'availability':
+      return en ? 'Review and send' : 'Vérifier et envoyer';
+    default:
+      return en ? 'Next' : 'Suivant';
+  }
 }
