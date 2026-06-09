@@ -77,6 +77,10 @@ export const metadata: Metadata = {
     description: 'Mandats en sant\u00e9 au Qu\u00e9bec pour les professionnels de la sant\u00e9.',
     images: [socialImage],
   },
+  icons: {
+    icon: [{ url: '/icon', sizes: '96x96', type: 'image/png' }],
+    apple: [{ url: '/apple-icon', sizes: '180x180', type: 'image/png' }],
+  },
   facebook: facebookAppId ? { appId: facebookAppId } : undefined,
   robots: { index: true, follow: true },
 };
