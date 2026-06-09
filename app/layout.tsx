@@ -78,8 +78,8 @@ export const metadata: Metadata = {
     images: [socialImage],
   },
   icons: {
-    icon: [{ url: '/icon', sizes: '96x96', type: 'image/png' }],
-    apple: [{ url: '/apple-icon', sizes: '180x180', type: 'image/png' }],
+    icon: [{ url: '/images/sanitas-favicon.png', sizes: '512x512', type: 'image/png' }],
+    apple: [{ url: '/images/sanitas-apple-icon.png', sizes: '180x180', type: 'image/png' }],
   },
   facebook: facebookAppId ? { appId: facebookAppId } : undefined,
   robots: { index: true, follow: true },
