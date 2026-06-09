@@ -330,8 +330,14 @@ export function buildDocumentList(form: FormState, job?: Job | null): Array<{
   return list;
 }
 
-export const STEP_ORDER: StepId[] = ['identity', 'work', 'availability', 'documents', 'review'];
+export const POSTING_STEP_ORDER: StepId[] = ['identity', 'documents', 'work', 'availability', 'review'];
+export const SPONTANEOUS_STEP_ORDER: StepId[] = ['identity', 'work', 'documents', 'availability', 'review'];
+export const STEP_ORDER = POSTING_STEP_ORDER;
 
-export function stepIndex(step: StepId): number {
-  return STEP_ORDER.indexOf(step);
+export function getStepOrder(mode: Mode): StepId[] {
+  return mode === 'posting' ? POSTING_STEP_ORDER : SPONTANEOUS_STEP_ORDER;
+}
+
+export function stepIndex(step: StepId, order: StepId[] = STEP_ORDER): number {
+  return order.indexOf(step);
 }

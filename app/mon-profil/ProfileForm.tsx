@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import SectionCard from '@/components/SectionCard';
 import SegmentedChoices from '@/components/SegmentedChoices';
 import DepartmentGroups from '@/components/DepartmentGroups';
 import PreferenceSetEditor from '@/components/PreferenceSetEditor';
@@ -28,6 +27,7 @@ import type { Candidate, RegionChoice } from '@/types';
 import { makePreferenceSetFromFlat, normalizeCandidatePreferenceSets } from '@/lib/ats';
 import { displayValue, localizedPath, type Locale } from '@/lib/i18n';
 import { useLocale } from '@/components/I18nProvider';
+import { cn } from '@/lib/utils';
 
 interface Props {
   initial: Candidate;
@@ -117,6 +117,48 @@ export default function ProfileForm({ initial, locale: localeProp }: Props) {
   const needsPermit =
     professionRequiresPermit(form.profession) ||
     form.qualified_professions.some((profession) => professionRequiresPermit(profession));
+  const hasContact = hasText(form.first_name) && hasText(form.last_name) && (hasText(form.phone) || hasText(form.email));
+  const hasResidence = hasText(form.city_residence) && hasText(form.region_residence);
+  const hasIdentityProgress = hasContact || hasResidence || form.languages.length > 0 || hasText(form.preferred_contact);
+  const workReady =
+    (hasText(form.profession) || form.qualified_professions.length > 0) &&
+    hasText(form.years_experience) &&
+    hasText(form.work_authorization) &&
+    (!needsPermit || hasText(form.permit_status));
+  const workStarted =
+    hasText(form.profession) ||
+    form.qualified_professions.length > 0 ||
+    hasText(form.years_experience) ||
+    hasText(form.work_authorization) ||
+    hasText(form.permit_status);
+  const availabilityReady = hasText(form.start_availability) && form.preferred_shifts.length > 0;
+  const availabilityStarted =
+    hasText(form.start_availability) ||
+    hasText(form.preferred_hours) ||
+    form.preferred_shifts.length > 0 ||
+    form.preferred_mandate_types.length > 0 ||
+    hasText(form.mobility) ||
+    hasText(form.housing_required) ||
+    hasText(form.transport_available);
+  const hasPreferenceSet = form.preference_sets.some(
+    (set) =>
+      set.active !== false &&
+      ((set.regions || []).some((region) => hasText(region.region)) ||
+        (set.departments || []).length > 0 ||
+        (set.shifts || []).length > 0 ||
+        (set.mandate_types || []).length > 0)
+  );
+  const hasFlatPreferences =
+    form.preferred_regions.some((region) => hasText(region.region)) ||
+    form.preferred_departments.length > 0 ||
+    hasText(form.preferred_establishments) ||
+    hasText(form.avoided_establishments);
+  const preferencesReady = hasPreferenceSet || hasFlatPreferences;
+  const identityStatus = sectionStatus(hasContact && hasResidence, hasIdentityProgress);
+  const workStatus = sectionStatus(workReady, workStarted);
+  const availabilityStatus = sectionStatus(availabilityReady, availabilityStarted);
+  const preferencesStatus: SectionStatus = preferencesReady ? 'complete' : 'optional';
+  const communicationStatus: SectionStatus = form.mailing_list_opt_in ? 'complete' : 'optional';
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -213,7 +255,38 @@ export default function ProfileForm({ initial, locale: localeProp }: Props) {
         </div>
       )}
 
-      <SectionCard title={tr('Coordonnees', 'Contact information')}>
+      <div className="rounded-2xl border border-border bg-muted/30 p-5 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
+              {tr('Dossier candidat', 'Candidate file')}
+            </p>
+            <h2 className="mt-1 text-[22px] font-semibold tracking-tight text-fg">
+              {tr('Complétez seulement ce qui aide Sanitas à vous proposer les bons mandats.', 'Complete only what helps Sanitas match you with the right assignments.')}
+            </h2>
+            <p className="mt-2 max-w-2xl text-[14.5px] leading-relaxed text-fg-muted">
+              {tr(
+                'Le CV reste obligatoire pour postuler. Le reste sert à éviter les appels inutiles et à mieux filtrer les mandats compatibles.',
+                'A resume is still required to apply. The rest helps avoid unnecessary calls and filters compatible assignments more accurately.'
+              )}
+            </p>
+          </div>
+          <Link href={localizedPath(locale, 'documents')} className="btn-secondary shrink-0">
+            {tr('Vérifier mon CV', 'Check my resume')}
+          </Link>
+        </div>
+      </div>
+
+      <ProfileSection
+        title={tr('Identité et contact', 'Identity and contact')}
+        description={tr(
+          'Les informations minimales pour vous joindre et situer votre dossier.',
+          'The minimum information needed to reach you and locate your file.'
+        )}
+        status={identityStatus}
+        locale={locale}
+        defaultOpen={identityStatus !== 'complete'}
+      >
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label={tr('Prenom', 'First name')} required>
             <input className="input" value={form.first_name} onChange={(e) => set('first_name', e.target.value)} />
@@ -237,12 +310,6 @@ export default function ProfileForm({ initial, locale: localeProp }: Props) {
         <Field label={tr('Langues de travail', 'Working languages')}>
           <SegmentedChoices options={LANGUAGES} value={form.languages} onChange={(v) => set('languages', v as string[])} multi />
         </Field>
-        <Field label={tr('Autorisation de travailler au Canada', 'Authorization to work in Canada')}>
-          <SegmentedChoices options={WORK_AUTH} value={form.work_authorization} onChange={(v) => set('work_authorization', v as string)} />
-        </Field>
-      </SectionCard>
-
-      <SectionCard title={tr('Lieu de residence', 'Residence')}>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label={tr('Ville', 'City')}>
             <input className="input" value={form.city_residence} onChange={(e) => set('city_residence', e.target.value)} />
@@ -257,9 +324,18 @@ export default function ProfileForm({ initial, locale: localeProp }: Props) {
             <input className="input" value={form.postal_code} onChange={(e) => set('postal_code', e.target.value)} />
           </Field>
         </div>
-      </SectionCard>
+      </ProfileSection>
 
-      <SectionCard title={tr('Profession et experience', 'Profession and experience')}>
+      <ProfileSection
+        title={tr('Profession et admissibilité', 'Profession and eligibility')}
+        description={tr(
+          'Ce bloc dit au recruteur pour quels titres votre dossier peut être présenté.',
+          'This section tells the recruiter which roles your file can be presented for.'
+        )}
+        status={workStatus}
+        locale={locale}
+        defaultOpen={identityStatus === 'complete' && workStatus !== 'complete'}
+      >
         <Field label="Profession">
           <select className="input" value={form.profession} onChange={(e) => {
             const next = e.target.value;
@@ -295,8 +371,8 @@ export default function ProfileForm({ initial, locale: localeProp }: Props) {
         <Field label={tr("Annees d'experience", 'Years of experience')}>
           <SegmentedChoices options={YEARS_EXPERIENCE} value={form.years_experience} onChange={(v) => set('years_experience', v as string)} />
         </Field>
-        <Field label={tr('Mobilite', 'Mobility')}>
-          <SegmentedChoices options={MOBILITY} value={form.mobility} onChange={(v) => set('mobility', v as string)} />
+        <Field label={tr('Autorisation de travailler au Canada', 'Authorization to work in Canada')}>
+          <SegmentedChoices options={WORK_AUTH} value={form.work_authorization} onChange={(v) => set('work_authorization', v as string)} />
         </Field>
         {needsPermit && (
           <div className="space-y-4 rounded-xl border border-border bg-muted/30 p-4">
@@ -308,9 +384,18 @@ export default function ProfileForm({ initial, locale: localeProp }: Props) {
             </Field>
           </div>
         )}
-      </SectionCard>
+      </ProfileSection>
 
-      <SectionCard title={tr('Disponibilites', 'Availability')}>
+      <ProfileSection
+        title={tr('Disponibilités et logistique', 'Availability and logistics')}
+        description={tr(
+          'Les éléments pratiques qui permettent de savoir quand et comment vous pouvez accepter un mandat.',
+          'The practical details that clarify when and how you can accept an assignment.'
+        )}
+        status={availabilityStatus}
+        locale={locale}
+        defaultOpen={identityStatus === 'complete' && workStatus === 'complete' && availabilityStatus !== 'complete'}
+      >
         <Field label={tr('Quand pouvez-vous commencer ?', 'When can you start?')}>
           <SegmentedChoices options={START_AVAILABILITY} value={form.start_availability} onChange={(v) => set('start_availability', v as string)} />
         </Field>
@@ -323,14 +408,28 @@ export default function ProfileForm({ initial, locale: localeProp }: Props) {
         <Field label={tr('Types de mandat recherches', 'Assignment types sought')}>
           <SegmentedChoices options={MANDATE_TYPES} value={form.preferred_mandate_types} onChange={(v) => set('preferred_mandate_types', v as string[])} multi />
         </Field>
-      </SectionCard>
+        <Field label={tr('Mobilite', 'Mobility')}>
+          <SegmentedChoices options={MOBILITY} value={form.mobility} onChange={(v) => set('mobility', v as string)} />
+        </Field>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label={tr('Hebergement requis', 'Housing required')}>
+            <SegmentedChoices options={HOUSING_CHOICES} value={form.housing_required} onChange={(v) => set('housing_required', v as string)} />
+          </Field>
+          <Field label={tr('Transport disponible', 'Transportation available')}>
+            <SegmentedChoices options={TRANSPORT_CHOICES} value={form.transport_available} onChange={(v) => set('transport_available', v as string)} />
+          </Field>
+        </div>
+      </ProfileSection>
 
-      <SectionCard
+      <ProfileSection
         title={tr('Mes choix de mandats', 'My assignment preferences')}
-        helper={tr(
-          'Regroupez ce qui va ensemble. Exemple: une region peut etre acceptable seulement pour certains departements ou certains quarts.',
+        description={tr(
+          'Regroupez ce qui va ensemble. Exemple: une région peut être acceptable seulement pour certains départements ou certains quarts.',
           'Group what belongs together. For example, one region may work only for certain departments or shifts.'
         )}
+        status={preferencesStatus}
+        locale={locale}
+        defaultOpen={false}
       >
         <PreferenceSetEditor
           value={form.preference_sets}
@@ -359,9 +458,18 @@ export default function ProfileForm({ initial, locale: localeProp }: Props) {
             }));
           }}
         />
-      </SectionCard>
+        <div className="border-t border-border pt-5">
+          <h3 className="text-[16px] font-semibold text-fg">
+            {tr('Régions, départements et établissements', 'Regions, departments and facilities')}
+          </h3>
+          <p className="mt-1 text-[13.5px] leading-relaxed text-fg-muted">
+            {tr(
+              "Gardez ces détails si vous voulez que Sanitas vous propose aussi d'autres mandats compatibles.",
+              'Keep these details if you want Sanitas to propose other compatible assignments too.'
+            )}
+          </p>
+        </div>
 
-      <SectionCard title={tr('Geographie preferee', 'Preferred geography')} helper={tr('Regions, villes, etablissements qui vous interessent.', 'Regions, cities and facilities that interest you.')}>
         <div className="space-y-3">
           {form.preferred_regions.map((rc, idx) => (
             <div key={idx} className="rounded-xl border border-border bg-surface p-4">
@@ -402,27 +510,25 @@ export default function ProfileForm({ initial, locale: localeProp }: Props) {
             <textarea className="textarea" value={form.avoided_establishments} onChange={(e) => set('avoided_establishments', e.target.value)} />
           </Field>
         </div>
-      </SectionCard>
+      </ProfileSection>
 
-      <SectionCard title={tr('Logistique', 'Logistics')}>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label={tr('Hebergement requis', 'Housing required')}>
-            <SegmentedChoices options={HOUSING_CHOICES} value={form.housing_required} onChange={(v) => set('housing_required', v as string)} />
-          </Field>
-          <Field label={tr('Transport disponible', 'Transportation available')}>
-            <SegmentedChoices options={TRANSPORT_CHOICES} value={form.transport_available} onChange={(v) => set('transport_available', v as string)} />
-          </Field>
-        </div>
-      </SectionCard>
-
-      <SectionCard title={tr('Communications', 'Communications')}>
+      <ProfileSection
+        title={tr('Communications', 'Communications')}
+        description={tr(
+          'Choisissez si Sanitas peut vous envoyer des mandats compatibles avec votre dossier.',
+          'Choose whether Sanitas can send you assignments compatible with your file.'
+        )}
+        status={communicationStatus}
+        locale={locale}
+        defaultOpen={false}
+      >
         <label className="flex items-start gap-3 cursor-pointer">
           <input type="checkbox" className="mt-1 h-4 w-4 rounded border-border accent-fg" checked={form.mailing_list_opt_in} onChange={(e) => set('mailing_list_opt_in', e.target.checked)} />
           <span className="text-[15px] text-fg leading-relaxed">
             {tr('Je souhaite recevoir les nouveaux besoins et mandats compatibles avec mon profil.', 'I want to receive new needs and assignments compatible with my profile.')}
           </span>
         </label>
-      </SectionCard>
+      </ProfileSection>
 
       <div className="flex flex-wrap items-center gap-3">
         <button type="submit" disabled={saving} className="btn-primary">
@@ -442,6 +548,80 @@ export default function ProfileForm({ initial, locale: localeProp }: Props) {
         )}
       </div>
     </form>
+  );
+}
+
+type SectionStatus = 'complete' | 'partial' | 'incomplete' | 'optional';
+
+function hasText(value?: string | null) {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+function sectionStatus(complete: boolean, started: boolean): SectionStatus {
+  if (complete) return 'complete';
+  return started ? 'partial' : 'incomplete';
+}
+
+function ProfileSection({
+  title,
+  description,
+  status,
+  locale,
+  defaultOpen,
+  children,
+}: {
+  title: string;
+  description?: string;
+  status: SectionStatus;
+  locale: Locale;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const isComplete = status === 'complete';
+  const statusLabel =
+    locale === 'en'
+      ? {
+          complete: 'Complete',
+          partial: 'In progress',
+          incomplete: 'To complete',
+          optional: 'Optional',
+        }[status]
+      : {
+          complete: 'Complet',
+          partial: 'En cours',
+          incomplete: 'À compléter',
+          optional: 'Optionnel',
+        }[status];
+
+  return (
+    <details
+      open={defaultOpen}
+      className="group rounded-2xl border border-border bg-surface shadow-soft open:shadow-md"
+    >
+      <summary className="grid cursor-pointer list-none gap-4 px-5 py-5 sm:grid-cols-[1fr_auto] sm:items-center sm:px-6">
+        <div>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <h2 className="text-[20px] font-semibold tracking-tight text-fg sm:text-[22px]">{title}</h2>
+            <span
+              className={cn(
+                'inline-flex rounded-full px-2.5 py-1 text-[12px] font-semibold',
+                isComplete && 'bg-success-soft text-success',
+                status === 'partial' && 'bg-warning-soft text-warning',
+                status === 'incomplete' && 'bg-danger-soft text-danger',
+                status === 'optional' && 'bg-muted text-fg-muted'
+              )}
+            >
+              {statusLabel}
+            </span>
+          </div>
+          {description && <p className="mt-1.5 text-[14.5px] leading-relaxed text-fg-muted">{description}</p>}
+        </div>
+        <span className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-[18px] text-fg-muted transition group-open:rotate-180">
+          v
+        </span>
+      </summary>
+      <div className="space-y-5 border-t border-border px-5 py-5 sm:px-6">{children}</div>
+    </details>
   );
 }
 

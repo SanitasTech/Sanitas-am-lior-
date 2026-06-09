@@ -65,6 +65,39 @@ const HEALTHCARE_SERVICE_AREAS = [
   'International registered nurse opportunities',
 ];
 
+const PRIORITY_PUBLIC_PAGES = [
+  {
+    name: 'Agence infirmière Québec',
+    url: '/agence-infirmiere-quebec',
+    description:
+      'Page pilier pour les recherches agence infirmière Québec, agence de placement infirmier Québec et placement infirmier au Québec.',
+  },
+  {
+    name: 'Emplois infirmières Québec',
+    url: '/emplois-infirmieres-quebec',
+    description:
+      'Page pilier pour les candidats infirmiers autorisés, techniciens et cliniciens qui cherchent des mandats infirmiers au Québec.',
+  },
+  {
+    name: 'Mandats infirmiers en régions éloignées',
+    url: '/mandats-infirmiers-region-eloignee',
+    description:
+      'Page pilier pour les mandats infirmiers en Baie-James, Grand Nord, Gaspésie, Îles-de-la-Madeleine, Bas-Saint-Laurent, Abitibi, Côte-Nord et Outaouais.',
+  },
+  {
+    name: 'Agence de placement santé Laval',
+    url: '/agence-placement-sante-laval',
+    description:
+      'Page locale pour les recherches agence de placement santé Laval et recrutement santé Laval.',
+  },
+  {
+    name: 'Recrutement personnel santé Québec',
+    url: '/recrutement-personnel-sante-quebec',
+    description:
+      'Page établissements pour les besoins en recrutement de personnel de santé au Québec.',
+  },
+];
+
 export function absoluteUrl(path = '/'): string {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
   return `${SITE_URL}${normalizedPath === '/' ? '' : normalizedPath}`;
@@ -243,11 +276,14 @@ export function websiteJsonLd() {
     publisher: { '@id': `${SITE_URL}/#organization` },
     inLanguage: ['fr-CA', 'en-CA'],
     about: HEALTHCARE_SERVICE_AREAS.map((name) => ({ '@type': 'Thing', name })),
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: `${SITE_URL}/postes?profession={search_term_string}`,
-      'query-input': 'required name=search_term_string',
-    },
+    hasPart: PRIORITY_PUBLIC_PAGES.map((page) => ({
+      '@type': 'WebPage',
+      '@id': `${absoluteUrl(page.url)}#webpage`,
+      url: absoluteUrl(page.url),
+      name: page.name,
+      description: page.description,
+      inLanguage: 'fr-CA',
+    })),
   };
 }
 

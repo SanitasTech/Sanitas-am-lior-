@@ -1,5 +1,13 @@
 import PublicLayout from '@/components/PublicLayout';
-import { publicPageMetadata } from '@/lib/seo';
+import SeoJsonLd from '@/components/SeoJsonLd';
+import {
+  breadcrumbJsonLd,
+  faqPageJsonLd,
+  itemListJsonLd,
+  publicPageMetadata,
+  serviceJsonLd,
+  webPageJsonLd,
+} from '@/lib/seo';
 import Link from 'next/link';
 
 export const metadata = publicPageMetadata({
@@ -71,9 +79,77 @@ const departmentLinks = [
   { label: 'CHSLD', href: '/mandats-infirmiers-chsld-quebec' },
 ];
 
+const FAQ = [
+  {
+    question: 'Quelles régions éloignées sont couvertes par Sanitas ?',
+    answer:
+      'Sanitas met en avant les mandats infirmiers en Baie-James, Grand Nord, Outaouais, Gaspésie, Îles-de-la-Madeleine, Bas-Saint-Laurent, Abitibi et Côte-Nord selon les besoins actifs.',
+  },
+  {
+    question: 'Puis-je choisir seulement certaines régions éloignées ?',
+    answer:
+      'Oui. Le dossier candidat permet de préciser les régions acceptées, les départements souhaités, les quarts, la mobilité et les contraintes importantes.',
+  },
+  {
+    question: 'Sanitas évite-t-elle les propositions incompatibles ?',
+    answer:
+      'Oui. Les préférences croisées permettent d’éviter de mélanger une région acceptée avec un département, un quart ou une contrainte qui ne convient pas au candidat.',
+  },
+  {
+    question: 'Quels départements sont fréquents en région éloignée ?',
+    answer:
+      'Les besoins peuvent inclure urgence, soins intensifs, bloc opératoire, obstétrique, chirurgie, CHSLD, soins à domicile, médecine/chirurgie et santé mentale selon les mandats actifs.',
+  },
+];
+
 export default function RemoteNursingAssignmentsPage() {
   return (
     <PublicLayout>
+      <SeoJsonLd
+        id="remote-nursing-assignments-schema"
+        data={{
+          '@context': 'https://schema.org',
+          '@graph': [
+            webPageJsonLd({
+              name: 'Mandats infirmiers en régions éloignées au Québec',
+              description:
+                'Page Sanitas pour les mandats infirmiers en Baie-James, Grand Nord, Outaouais, Gaspésie, Îles-de-la-Madeleine, Bas-Saint-Laurent, Abitibi et Côte-Nord.',
+              url: '/mandats-infirmiers-region-eloignee',
+            }),
+            serviceJsonLd({
+              name: 'Mandats infirmiers en régions éloignées',
+              description:
+                'Recherche de mandats infirmiers régionaux au Québec pour infirmières autorisées, techniciennes et cliniciennes.',
+              url: '/mandats-infirmiers-region-eloignee',
+              serviceType: 'Healthcare nursing job matching',
+              audience: 'candidates',
+              areaServed: [
+                'Québec',
+                'Baie-James',
+                'Nord-du-Québec',
+                'Outaouais',
+                'Gaspésie',
+                'Îles-de-la-Madeleine',
+                'Bas-Saint-Laurent',
+                'Abitibi-Témiscamingue',
+                'Côte-Nord',
+              ],
+            }),
+            itemListJsonLd(
+              remoteRegions.map((region) => ({
+                name: `Mandats infirmiers ${region.name}`,
+                url: region.href,
+                description: region.focus,
+              })),
+            ),
+            faqPageJsonLd(FAQ),
+            breadcrumbJsonLd([
+              { name: 'Accueil', url: '/' },
+              { name: 'Mandats infirmiers en régions éloignées', url: '/mandats-infirmiers-region-eloignee' },
+            ]),
+          ],
+        }}
+      />
       <section className="section pt-16 pb-12 bg-muted/30 border-b border-border">
         <div className="container-page max-w-5xl">
           <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
@@ -197,6 +273,22 @@ export default function RemoteNursingAssignmentsPage() {
               </Link>
             </div>
           </aside>
+        </div>
+      </section>
+
+      <section className="pb-20">
+        <div className="container-page max-w-4xl">
+          <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
+            <h2 className="text-[22px] font-semibold text-fg">Questions fréquentes</h2>
+            <div className="mt-6 grid gap-5 md:grid-cols-2">
+              {FAQ.map((item) => (
+                <article key={item.question}>
+                  <h3 className="text-[16px] font-semibold text-fg">{item.question}</h3>
+                  <p className="mt-2 text-[15px] leading-relaxed text-fg-muted">{item.answer}</p>
+                </article>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
     </PublicLayout>

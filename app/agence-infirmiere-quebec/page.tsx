@@ -4,6 +4,7 @@ import SeoJsonLd from '@/components/SeoJsonLd';
 import {
   breadcrumbJsonLd,
   faqPageJsonLd,
+  itemListJsonLd,
   publicPageMetadata,
   serviceJsonLd,
   webPageJsonLd,
@@ -102,6 +103,32 @@ export default function NursingAgencyQuebecPage() {
               audience: 'both',
               areaServed: ['Québec', 'Laval', 'Montréal', 'Montérégie', 'Outaouais', 'Gaspésie', 'Abitibi', 'Côte-Nord'],
             }),
+            itemListJsonLd([
+              {
+                name: 'Emplois infirmières Québec',
+                url: '/emplois-infirmieres-quebec',
+                description:
+                  'Mandats infirmiers pour infirmières autorisées, techniciennes et cliniciennes au Québec.',
+              },
+              {
+                name: 'Mandats infirmiers en régions éloignées',
+                url: '/mandats-infirmiers-region-eloignee',
+                description:
+                  'Mandats infirmiers en Baie-James, Grand Nord, Gaspésie, Îles-de-la-Madeleine, Bas-Saint-Laurent, Abitibi, Côte-Nord et Outaouais.',
+              },
+              {
+                name: 'Agence placement santé Laval',
+                url: '/agence-placement-sante-laval',
+                description:
+                  'Page locale Sanitas pour les besoins de placement santé et recrutement à Laval.',
+              },
+              {
+                name: 'Recrutement personnel santé Québec',
+                url: '/recrutement-personnel-sante-quebec',
+                description:
+                  'Page pour les établissements qui cherchent du personnel de santé au Québec.',
+              },
+            ]),
             faqPageJsonLd(FAQ),
           ],
         }}

@@ -4,7 +4,7 @@ import PublicLayout from '@/components/PublicLayout';
 import SeoJsonLd from '@/components/SeoJsonLd';
 import SeoLandingPage from '@/components/SeoLandingPage';
 import { getLocalSeoPage, getLocalSeoSlugs } from '@/lib/local-seo-pages';
-import { breadcrumbJsonLd, publicPageMetadata, serviceJsonLd, webPageJsonLd } from '@/lib/seo';
+import { breadcrumbJsonLd, itemListJsonLd, publicPageMetadata, serviceJsonLd, webPageJsonLd } from '@/lib/seo';
 
 export const dynamicParams = false;
 
@@ -55,6 +55,12 @@ export default function EnglishLocalSeoPage({ params }: { params: { seoSlug: str
               { name: 'Home', url: '/en' },
               { name: page.title, url: `/en/${page.slug}` },
             ]),
+            itemListJsonLd(
+              page.relatedLinks.map((link) => ({
+                name: link.label,
+                url: link.href,
+              })),
+            ),
           ],
         }}
       />

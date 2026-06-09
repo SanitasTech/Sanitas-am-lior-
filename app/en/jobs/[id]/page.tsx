@@ -226,15 +226,15 @@ export default async function EnglishJobDetailPage({ params }: { params: { id: s
                   </li>
                   <li className="rounded-xl border border-border bg-bg p-4">
                     <span className="block text-[13px] font-semibold uppercase tracking-wider text-accent">2</span>
-                    Confirm only the details that matter for this assignment.
-                  </li>
-                  <li className="rounded-xl border border-border bg-bg p-4">
-                    <span className="block text-[13px] font-semibold uppercase tracking-wider text-accent">3</span>
                     Upload your resume, or reuse the one already in your file.
                   </li>
                   <li className="rounded-xl border border-border bg-bg p-4">
+                    <span className="block text-[13px] font-semibold uppercase tracking-wider text-accent">3</span>
+                    Confirm only the details that matter for this assignment.
+                  </li>
+                  <li className="rounded-xl border border-border bg-bg p-4">
                     <span className="block text-[13px] font-semibold uppercase tracking-wider text-accent">4</span>
-                    Submit your application; Sanitas will contact you about next steps.
+                    Submit your application; you can complete your preferences afterward.
                   </li>
                 </ol>
               </section>

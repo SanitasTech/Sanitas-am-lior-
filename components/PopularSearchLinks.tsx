@@ -10,6 +10,8 @@ const CORE_LINKS: Record<Locale, Array<{ label: string; href: string }>> = {
     { label: 'Emplois PAB Québec', href: '/emplois-pab-quebec' },
     { label: 'Emplois ASSS Québec', href: '/emplois-asss-quebec' },
     { label: 'Mandats en régions éloignées', href: '/mandats-infirmiers-region-eloignee' },
+    { label: 'Agence placement santé Laval', href: '/agence-placement-sante-laval' },
+    { label: 'Recrutement personnel santé Québec', href: '/recrutement-personnel-sante-quebec' },
   ],
   en: [
     { label: 'Nursing agency Quebec', href: '/en/nursing-agency-quebec' },
@@ -18,6 +20,8 @@ const CORE_LINKS: Record<Locale, Array<{ label: string; href: string }>> = {
     { label: 'PAB jobs Quebec', href: '/en/pab-jobs-quebec' },
     { label: 'ASSS jobs Quebec', href: '/en/asss-jobs-quebec' },
     { label: 'Remote nursing assignments', href: '/en/remote-region-nursing-assignments-quebec' },
+    { label: 'Healthcare staffing Laval', href: '/en/healthcare-staffing-laval' },
+    { label: 'Healthcare recruitment Quebec', href: '/en/healthcare-recruitment-quebec' },
   ],
 };
 

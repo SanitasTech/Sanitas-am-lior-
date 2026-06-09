@@ -36,11 +36,11 @@ export default function EnglishThankYouPage({ searchParams }: Props) {
               <CheckCircleIcon className="h-8 w-8" />
             </div>
             <h1 className="text-display-lg text-fg">
-              {isPosting ? 'Application sent!' : 'Profile activated!'}
+              {isPosting ? 'Application sent with your resume!' : 'Profile activated!'}
             </h1>
             <p className="mt-4 text-[17px] leading-relaxed text-fg-muted max-w-prose mx-auto">
               {isPosting
-                ? 'Your interest in this assignment is with us. Here is what happens next:'
+                ? 'Your application was sent with your resume. A Sanitas recruiter can now review your profile.'
                 : 'Your profile is in our database. Here is what happens next:'}
             </p>
           </div>
@@ -52,7 +52,7 @@ export default function EnglishThankYouPage({ searchParams }: Props) {
               title="We review your file"
               body={
                 isPosting
-                  ? 'A recruiter checks that your profile fits the assignment requirements (often within an hour).'
+                  ? 'Your resume is in your file. A recruiter checks that your profile fits the assignment requirements.'
                   : 'A recruiter reviews your file and identifies assignments matching your preferences.'
               }
             />
@@ -74,12 +74,32 @@ export default function EnglishThankYouPage({ searchParams }: Props) {
             />
           </ol>
 
+          {isPosting && (
+            <div className="mt-10 rounded-2xl border border-accent/30 bg-accent-soft/35 p-5 text-left">
+              <p className="text-[12px] font-semibold uppercase tracking-wider text-accent">
+                Receive more matching assignments
+              </p>
+              <h2 className="mt-2 text-[20px] font-semibold tracking-tight text-fg">
+                Complete your preferences in 1 minute
+              </h2>
+              <p className="mt-2 text-[14.5px] leading-relaxed text-fg-muted">
+                To receive other matching assignments, you can now add your regions, shifts,
+                departments and important constraints. This step is optional.
+              </p>
+            </div>
+          )}
+
           <div className="mt-10 flex flex-wrap justify-center gap-3">
             <Link href="/en/my-applications" className="btn-primary">
-              View my applications
+              {isPosting ? 'View my application' : 'View my applications'}
             </Link>
+            {isPosting && (
+              <Link href="/en/my-profile" className="btn-secondary">
+                Complete my preferences
+              </Link>
+            )}
             <Link href="/en/jobs" className="btn-secondary">
-              Browse more jobs
+              Browse more assignments
             </Link>
           </div>
 

@@ -226,15 +226,15 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                   </li>
                   <li className="rounded-xl border border-border bg-bg p-4">
                     <span className="block text-[13px] font-semibold uppercase tracking-wider text-accent">2</span>
-                    Confirmez seulement les informations utiles au mandat.
-                  </li>
-                  <li className="rounded-xl border border-border bg-bg p-4">
-                    <span className="block text-[13px] font-semibold uppercase tracking-wider text-accent">3</span>
                     Ajoutez votre CV, ou réutilisez celui déjà dans votre dossier.
                   </li>
                   <li className="rounded-xl border border-border bg-bg p-4">
+                    <span className="block text-[13px] font-semibold uppercase tracking-wider text-accent">3</span>
+                    Confirmez seulement les informations utiles au mandat.
+                  </li>
+                  <li className="rounded-xl border border-border bg-bg p-4">
                     <span className="block text-[13px] font-semibold uppercase tracking-wider text-accent">4</span>
-                    Envoyez votre candidature; Sanitas vous contactera pour la suite.
+                    Envoyez votre candidature; vous pourrez ensuite compléter vos préférences.
                   </li>
                 </ol>
               </section>

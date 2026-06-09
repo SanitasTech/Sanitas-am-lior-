@@ -36,11 +36,11 @@ export default function MerciPage({ searchParams }: Props) {
               <CheckCircleIcon className="h-8 w-8" />
             </div>
             <h1 className="text-display-lg text-fg">
-              {isPosting ? 'Candidature envoyée !' : 'Profil activé !'}
+              {isPosting ? 'Candidature envoyée avec CV !' : 'Profil activé !'}
             </h1>
             <p className="mt-4 text-[17px] leading-relaxed text-fg-muted max-w-prose mx-auto">
               {isPosting
-                ? 'Ton intérêt pour ce mandat est arrivé chez nous. Voici ce qui se passe maintenant :'
+                ? 'Votre candidature est envoyée avec votre CV. Un recruteur Sanitas pourra maintenant analyser votre profil.'
                 : 'Ton profil est dans notre base. Voici ce qui va se passer :'}
             </p>
           </div>
@@ -52,7 +52,7 @@ export default function MerciPage({ searchParams }: Props) {
               title="Nous analysons ton dossier"
               body={
                 isPosting
-                  ? "Une recruteuse vérifie que ton profil correspond aux exigences du mandat (souvent dans l'heure)."
+                  ? "Votre CV est au dossier. Une recruteuse vérifie que votre profil correspond aux exigences du mandat."
                   : 'Une recruteuse vérifie ton dossier et identifie les mandats compatibles avec tes préférences.'
               }
             />
@@ -74,12 +74,32 @@ export default function MerciPage({ searchParams }: Props) {
             />
           </ol>
 
+          {isPosting && (
+            <div className="mt-10 rounded-2xl border border-accent/30 bg-accent-soft/35 p-5 text-left">
+              <p className="text-[12px] font-semibold uppercase tracking-wider text-accent">
+                Recevoir d'autres mandats
+              </p>
+              <h2 className="mt-2 text-[20px] font-semibold tracking-tight text-fg">
+                Complétez vos préférences en 1 minute
+              </h2>
+              <p className="mt-2 text-[14.5px] leading-relaxed text-fg-muted">
+                Pour recevoir d’autres mandats compatibles, vous pouvez maintenant ajouter vos régions,
+                quarts, départements et contraintes importantes. Cette étape est optionnelle.
+              </p>
+            </div>
+          )}
+
           <div className="mt-10 flex flex-wrap justify-center gap-3">
             <Link href="/mes-candidatures" className="btn-primary">
-              Voir mes candidatures
+              {isPosting ? 'Voir ma candidature' : 'Voir mes candidatures'}
             </Link>
+            {isPosting && (
+              <Link href="/mon-profil" className="btn-secondary">
+                Compléter mes préférences
+              </Link>
+            )}
             <Link href="/postes" className="btn-secondary">
-              Voir d’autres postes
+              Voir d’autres mandats
             </Link>
           </div>
 

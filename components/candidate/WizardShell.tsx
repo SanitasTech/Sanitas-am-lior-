@@ -8,7 +8,6 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import type { Locale } from '@/lib/i18n';
 import type { StepId } from './form-state';
-import { STEP_ORDER } from './form-state';
 
 // ---------------------------------------------------------------------
 // SavedIndicator — petit témoin « Brouillon enregistré il y a X »
@@ -47,7 +46,7 @@ const STEP_LABELS: Record<StepId, { fr: string; en: string }> = {
   identity: { fr: 'Toi', en: 'You' },
   work: { fr: 'Ton métier', en: 'Your work' },
   availability: { fr: 'Tes disponibilités', en: 'Your availability' },
-  documents: { fr: 'Tes documents', en: 'Your documents' },
+  documents: { fr: 'CV requis', en: 'Resume required' },
   review: { fr: 'Confirmer', en: 'Confirm' },
 };
 
@@ -60,6 +59,7 @@ export function WizardHeader({
   canGoBack,
   locale,
   savedAt,
+  stepOrder,
 }: {
   currentStep: StepId;
   totalSteps: number;
@@ -69,8 +69,9 @@ export function WizardHeader({
   canGoBack: boolean;
   locale: Locale;
   savedAt?: number | null;
+  stepOrder: StepId[];
 }) {
-  const index = STEP_ORDER.indexOf(currentStep);
+  const index = stepOrder.indexOf(currentStep);
   const percent = Math.round(((index + 1) / totalSteps) * 100);
   const en = locale === 'en';
 

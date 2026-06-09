@@ -109,6 +109,10 @@ export default function JobCard({ job, variant = 'default', locale = 'fr' }: Job
         </p>
       )}
 
+      <p className="text-[13px] font-medium text-fg-subtle">
+        {locale === 'en' ? 'Resume required to apply' : 'CV requis pour postuler'}
+      </p>
+
       <div className="mt-auto flex flex-col gap-2 sm:flex-row sm:gap-3 pt-2">
         <Link href={localizedJobPath(locale, job.id)} className="btn-secondary btn-sm">
           {copy.viewJob}
