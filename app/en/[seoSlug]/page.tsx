@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import PublicLayout from '@/components/PublicLayout';
 import SeoJsonLd from '@/components/SeoJsonLd';
 import SeoLandingPage from '@/components/SeoLandingPage';
-import { getLocalSeoPage, getLocalSeoSlugs } from '@/lib/local-seo-pages';
-import { breadcrumbJsonLd, itemListJsonLd, publicPageMetadata, serviceJsonLd, webPageJsonLd } from '@/lib/seo';
+import { getLocalSeoFaq, getLocalSeoPage, getLocalSeoSlugs } from '@/lib/local-seo-pages';
+import { breadcrumbJsonLd, faqPageJsonLd, itemListJsonLd, publicPageMetadata, serviceJsonLd, webPageJsonLd } from '@/lib/seo';
 
 export const dynamicParams = false;
 
@@ -29,6 +29,7 @@ export function generateMetadata({ params }: { params: { seoSlug: string } }): M
 export default function EnglishLocalSeoPage({ params }: { params: { seoSlug: string } }) {
   const page = getLocalSeoPage('en', params.seoSlug);
   if (!page) notFound();
+  const faq = getLocalSeoFaq('en', page);
 
   return (
     <PublicLayout locale="en">
@@ -61,6 +62,7 @@ export default function EnglishLocalSeoPage({ params }: { params: { seoSlug: str
                 url: link.href,
               })),
             ),
+            faqPageJsonLd(faq),
           ],
         }}
       />
@@ -70,6 +72,7 @@ export default function EnglishLocalSeoPage({ params }: { params: { seoSlug: str
         intro={page.intro}
         highlights={page.highlights}
         sections={page.sections}
+        faq={faq}
         primaryCta={page.primaryCta}
         secondaryCta={page.secondaryCta}
         relatedLinks={page.relatedLinks}

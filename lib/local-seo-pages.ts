@@ -2,6 +2,7 @@ import type { Locale } from '@/lib/i18n';
 
 type SeoSection = { title: string; body: string };
 type SeoLink = { label: string; href: string };
+type SeoFaq = { question: string; answer: string };
 
 export interface LocalSeoContent {
   slug: string;
@@ -15,6 +16,7 @@ export interface LocalSeoContent {
   primaryCta: SeoLink;
   secondaryCta?: SeoLink;
   relatedLinks: SeoLink[];
+  faq?: SeoFaq[];
 }
 
 export interface LocalSeoPagePair {
@@ -954,6 +956,60 @@ export const LOCAL_SEO_FOOTER_LINKS: Record<Locale, SeoLink[]> = {
 export function getLocalSeoPage(locale: Locale, slug: string): LocalSeoContent | null {
   const pair = LOCAL_SEO_PAGES.find((page) => page[locale].slug === slug);
   return pair ? pair[locale] : null;
+}
+
+export function getLocalSeoFaq(locale: Locale, page: LocalSeoContent): SeoFaq[] {
+  if (page.faq?.length) return page.faq;
+
+  const lowerTitle = page.title.toLowerCase();
+  const isFacilityPage =
+    page.primaryCta.href.includes('/etablissements') ||
+    page.primaryCta.href.includes('/facilities') ||
+    lowerTitle.includes('placement') ||
+    lowerTitle.includes('staffing') ||
+    lowerTitle.includes('recruitment');
+
+  if (locale === 'en') {
+    return [
+      {
+        question: `Who is ${page.title} for?`,
+        answer: page.intro,
+      },
+      {
+        question: isFacilityPage
+          ? 'What should a facility include in a staffing request?'
+          : 'What should a candidate prepare before applying?',
+        answer: isFacilityPage
+          ? 'A useful request should include the profession, region, city, department, shift, start date, duration, urgency level and required documents.'
+          : 'A useful candidate file should include a CV, profession, preferred regions, departments, shifts, availability, mobility and important constraints.',
+      },
+      {
+        question: 'How does Sanitas reduce incompatible matches?',
+        answer:
+          'Sanitas uses practical criteria such as profession, region, department, shift, availability, mobility, CV and documents to clarify which assignments are relevant before follow-up.',
+      },
+    ];
+  }
+
+  return [
+    {
+      question: `À qui s’adresse ${page.title} ?`,
+      answer: page.intro,
+    },
+    {
+      question: isFacilityPage
+        ? 'Quelles informations un établissement devrait-il transmettre ?'
+        : 'Que préparer avant de postuler ?',
+      answer: isFacilityPage
+        ? 'Une demande utile devrait préciser la profession, la région, la ville, le département, le quart, la date de début, la durée, le niveau d’urgence et les documents requis.'
+        : 'Un dossier candidat utile devrait inclure le CV, la profession, les régions souhaitées, les départements, les quarts, la disponibilité, la mobilité et les contraintes importantes.',
+    },
+    {
+      question: 'Comment Sanitas réduit les propositions incompatibles ?',
+      answer:
+        'Sanitas utilise des critères concrets comme la profession, la région, le département, le quart, la disponibilité, la mobilité, le CV et les documents pour clarifier les mandats pertinents avant le suivi.',
+    },
+  ];
 }
 
 export function getLocalSeoSlugs(locale: Locale): string[] {

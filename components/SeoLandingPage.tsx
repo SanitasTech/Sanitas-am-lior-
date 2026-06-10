@@ -6,6 +6,7 @@ interface SeoLandingPageProps {
   intro: string;
   highlights: string[];
   sections: Array<{ title: string; body: string }>;
+  faq?: Array<{ question: string; answer: string }>;
   primaryCta: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
   relatedLinks?: Array<{ label: string; href: string }>;
@@ -18,6 +19,7 @@ export default function SeoLandingPage({
   intro,
   highlights,
   sections,
+  faq = [],
   primaryCta,
   secondaryCta,
   relatedLinks = [],
@@ -69,6 +71,26 @@ export default function SeoLandingPage({
           </div>
         </div>
       </section>
+
+      {faq.length > 0 ? (
+        <section className="section pt-2 pb-10">
+          <div className="container-page max-w-4xl">
+            <div className="rounded-2xl border border-border bg-surface p-6">
+              <h2 className="text-[20px] font-semibold text-fg">
+                {relatedTitle === 'Useful links' ? 'Frequently asked questions' : 'Questions fréquentes'}
+              </h2>
+              <div className="mt-5 grid gap-5 md:grid-cols-3">
+                {faq.map((item) => (
+                  <article key={item.question}>
+                    <h3 className="text-[15.5px] font-semibold leading-snug text-fg">{item.question}</h3>
+                    <p className="mt-2 text-[14.5px] leading-relaxed text-fg-muted">{item.answer}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {relatedLinks.length > 0 ? (
         <section className="pb-20">
