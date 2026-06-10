@@ -23,6 +23,7 @@ export const SITE_URL = normalizePublicSiteUrl(
 );
 
 export const SOCIAL_IMAGE_PATH = '/opengraph-image';
+export const BRAND_LOGO_PATH = '/images/sanitas-favicon.png';
 
 const HEALTHCARE_SERVICE_AREAS = [
   'Mandats infirmiers au Québec',
@@ -187,8 +188,8 @@ export function organizationJsonLd() {
     url: SITE_URL,
     email: COMPANY.email,
     telephone: COMPANY.phone,
-    image: absoluteUrl(SOCIAL_IMAGE_PATH),
-    logo: absoluteUrl(SOCIAL_IMAGE_PATH),
+    image: absoluteUrl(BRAND_LOGO_PATH),
+    logo: absoluteUrl(BRAND_LOGO_PATH),
     priceRange: '$$',
     description:
       'Agence de placement en santé basée à Laval, spécialisée dans les mandats infirmiers et le recrutement de professionnels de la santé au Québec.',
@@ -537,7 +538,7 @@ export function jobPostingJsonLd(job: Job, locale: Locale) {
       '@id': `${SITE_URL}/#organization`,
       name: COMPANY.name,
       sameAs: SITE_URL,
-      logo: absoluteUrl(SOCIAL_IMAGE_PATH),
+      logo: absoluteUrl(BRAND_LOGO_PATH),
     },
     industry: 'Healthcare staffing',
     occupationalCategory: displayValue(locale, job.profession),
