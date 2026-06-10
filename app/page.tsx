@@ -25,9 +25,9 @@ import type { Job } from '@/types';
 import { urgencyOrder } from '@/lib/utils';
 
 export const metadata = publicPageMetadata({
-  title: 'Agence de placement infirmière au Québec | Mandats en santé',
+  title: 'Agence infirmière au Québec | Mandats infirmiers Sanitas',
   description:
-    'Agence Sanitas aide les infirmières autorisées, techniciennes, cliniciennes et professionnels de la santé à trouver des mandats au Québec.',
+    'Agence Sanitas aide les infirmières autorisées, infirmiers autorisés, techniciennes et cliniciennes à trouver des mandats infirmiers au Québec.',
   path: '/',
   frPath: '/',
   enPath: '/en',
@@ -142,9 +142,9 @@ export default async function HomePage() {
           '@context': 'https://schema.org',
           '@graph': [
             webPageJsonLd({
-              name: 'Agence de placement en santé au Québec',
+              name: 'Agence infirmière au Québec',
               description:
-                'Agence Sanitas aide les professionnels de la santé à trouver des mandats au Québec et accompagne les établissements dans leurs besoins de personnel.',
+                'Agence Sanitas aide les infirmières autorisées, infirmiers autorisés, techniciennes et cliniciennes à trouver des mandats infirmiers au Québec.',
               url: '/',
             }),
           ],
@@ -197,16 +197,16 @@ export default async function HomePage() {
             </h1>
 
             <p className="mt-8 max-w-2xl text-[18.5px] sm:text-[20px] leading-relaxed text-bg/85">
-              Infirmières autorisées, techniciennes, cliniciennes et autres professionnels de la
-              santé: choisissez vos régions, vos départements et vos horaires. Sanitas vous aide
-              à trouver des mandats compatibles au Québec.
+              Infirmières autorisées, infirmiers autorisés, techniciennes et cliniciennes:
+              choisissez vos régions, vos départements et vos horaires. Sanitas vous aide à
+              trouver des mandats infirmiers compatibles au Québec.
             </p>
 
             {/* CTAs : audience-segmentés, libellés agrandis pour identification immédiate */}
             <div className="mt-10 grid gap-6 sm:gap-8 sm:grid-cols-[auto_1px_auto] sm:items-start">
               <div>
                 <p className="text-[16px] font-serif italic tracking-[-0.05em] text-bg mb-3">
-                  Vous êtes <span className="font-semibold not-italic font-sans tracking-normal">professionnel de la santé</span>
+                  Vous êtes <span className="font-semibold not-italic font-sans tracking-normal">infirmier ou professionnel de la santé</span>
                 </p>
                 <div className="flex flex-wrap gap-2.5">
                   <Link
@@ -253,6 +253,38 @@ export default async function HomePage() {
               Recherche rapide
             </p>
             <HomeSearch />
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-border bg-surface py-6">
+        <div className="container-page">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-[12.5px] font-semibold uppercase tracking-[0.18em] text-accent">
+                Accès rapides
+              </p>
+              <h2 className="mt-1 text-[22px] font-semibold tracking-tight text-fg">
+                Recherches principales sur Agence Sanitas
+              </h2>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/agence-infirmiere-quebec" className="chip-link">
+                Agence infirmière Québec
+              </Link>
+              <Link href="/emplois-infirmieres-quebec" className="chip-link">
+                Emplois infirmières Québec
+              </Link>
+              <Link href="/mandats-infirmiers-region-eloignee" className="chip-link">
+                Mandats en régions éloignées
+              </Link>
+              <Link href="/agence-placement-sante-laval" className="chip-link">
+                Agence placement santé Laval
+              </Link>
+              <Link href="/recrutement-personnel-sante-quebec" className="chip-link">
+                Recrutement personnel santé
+              </Link>
+            </div>
           </div>
         </div>
       </section>

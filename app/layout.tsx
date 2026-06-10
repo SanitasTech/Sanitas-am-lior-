@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     template: '%s | Agence Sanitas',
   },
   description:
-    'Agence de placement infirmi\u00e8re et sant\u00e9 bas\u00e9e \u00e0 Laval. Mandats infirmiers au Qu\u00e9bec pour infirmi\u00e8res autoris\u00e9es, techniciennes, cliniciennes et professionnels de la sant\u00e9.',
+    'Agence infirmi\u00e8re bas\u00e9e \u00e0 Laval. Mandats infirmiers au Qu\u00e9bec pour infirmi\u00e8res autoris\u00e9es, infirmiers autoris\u00e9s, techniciennes et cliniciennes.',
   keywords: [
     'agence infirmi\u00e8re Qu\u00e9bec',
     'agence infirmiere quebec',
@@ -47,8 +47,8 @@ export const metadata: Metadata = {
     'mandat infirmi\u00e8re Abitibi',
     'mandat infirmi\u00e8re C\u00f4te-Nord',
     'mandat infirmi\u00e8re Bas-Saint-Laurent',
+    'mandat infirmi\u00e8re \u00celes-de-la-Madeleine',
     'emplois infirmi\u00e8res Qu\u00e9bec',
-    'emplois PAB Qu\u00e9bec',
     'recrutement personnel sant\u00e9 Qu\u00e9bec',
     'healthcare staffing Quebec',
     'nursing agency jobs Quebec',
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Agence Sanitas',
     description:
-      'Mandats en sant\u00e9 au Qu\u00e9bec. Choisissez vos r\u00e9gions, vos quarts et le type de mandat qui vous convient.',
+      'Mandats infirmiers au Qu\u00e9bec pour infirmi\u00e8res autoris\u00e9es, techniciennes et cliniciennes. Choisissez vos r\u00e9gions, vos quarts et vos disponibilit\u00e9s.',
     url: SITE_URL,
     locale: 'fr_CA',
     type: 'website',
@@ -74,7 +74,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Agence Sanitas',
-    description: 'Mandats en sant\u00e9 au Qu\u00e9bec pour les professionnels de la sant\u00e9.',
+    description: 'Mandats infirmiers au Qu\u00e9bec pour infirmi\u00e8res autoris\u00e9es, techniciennes et cliniciennes.',
     images: [socialImage],
   },
   icons: {

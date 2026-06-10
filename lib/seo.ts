@@ -192,8 +192,8 @@ export function organizationJsonLd() {
     logo: absoluteUrl(BRAND_LOGO_PATH),
     priceRange: '$$',
     description:
-      'Agence de placement en santé basée à Laval, spécialisée dans les mandats infirmiers et le recrutement de professionnels de la santé au Québec.',
-    slogan: 'Mandats en santé au Québec pour professionnels de la santé.',
+      'Agence infirmière et agence de placement en santé basée à Laval, spécialisée dans les mandats infirmiers pour infirmières autorisées, techniciennes et cliniciennes au Québec.',
+    slogan: 'Mandats infirmiers au Québec pour infirmières autorisées, techniciennes et cliniciennes.',
     address: {
       '@type': 'PostalAddress',
       streetAddress: `${COMPANY.address.line2}, ${COMPANY.address.line1}`,
@@ -219,7 +219,7 @@ export function organizationJsonLd() {
         ),
         offerCatalogItem(
           'Mandats pour candidats en santé',
-          'Accès aux mandats pour infirmières, infirmières auxiliaires, PAB, ASSS et autres professionnels de la santé.'
+          'Accès aux mandats pour infirmières autorisées, techniciennes, cliniciennes et autres professionnels de la santé selon les postes actifs.'
         ),
         offerCatalogItem(
           'Recherche de personnel pour établissements',

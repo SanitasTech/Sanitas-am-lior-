@@ -175,6 +175,50 @@ export default function NursingAgencyQuebecPage() {
         </div>
       </section>
 
+      <section className="section bg-surface py-12">
+        <div className="container-page grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
+          <div>
+            <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
+              Agence infirmière Québec
+            </p>
+            <h2 className="mt-2 text-[28px] font-semibold tracking-tight text-fg">
+              Ce que Sanitas fait concrètement
+            </h2>
+            <p className="mt-4 text-[16px] leading-relaxed text-fg-muted">
+              Lorsqu’un candidat cherche une agence infirmière au Québec, il doit pouvoir comprendre
+              rapidement si l’agence traite des mandats infirmiers réels, si les régions sont claires
+              et si le dossier sera suivi par une équipe accessible.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[
+              {
+                title: 'Mandats infirmiers ciblés',
+                body: 'Recherche par profession, région, département, quart et disponibilité.',
+              },
+              {
+                title: 'Profils infirmiers précis',
+                body: 'Infirmières autorisées, infirmiers autorisés, techniciennes et cliniciennes.',
+              },
+              {
+                title: 'Régions du Québec',
+                body: 'Laval, Montréal, Outaouais, Gaspésie, Abitibi, Côte-Nord, Bas-Saint-Laurent et Îles-de-la-Madeleine.',
+              },
+              {
+                title: 'Dossier exploitable',
+                body: 'CV obligatoire, documents suivis et informations utiles pour présenter un candidat.',
+              },
+            ].map((item) => (
+              <article key={item.title} className="rounded-2xl border border-border bg-bg p-5">
+                <h3 className="text-[18px] font-semibold text-fg">{item.title}</h3>
+                <p className="mt-3 text-[15px] leading-relaxed text-fg-muted">{item.body}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="section py-10">
         <div className="container-page grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
           <div>
@@ -243,7 +287,7 @@ export default function NursingAgencyQuebecPage() {
               },
               {
                 title: 'Régions éloignées',
-                body: 'Couvrir les besoins en Baie-James, Grand Nord, Gaspésie, Abitibi et Côte-Nord.',
+                body: 'Couvrir les besoins en Baie-James, Grand Nord, Gaspésie, Îles-de-la-Madeleine, Bas-Saint-Laurent, Abitibi et Côte-Nord.',
               },
             ].map((item) => (
               <article key={item.title} className="card p-5">
