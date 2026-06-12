@@ -41,6 +41,33 @@ export const QUEBEC_REGIONS: string[] = [
   'Saguenay–Lac-Saint-Jean',
 ];
 
+// Régions considérées « éloignées » pour l'affichage (badge sur les cartes
+// de postes). Comparaison sans accents : le champ jobs.region peut contenir
+// des libellés libres (ex. « Baie-James », « Grand Nord »).
+// Liste alignée sur la page /mandats-infirmiers-region-eloignee.
+const REMOTE_REGION_KEYWORDS = [
+  'nord-du-quebec',
+  'cote-nord',
+  'gaspesie',
+  'iles-de-la-madeleine',
+  'abitibi',
+  'baie-james',
+  'grand nord',
+  'nunavik',
+  'terres-cries',
+  'bas-saint-laurent',
+  'outaouais',
+];
+
+export function isRemoteRegion(region?: string | null): boolean {
+  if (!region) return false;
+  const value = region
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+  return REMOTE_REGION_KEYWORDS.some((keyword) => value.includes(keyword));
+}
+
 export const DEFAULT_JOB_COUNTRY = 'Canada';
 
 export const JOB_COUNTRIES: string[] = [

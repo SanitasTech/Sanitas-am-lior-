@@ -156,8 +156,8 @@ export default async function HomePage() {
           Le bg-fg sur la section sert de secours sombre si l'image échoue.
           ============================================================ */}
       <section className="relative isolate overflow-hidden bg-fg">
-        {/* Couche 1 : image de fond, presque pleine luminosité */}
-        <div className="absolute inset-0 -z-10 opacity-90">
+        {/* Couche 1 : image de fond */}
+        <div className="absolute inset-0 -z-10">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={HERO_BG}
@@ -167,57 +167,50 @@ export default async function HomePage() {
           />
         </div>
 
-        {/* Couche 2 : teinte accent légère pour rester dans les tons du site */}
+        {/* Couche 2 : voile sombre teinté accent, dense à gauche pour la
+            lisibilité du texte, dégagé à droite pour laisser vivre la photo */}
         <div
-          className="absolute inset-0 -z-10 bg-gradient-to-br from-accent/35 via-accent/15 to-fg/40"
-          aria-hidden
-        />
-        {/* Couche 3 : ombrage subtil en bas-gauche uniquement, pour la lisibilité du texte */}
-        <div
-          className="absolute inset-0 -z-10 bg-gradient-to-tr from-fg/55 via-fg/15 to-transparent"
+          className="absolute inset-0 -z-10 bg-gradient-to-r from-fg/80 via-fg/55 to-fg/15"
           aria-hidden
         />
 
         {/* Contenu */}
-        <div className="container-page relative pt-24 pb-32 sm:pt-28 sm:pb-36 lg:pt-32 lg:pb-44">
+        <div className="container-page relative pt-20 pb-20 sm:pt-24 sm:pb-24 lg:pt-28 lg:pb-28">
           <div className="max-w-3xl">
-            <p className="inline-flex items-center gap-2 rounded-full bg-bg/15 backdrop-blur px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.15em] text-bg ring-1 ring-bg/20">
-              <span className="h-1.5 w-1.5 rounded-full bg-bg" aria-hidden />
+            <p className="inline-flex items-center gap-2 rounded-full bg-bg/10 backdrop-blur px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.15em] text-bg ring-1 ring-bg/25">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent-bright" aria-hidden />
               Agence de placement infirmière · Laval, Québec
             </p>
 
-            <h1 className="mt-6 text-[clamp(2.75rem,6vw,5rem)] leading-[1.02] tracking-[-0.025em] font-semibold text-bg">
-              Des mandats infirmiers
-              <br />
-              <span className="font-serif italic font-normal text-bg tracking-[-0.08em]">
-                et en santé adaptés à{' '}
-                <span className="text-[oklch(0.72_0.09_220)]">votre</span>{' '}
-                réalité.
+            <h1 className="mt-6 text-[clamp(2.5rem,5.5vw,4.25rem)] leading-[1.06] tracking-[-0.025em] font-semibold text-bg">
+              Des mandats infirmiers et en santé{' '}
+              <span className="font-serif italic font-medium tracking-[-0.01em] text-[oklch(0.85_0.09_220)]">
+                adaptés à votre réalité.
               </span>
             </h1>
 
-            <p className="mt-8 max-w-2xl text-[18.5px] sm:text-[20px] leading-relaxed text-bg/85">
-              Infirmières autorisées, infirmiers autorisés, techniciennes et cliniciennes:
+            <p className="mt-6 max-w-2xl text-[17.5px] sm:text-[19px] leading-relaxed text-bg/85">
+              Infirmières autorisées, infirmiers autorisés, techniciennes et cliniciennes :
               choisissez vos régions, vos départements et vos horaires. Sanitas vous aide à
               trouver des mandats infirmiers compatibles au Québec.
             </p>
 
-            {/* CTAs : audience-segmentés, libellés agrandis pour identification immédiate */}
-            <div className="mt-10 grid gap-6 sm:gap-8 sm:grid-cols-[auto_1px_auto] sm:items-start">
+            {/* CTAs : audience-segmentés, candidats nettement dominants */}
+            <div className="mt-10 grid gap-6 sm:gap-10 sm:grid-cols-[auto_1px_auto] sm:items-start">
               <div>
-                <p className="text-[16px] font-serif italic tracking-[-0.05em] text-bg mb-3">
-                  Vous êtes <span className="font-semibold not-italic font-sans tracking-normal">infirmier ou professionnel de la santé</span>
+                <p className="text-[12px] font-semibold uppercase tracking-[0.15em] text-bg/70 mb-3">
+                  Infirmiers et professionnels de la santé
                 </p>
                 <div className="flex flex-wrap gap-2.5">
                   <Link
                     href="/emplois-infirmieres-quebec"
-                    className="inline-flex items-center justify-center rounded-full bg-bg px-5 py-2.5 text-[15px] font-medium text-fg transition-all hover:opacity-90"
+                    className="inline-flex items-center justify-center rounded-full bg-bg px-6 py-3 text-[15.5px] font-semibold text-fg shadow-soft transition-all hover:bg-bg/90"
                   >
                     Voir les mandats infirmiers
                   </Link>
                   <Link
                     href="/postuler"
-                    className="inline-flex items-center justify-center rounded-full border border-bg/35 bg-bg/10 backdrop-blur px-5 py-2.5 text-[15px] font-medium text-bg transition-colors hover:bg-bg/20"
+                    className="inline-flex items-center justify-center rounded-full border border-bg/40 bg-bg/10 backdrop-blur px-6 py-3 text-[15.5px] font-medium text-bg transition-colors hover:bg-bg/20"
                   >
                     Envoyer mon profil
                   </Link>
@@ -225,27 +218,18 @@ export default async function HomePage() {
               </div>
               <div className="hidden sm:block w-px self-stretch bg-bg/25" aria-hidden />
               <div>
-                <p className="text-[16px] font-serif italic tracking-[-0.05em] text-bg mb-3">
-                  Vous représentez un <span className="font-semibold not-italic font-sans tracking-normal">établissement</span>
+                <p className="text-[12px] font-semibold uppercase tracking-[0.15em] text-bg/70 mb-3">
+                  Établissements de santé
                 </p>
                 <Link
                   href="/etablissements"
-                  className="inline-flex items-center justify-center rounded-full bg-bg px-5 py-2.5 text-[15px] font-medium text-fg transition-all hover:opacity-90"
+                  className="inline-flex items-center justify-center rounded-full border border-bg/40 bg-bg/10 backdrop-blur px-6 py-3 text-[15.5px] font-medium text-bg transition-colors hover:bg-bg/20"
                 >
                   Demander du personnel
                 </Link>
               </div>
             </div>
           </div>
-
-          {/* Petit chip de réassurance, comme un sous-titre visuel */}
-          <p className="mt-12 inline-flex flex-wrap items-center gap-2.5 text-[15px] text-bg/90">
-            <span className="font-serif italic tracking-[-0.05em]">17 régions</span>
-            <span className="text-bg/50">·</span>
-            <span className="font-serif italic tracking-[-0.05em]">14+ professions</span>
-            <span className="text-bg/50">·</span>
-            <span className="font-serif italic tracking-[-0.05em]">réponse en 24 h</span>
-          </p>
 
           {/* Barre de recherche intégrée au hero, en bas */}
           <div className="mt-14">
@@ -257,13 +241,28 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="border-b border-border bg-surface py-6">
+      {/* Bandeau de réassurance : stats structurées + permis CNESST */}
+      <section className="border-b border-border bg-surface">
+        <div className="container-page py-6">
+          <dl className="grid grid-cols-2 gap-6 sm:grid-cols-4 sm:gap-4">
+            <HeroStat value="17" label="régions couvertes au Québec" />
+            <HeroStat value="14+" label="professions de la santé" />
+            <HeroStat value="24 h" label="délai de réponse moyen" />
+            <div className="flex flex-col justify-center">
+              <dt className="text-[12.5px] text-fg-subtle">Permis CNESST</dt>
+              <dd className="mt-0.5 text-[17px] font-semibold tracking-tight text-fg tabular-nums">
+                AP-2000952
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <section className="border-b border-border py-6">
         <div className="container-page">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-[12.5px] font-semibold uppercase tracking-[0.18em] text-accent">
-                Accès rapides
-              </p>
+              <p className="eyebrow">Accès rapides</p>
               <h2 className="mt-1 text-[22px] font-semibold tracking-tight text-fg">
                 Recherches principales sur Agence Sanitas
               </h2>
@@ -296,9 +295,7 @@ export default async function HomePage() {
         <div className="container-page">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
-                Mandats urgents
-              </p>
+              <p className="eyebrow">Mandats urgents</p>
               <h2 className="mt-2 text-display-lg text-fg">À combler rapidement</h2>
             </div>
             <Link href="/postes" className="btn-secondary btn-sm self-start">
@@ -332,9 +329,7 @@ export default async function HomePage() {
         <div className="container-page">
           <div className="grid gap-10 md:grid-cols-[1.1fr_1fr] md:items-end">
             <div>
-              <p className="text-[13px] font-semibold uppercase tracking-wider text-fg-subtle">
-                Notre approche
-              </p>
+              <p className="eyebrow-subtle">Notre approche</p>
               <h2 className="mt-2 text-display-lg text-fg max-w-2xl">
                 Une agence de placement en santé basée à Laval.
               </h2>
@@ -379,9 +374,7 @@ export default async function HomePage() {
               className="w-full"
             />
             <div>
-              <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
-                Pour les candidats
-              </p>
+              <p className="eyebrow">Pour les candidats</p>
               <h2 className="mt-2 text-display-lg text-fg">Infirmiers et professionnels de la santé</h2>
               <p className="mt-4 text-[17.5px] leading-relaxed text-fg-muted max-w-prose">
                 Trouvez des mandats compatibles avec votre profession, vos disponibilités, vos
@@ -422,9 +415,7 @@ export default async function HomePage() {
         <div className="container-page">
           <div className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-center">
             <div>
-              <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
-                Pour les établissements
-              </p>
+              <p className="eyebrow">Pour les établissements</p>
               <h2 className="mt-2 text-display-lg text-fg">Vous représentez un établissement ?</h2>
               <p className="mt-4 text-[17.5px] leading-relaxed text-fg-muted max-w-prose">
                 Soumettez votre besoin en personnel et l'équipe Sanitas vous répondra rapidement.
@@ -458,9 +449,7 @@ export default async function HomePage() {
       <section className="section">
         <div className="container-page">
           <div className="text-center max-w-2xl mx-auto">
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
-              Fonctionnement
-            </p>
+            <p className="eyebrow">Fonctionnement</p>
             <h2 className="mt-2 text-display-lg text-fg">Un processus simple.</h2>
           </div>
 
@@ -500,9 +489,7 @@ export default async function HomePage() {
         <div className="container-page">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
-                Témoignages
-              </p>
+              <p className="eyebrow">Témoignages</p>
               <h2 className="mt-2 text-display-lg text-fg">Ce qu'on dit de nous.</h2>
             </div>
             <p className="text-[13.5px] text-fg-muted">
@@ -546,15 +533,12 @@ export default async function HomePage() {
             de votre besoin en personnel.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link
-              href="/contact"
-              className="rounded-full bg-bg text-fg px-6 py-3 text-[15px] font-medium hover:opacity-90"
-            >
+            <Link href="/contact" className="btn-dark">
               Nous écrire
             </Link>
             <a
               href="tel:+14509739696"
-              className="rounded-full border border-bg/30 px-6 py-3 text-[15px] font-medium hover:bg-bg/10"
+              className="btn border border-bg/30 text-bg hover:bg-bg/10"
             >
               450 973-9696
             </a>
@@ -605,6 +589,17 @@ function ProcessColumn({
           </li>
         ))}
       </ol>
+    </div>
+  );
+}
+
+function HeroStat({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="flex flex-col justify-center">
+      <dt className="order-2 mt-0.5 text-[13px] leading-snug text-fg-muted">{label}</dt>
+      <dd className="order-1 text-[24px] font-semibold tracking-tight text-fg tabular-nums">
+        {value}
+      </dd>
     </div>
   );
 }

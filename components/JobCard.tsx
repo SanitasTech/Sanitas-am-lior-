@@ -1,7 +1,10 @@
 import Link from 'next/link';
 import type { Job } from '@/types';
+import Badge from './Badge';
 import UrgencyBadge from './UrgencyBadge';
+import { MapPinIcon, ArrowRightIcon } from './Icons';
 import { formatDate } from '@/lib/utils';
+import { isRemoteRegion } from '@/lib/constants';
 import {
   PUBLIC_COPY,
   dateLocale,
@@ -24,6 +27,7 @@ export default function JobCard({ job, variant = 'default', locale = 'fr' }: Job
   const copy = PUBLIC_COPY[locale].jobs;
   const country = job.country || 'Canada';
   const isInternational = country !== 'Canada';
+  const remoteRegion = !isInternational && isRemoteRegion(job.region);
   const establishment = jobEstablishment(job, locale);
   const salary = jobSalary(job, locale);
   const meta: string[] = [];
@@ -32,66 +36,58 @@ export default function JobCard({ job, variant = 'default', locale = 'fr' }: Job
   if (isInternational) meta.push(displayValue(locale, country));
   if (job.department) meta.push(displayValue(locale, job.department));
 
+  const facts: Array<{ label: string; value: string }> = [];
+  if (job.shift) facts.push({ label: copy.shift, value: displayValue(locale, job.shift) });
+  if (job.mandate_type) facts.push({ label: copy.type, value: displayValue(locale, job.mandate_type) });
+  if (job.start_date) facts.push({ label: copy.start, value: formatDate(job.start_date, dateLocale(locale)) });
+  if (job.region) {
+    facts.push({ label: isInternational ? copy.territory : copy.region, value: job.region });
+  }
+
+  const hasBadges = (job.urgency && job.urgency !== 'normal') || isInternational || remoteRegion;
+
   return (
-    <article className="card p-6 transition-shadow hover:shadow-card flex flex-col gap-4">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-[13px] font-medium uppercase tracking-wider text-fg-subtle">
-            {displayValue(locale, job.profession)}
-          </p>
-          <h3 className="mt-1 text-[20px] font-semibold tracking-tight leading-snug">
-            <Link
-              href={localizedJobPath(locale, job.id)}
-              className="text-fg transition-colors hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-accent"
-            >
-              {jobTitle(job, locale)}
-            </Link>
-          </h3>
-        </div>
-        <div className="flex flex-col items-end gap-2">
+    <article className="card-interactive p-6 flex flex-col gap-4">
+      {hasBadges && (
+        <div className="flex flex-wrap items-center gap-2">
           <UrgencyBadge urgency={job.urgency} locale={locale} />
-          {isInternational && (
-            <span className="rounded-full border border-accent/30 bg-accent-soft px-2.5 py-1 text-[11.5px] font-medium text-accent">
-              International
-            </span>
+          {isInternational && <Badge variant="accent">International</Badge>}
+          {remoteRegion && (
+            <Badge variant="success">{locale === 'en' ? 'Remote region' : 'Région éloignée'}</Badge>
           )}
         </div>
+      )}
+
+      <div className="min-w-0">
+        <p className="text-[12.5px] font-semibold uppercase tracking-[0.14em] text-fg-subtle">
+          {displayValue(locale, job.profession)}
+        </p>
+        <h3 className="mt-1.5 text-[20px] font-semibold tracking-tight leading-snug">
+          <Link
+            href={localizedJobPath(locale, job.id)}
+            className="text-fg transition-colors hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-accent"
+          >
+            {jobTitle(job, locale)}
+          </Link>
+        </h3>
+        {meta.length > 0 && (
+          <p className="mt-2 flex items-start gap-1.5 text-[15px] text-fg-muted leading-relaxed">
+            <MapPinIcon className="mt-1 h-4 w-4 shrink-0 text-fg-subtle" />
+            <span>{meta.join(' · ')}</span>
+          </p>
+        )}
       </div>
 
-      {meta.length > 0 && <p className="text-[15px] text-fg-muted leading-relaxed">{meta.join(' · ')}</p>}
-
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-[14.5px]">
-        {job.shift && (
-          <div>
-            <dt className="text-fg-subtle">{copy.shift}</dt>
-            <dd className="text-fg">{displayValue(locale, job.shift)}</dd>
-          </div>
-        )}
-        {job.mandate_type && (
-          <div>
-            <dt className="text-fg-subtle">{copy.type}</dt>
-            <dd className="text-fg">{displayValue(locale, job.mandate_type)}</dd>
-          </div>
-        )}
-        {job.start_date && (
-          <div>
-            <dt className="text-fg-subtle">{copy.start}</dt>
-            <dd className="text-fg">{formatDate(job.start_date, dateLocale(locale))}</dd>
-          </div>
-        )}
-        {isInternational && (
-          <div>
-            <dt className="text-fg-subtle">{copy.country}</dt>
-            <dd className="text-fg">{displayValue(locale, country)}</dd>
-          </div>
-        )}
-        {job.region && (
-          <div>
-            <dt className="text-fg-subtle">{isInternational ? copy.territory : copy.region}</dt>
-            <dd className="text-fg">{job.region}</dd>
-          </div>
-        )}
-      </dl>
+      {facts.length > 0 && (
+        <ul className="flex flex-wrap gap-2">
+          {facts.map((fact) => (
+            <li key={fact.label} className="tag text-[13.5px]">
+              <span className="text-fg-subtle">{fact.label}</span>
+              <span className="font-medium text-fg">{fact.value}</span>
+            </li>
+          ))}
+        </ul>
+      )}
 
       {isInternational && job.eligible_countries && job.eligible_countries.length > 0 && (
         <p className="text-[13.5px] text-fg-muted">
@@ -103,24 +99,31 @@ export default function JobCard({ job, variant = 'default', locale = 'fr' }: Job
       )}
 
       {variant === 'default' && salary && (
-        <p className="text-[14.5px] text-fg-muted">
+        <p className="text-[15px] text-fg">
           <span className="text-fg-subtle">{copy.salary} · </span>
-          {salary}
+          <span className="font-semibold">{salary}</span>
         </p>
       )}
 
-      <p className="text-[13px] font-medium text-fg-subtle">
-        {locale === 'en' ? 'Resume required to apply' : 'CV requis pour postuler'}
-      </p>
-
-      <div className="mt-auto flex flex-col gap-2 sm:flex-row sm:gap-3 pt-2">
-        <Link href={localizedJobPath(locale, job.id)} className="btn-secondary btn-sm">
-          {copy.viewJob}
-        </Link>
-        <Link href={`${localizedPath(locale, 'apply')}?mandat_id=${job.id}`} className="btn-primary btn-sm">
+      <div className="mt-auto pt-3 border-t border-border flex items-center justify-between gap-3">
+        <Link
+          href={`${localizedPath(locale, 'apply')}?mandat_id=${job.id}`}
+          className="btn-primary btn-sm"
+        >
           {copy.interested}
         </Link>
+        <Link
+          href={localizedJobPath(locale, job.id)}
+          className="inline-flex items-center gap-1.5 text-[14.5px] font-medium text-fg-muted transition-colors hover:text-accent"
+        >
+          {copy.viewJob}
+          <ArrowRightIcon className="h-4 w-4" />
+        </Link>
       </div>
+
+      <p className="text-[12.5px] text-fg-subtle -mt-1">
+        {locale === 'en' ? 'Resume required to apply' : 'CV requis pour postuler'}
+      </p>
     </article>
   );
 }

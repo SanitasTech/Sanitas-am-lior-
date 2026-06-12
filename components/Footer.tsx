@@ -5,12 +5,19 @@ import { LOCAL_SEO_FOOTER_LINKS } from '@/lib/local-seo-pages';
 
 export default function Footer({ locale = 'fr' }: { locale?: Locale }) {
   const copy = PUBLIC_COPY[locale];
-  const linksLeft = [
-    { href: ROUTES.home.fr, label: copy.footer.home },
-    { href: ROUTES.jobs.fr, label: copy.nav.jobs },
+  const candidateLinks = [
+    { href: ROUTES.jobs.fr, label: copy.nav.viewJobs },
     { href: ROUTES.apply.fr, label: copy.footer.sendProfile },
-    { href: ROUTES.facilities.fr, label: copy.nav.facilities },
     { href: ROUTES.login.fr, label: copy.footer.candidateSpace },
+  ];
+  const facilityLinks = [
+    { href: ROUTES.facilities.fr, label: copy.nav.staffing },
+    { href: ROUTES.contact.fr, label: copy.nav.contact },
+  ];
+  const infoLinks = [
+    { href: ROUTES.home.fr, label: copy.footer.home },
+    { href: ROUTES.about.fr, label: copy.nav.about },
+    { href: ROUTES.privacy.fr, label: copy.footer.privacy },
   ];
   const seoLinks =
     locale === 'en'
@@ -39,31 +46,34 @@ export default function Footer({ locale = 'fr' }: { locale?: Locale }) {
           { href: '/faq-candidats', label: 'FAQ candidats' },
           { href: '/faq-etablissements', label: 'FAQ établissements' },
         ];
-  const linksRight = [
-    { href: ROUTES.about.fr, label: copy.nav.about },
-    { href: ROUTES.contact.fr, label: copy.nav.contact },
-    { href: ROUTES.privacy.fr, label: copy.footer.privacy },
-  ];
   const localSeoLinks = LOCAL_SEO_FOOTER_LINKS[locale];
   const searchLinks = [...seoLinks, ...localSeoLinks];
 
   return (
-    <footer className="border-t border-border bg-bg mt-auto">
-      <div className="container-page py-14">
-        <div className="grid gap-10 md:grid-cols-4">
-          <div className="md:col-span-2">
-            <p className="text-[18px] font-semibold tracking-tight text-fg">{COMPANY.name}</p>
-            <p className="mt-1 text-[15px] text-fg-muted">
+    <footer className="border-t border-border bg-surface mt-auto">
+      <div className="container-page py-12 sm:py-14">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          <div>
+            <p
+              className="text-[19px] font-bold uppercase tracking-[0.11em] text-fg"
+              style={{
+                fontFamily:
+                  'Gotham, "Gotham SSm", "Avenir Next", Montserrat, "SF Pro Display", "Segoe UI", sans-serif',
+              }}
+            >
+              SANITAS
+            </p>
+            <p className="mt-1.5 text-[15px] text-fg-muted">
               {locale === 'en' ? 'Healthcare staffing agency' : COMPANY.tagline}
             </p>
-            <div className="mt-6 space-y-1.5 text-[15px] text-fg-muted">
+            <div className="mt-5 space-y-1.5 text-[14.5px] text-fg-muted">
               <p>
-                <a href={COMPANY.phoneHref} className="hover:text-fg">
+                <a href={COMPANY.phoneHref} className="font-medium text-fg transition-colors hover:text-accent">
                   {COMPANY.phone}
                 </a>
               </p>
               <p>
-                <a href={COMPANY.emailHref} className="hover:text-fg">
+                <a href={COMPANY.emailHref} className="transition-colors hover:text-accent">
                   {COMPANY.email}
                 </a>
               </p>
@@ -72,52 +82,33 @@ export default function Footer({ locale = 'fr' }: { locale?: Locale }) {
                 <br />
                 {COMPANY.address.city}, {COMPANY.address.province}, {COMPANY.address.postal}
               </p>
-              <p className="pt-3 text-[13.5px] text-fg-subtle">
-                {copy.footer.cnesst} ·{' '}
-                <span className="font-medium text-fg-muted">{COMPANY.cnesstPermit}</span>
-              </p>
             </div>
+            <p className="mt-5 inline-flex items-center gap-2 rounded-full bg-accent-soft px-3.5 py-1.5 text-[13px] text-accent ring-1 ring-inset ring-accent/15">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5" aria-hidden>
+                <circle cx="12" cy="12" r="9" />
+                <path d="m8 12 3 3 5-5" />
+              </svg>
+              {copy.footer.cnesst} <span className="font-semibold">{COMPANY.cnesstPermit}</span>
+            </p>
           </div>
 
-          <div>
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-fg-subtle">
-              {copy.footer.site}
-            </p>
-            <ul className="mt-4 space-y-2 text-[15px]">
-              {linksLeft.map((l) => (
-                <li key={l.href}>
-                  <Link href={localizeHref(locale, l.href)} className="text-fg-muted hover:text-fg">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-fg-subtle">
-              {copy.footer.information}
-            </p>
-            <ul className="mt-4 space-y-2 text-[15px]">
-              {linksRight.map((l) => (
-                <li key={l.href}>
-                  <Link href={localizeHref(locale, l.href)} className="text-fg-muted hover:text-fg">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <FooterColumn
+            title={locale === 'en' ? 'Candidates' : 'Candidats'}
+            links={candidateLinks}
+            locale={locale}
+          />
+          <FooterColumn title={copy.nav.facilities} links={facilityLinks} locale={locale} />
+          <FooterColumn title={copy.footer.information} links={infoLinks} locale={locale} />
         </div>
 
         <div className="mt-10 border-t border-border pt-8">
-          <p className="text-[13px] font-semibold uppercase tracking-wider text-fg-subtle">
+          <p className="eyebrow-subtle">
             {locale === 'en' ? 'Popular searches' : 'Recherches populaires'}
           </p>
-          <ul className="mt-4 grid gap-x-10 gap-y-2 text-[14.5px] sm:grid-cols-2">
+          <ul className="mt-4 grid gap-x-8 gap-y-2 text-[13.5px] sm:grid-cols-2 lg:grid-cols-3">
             {searchLinks.map((l) => (
               <li key={l.href} className="min-w-0">
-                <Link href={l.href} className="text-fg-muted hover:text-fg">
+                <Link href={l.href} className="text-fg-muted transition-colors hover:text-accent">
                   {l.label}
                 </Link>
               </li>
@@ -125,15 +116,43 @@ export default function Footer({ locale = 'fr' }: { locale?: Locale }) {
           </ul>
         </div>
 
-        <div className="hr-soft mt-12 pt-6 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div className="hr-soft mt-10 pt-6 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <p className="text-[13px] text-fg-subtle">
             © {new Date().getFullYear()} {COMPANY.name}. {copy.footer.rights}
           </p>
-          <Link href="/admin/login" className="text-[13px] text-fg-subtle hover:text-fg-muted">
+          <Link href="/admin/login" className="text-[13px] text-fg-subtle transition-colors hover:text-fg-muted">
             {copy.footer.recruiterSpace}
           </Link>
         </div>
       </div>
     </footer>
+  );
+}
+
+function FooterColumn({
+  title,
+  links,
+  locale,
+}: {
+  title: string;
+  links: Array<{ href: string; label: string }>;
+  locale: Locale;
+}) {
+  return (
+    <div>
+      <p className="eyebrow-subtle">{title}</p>
+      <ul className="mt-4 space-y-2.5 text-[14.5px]">
+        {links.map((l) => (
+          <li key={l.href}>
+            <Link
+              href={localizeHref(locale, l.href)}
+              className="text-fg-muted transition-colors hover:text-accent"
+            >
+              {l.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

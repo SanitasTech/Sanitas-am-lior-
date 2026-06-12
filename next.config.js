@@ -16,6 +16,8 @@ const nextConfig = {
       { source: '/careers', destination: '/postes', permanent: true },
       { source: '/emplois', destination: '/postes', permanent: true },
       { source: '/emploi', destination: '/postes', permanent: true },
+      { source: '/offres-demploi-1', destination: '/postes', permanent: true },
+      { source: '/tempor', destination: '/postes', permanent: true },
       { source: '/apply', destination: '/postuler', permanent: true },
       { source: '/about', destination: '/a-propos', permanent: true },
       { source: '/agence-sanitas', destination: '/a-propos', permanent: true },
@@ -32,6 +34,8 @@ const nextConfig = {
       { source: '/mandats-infirmiers-regions-eloignees', destination: '/mandats-infirmiers-region-eloignee', permanent: true },
       { source: '/regions-eloignees', destination: '/mandats-infirmiers-region-eloignee', permanent: true },
       { source: '/privacy-policy', destination: '/politique-confidentialite', permanent: true },
+      { source: '/cart', destination: '/postes', permanent: true },
+      { source: '/poste-admin', destination: '/admin/login', permanent: true },
     ];
   },
   async headers() {

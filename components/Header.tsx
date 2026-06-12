@@ -84,7 +84,7 @@ export default function Header({ initialUser = null, locale = 'fr' }: HeaderProp
           SANITAS
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex" aria-label={copy.nav.primary}>
+        <nav className="hidden items-center gap-1 lg:flex" aria-label={copy.nav.primary}>
           {nav.map((item) => {
             const href = localizeHref(locale, item.href);
             const active = pathname === href || pathname.startsWith(href + '/');
@@ -94,7 +94,7 @@ export default function Header({ initialUser = null, locale = 'fr' }: HeaderProp
                 href={href}
                 className={cn(
                   'rounded-full px-3.5 py-1.5 text-[14.5px] transition-colors',
-                  active ? 'text-fg' : 'text-fg-muted hover:text-fg'
+                  active ? 'bg-muted font-medium text-fg' : 'text-fg-muted hover:bg-muted/60 hover:text-fg'
                 )}
               >
                 {item.label}
@@ -103,7 +103,7 @@ export default function Header({ initialUser = null, locale = 'fr' }: HeaderProp
           })}
         </nav>
 
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-2 lg:flex">
           <LanguageSwitch currentHref={currentHref} locale={locale} />
           {user ? (
             <div className="relative">
@@ -140,12 +140,15 @@ export default function Header({ initialUser = null, locale = 'fr' }: HeaderProp
               )}
             </div>
           ) : (
-            <Link href={ROUTES.login[locale]} className="btn-secondary btn-sm">
+            <Link href={ROUTES.login[locale]} className="btn-ghost btn-sm">
               {copy.nav.login}
             </Link>
           )}
-          <Link href={ROUTES.facilities[locale]} className="btn-primary btn-sm">
+          <Link href={ROUTES.facilities[locale]} className="btn-secondary btn-sm">
             {copy.nav.staffing}
+          </Link>
+          <Link href={ROUTES.jobs[locale]} className="btn-primary btn-sm">
+            {copy.nav.viewJobs}
           </Link>
         </div>
 
@@ -154,7 +157,7 @@ export default function Header({ initialUser = null, locale = 'fr' }: HeaderProp
           aria-label={open ? copy.nav.closeMenu : copy.nav.openMenu}
           aria-expanded={open}
           onClick={() => setOpen(!open)}
-          className="md:hidden rounded-full border border-border bg-surface p-2 text-fg"
+          className="lg:hidden rounded-full border border-border bg-surface p-2 text-fg"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             {open ? <path d="M6 6 L18 18 M6 18 L18 6" /> : <path d="M4 7 H20 M4 12 H20 M4 17 H20" />}
@@ -163,7 +166,7 @@ export default function Header({ initialUser = null, locale = 'fr' }: HeaderProp
       </div>
 
       {open && (
-        <div className="md:hidden border-t border-border bg-bg">
+        <div className="lg:hidden border-t border-border bg-bg">
           <div className="container-page py-3 flex flex-col gap-1">
             {nav.map((item) => (
               <Link
@@ -189,7 +192,10 @@ export default function Header({ initialUser = null, locale = 'fr' }: HeaderProp
               ) : (
                 <Link href={ROUTES.login[locale]} onClick={() => setOpen(false)} className="btn-secondary">{copy.nav.login}</Link>
               )}
-              <Link href={ROUTES.facilities[locale]} className="btn-primary" onClick={() => setOpen(false)}>
+              <Link href={ROUTES.jobs[locale]} className="btn-primary" onClick={() => setOpen(false)}>
+                {copy.nav.viewJobs}
+              </Link>
+              <Link href={ROUTES.facilities[locale]} className="btn-secondary" onClick={() => setOpen(false)}>
                 {copy.nav.staffing}
               </Link>
             </div>

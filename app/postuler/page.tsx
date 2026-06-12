@@ -147,9 +147,7 @@ function AlreadyApplied({ job, submission }: { job: Job; submission: Submission 
           <div className="card p-7 sm:p-8">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
-                  Candidature déjà envoyée
-                </p>
+                <p className="eyebrow">Candidature déjà envoyée</p>
                 <h1 className="mt-2 text-display-md text-fg">{job.title}</h1>
                 <p className="mt-2 text-[15px] text-fg-muted">
                   Vous avez déjà manifesté votre intérêt pour ce mandat le{' '}
@@ -179,9 +177,7 @@ function InactiveMandate({ candidate }: { candidate: Candidate }) {
       <section className="section pt-16 pb-24">
         <div className="container-page max-w-2xl">
           <div className="card p-7 sm:p-8">
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
-              Mandat non disponible
-            </p>
+            <p className="eyebrow">Mandat non disponible</p>
             <h1 className="mt-2 text-display-md text-fg">
               Ce poste n'est plus actif.
             </h1>

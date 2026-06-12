@@ -118,13 +118,20 @@ export default async function PostesPage({ searchParams }: Props) {
       <section className="relative section pt-16 pb-8 overflow-hidden">
         <DecorativeBlob className="absolute -top-32 -right-40 h-[450px] w-[450px] text-accent pointer-events-none" />
         <div className="container-page relative">
-          <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">Postes</p>
+          <p className="eyebrow">Postes</p>
           <h1 className="mt-2 text-display-lg text-fg">Mandats infirmiers et emplois en santé</h1>
           <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-fg-muted">
             Filtrez les postes par profession, pays, région, ville, établissement, département,
             quart ou type de mandat. Pour les infirmières du Québec, les recherches clés sont
             maintenant regroupées par régions éloignées, département et type de mandat.
           </p>
+          {jobs.length > 0 && (
+            <p className="mt-5 inline-flex items-center gap-2 rounded-full bg-accent-soft px-4 py-1.5 text-[14px] font-medium text-accent ring-1 ring-inset ring-accent/15">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
+              {jobs.length} poste{jobs.length > 1 ? 's' : ''} actif{jobs.length > 1 ? 's' : ''} en ce
+              moment
+            </p>
+          )}
         </div>
       </section>
 
@@ -204,12 +211,19 @@ function PriorityLink({
   body: string;
 }) {
   return (
-    <Link href={href} className="card group p-5 transition hover:-translate-y-0.5 hover:shadow-card">
-      <p className="text-[12px] font-semibold uppercase tracking-wider text-accent">{eyebrow}</p>
-      <h2 className="mt-2 text-[18px] font-semibold leading-snug text-fg group-hover:text-accent">
+    <Link href={href} className="card-interactive group p-5 flex flex-col">
+      <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-accent">{eyebrow}</p>
+      <h2 className="mt-2 text-[18px] font-semibold leading-snug text-fg transition-colors group-hover:text-accent">
         {title}
       </h2>
       <p className="mt-3 text-[14.5px] leading-relaxed text-fg-muted">{body}</p>
+      <span className="mt-4 inline-flex items-center gap-1.5 text-[14px] font-medium text-accent">
+        Explorer
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden>
+          <path d="M4 12h16" />
+          <path d="m13 5 7 7-7 7" />
+        </svg>
+      </span>
     </Link>
   );
 }

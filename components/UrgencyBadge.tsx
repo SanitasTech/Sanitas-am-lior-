@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import Badge from '@/components/Badge';
 import { URGENCY_DISPLAY, type Locale } from '@/lib/i18n';
 
 interface UrgencyBadgeProps {
@@ -12,20 +12,8 @@ export default function UrgencyBadge({ urgency, className, locale = 'fr' }: Urge
   const isUrgent = urgency === 'urgent';
   const label = URGENCY_DISPLAY[urgency]?.[locale] || (isUrgent ? 'Urgent' : 'Prioritaire');
   return (
-    <span
-      className={cn(
-        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-medium',
-        isUrgent ? 'bg-danger-soft text-danger' : 'bg-warning-soft text-warning',
-        className
-      )}
-    >
-      <span
-        className={cn(
-          'h-1.5 w-1.5 rounded-full',
-          isUrgent ? 'bg-danger' : 'bg-warning'
-        )}
-      />
+    <Badge variant={isUrgent ? 'urgent' : 'priority'} dot className={className}>
       {label}
-    </span>
+    </Badge>
   );
 }

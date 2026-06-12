@@ -3,8 +3,10 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import PublicLayout from '@/components/PublicLayout';
 import SeoJsonLd from '@/components/SeoJsonLd';
+import Badge from '@/components/Badge';
 import UrgencyBadge from '@/components/UrgencyBadge';
-import { DecorativeBlob } from '@/components/Icons';
+import { DecorativeBlob, MapPinIcon } from '@/components/Icons';
+import { isRemoteRegion } from '@/lib/constants';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { formatDate } from '@/lib/utils';
 import {
@@ -100,20 +102,20 @@ export default async function EnglishJobDetailPage({ params }: { params: { id: s
           <div className="grid gap-10 lg:grid-cols-[1fr_360px]">
             <article className="min-w-0">
               <div className="flex flex-wrap items-center gap-3">
-                <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
-                  {displayValue('en', job.profession)}
-                </p>
+                <p className="eyebrow">{displayValue('en', job.profession)}</p>
                 <UrgencyBadge urgency={job.urgency} locale="en" />
-                {isInternational && (
-                  <span className="rounded-full border border-accent/30 bg-accent-soft px-3 py-1 text-[12px] font-medium text-accent">
-                    International
-                  </span>
+                {isInternational && <Badge variant="accent">International</Badge>}
+                {!isInternational && isRemoteRegion(job.region) && (
+                  <Badge variant="success">Remote region</Badge>
                 )}
               </div>
               <h1 className="mt-3 text-display-lg text-fg">{jobTitle(job, 'en')}</h1>
 
-              <div className="mt-6 text-[15px] text-fg-muted">
-                {[establishment, job.city, job.region, isInternational ? displayValue('en', country) : null].filter(Boolean).join(' · ')}
+              <div className="mt-5 flex items-start gap-2 text-[15.5px] text-fg-muted">
+                <MapPinIcon className="mt-1 h-4 w-4 shrink-0 text-fg-subtle" />
+                <span>
+                  {[establishment, job.city, job.region, isInternational ? displayValue('en', country) : null].filter(Boolean).join(' · ')}
+                </span>
               </div>
 
               <section className="mt-8 rounded-2xl border border-border bg-surface p-5 shadow-sm sm:p-6">

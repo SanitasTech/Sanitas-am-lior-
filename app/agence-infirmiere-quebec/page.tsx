@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import PublicLayout from '@/components/PublicLayout';
 import SeoJsonLd from '@/components/SeoJsonLd';
+import { CheckCircleIcon } from '@/components/Icons';
 import {
   breadcrumbJsonLd,
   faqPageJsonLd,
@@ -136,9 +137,7 @@ export default function NursingAgencyQuebecPage() {
 
       <section className="section border-b border-border bg-muted/30 pt-16 pb-12">
         <div className="container-page max-w-5xl">
-          <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
-            Agence de placement infirmier au Québec
-          </p>
+          <p className="eyebrow">Agence de placement infirmier au Québec</p>
           <h1 className="mt-3 max-w-4xl text-display-lg text-fg">Agence infirmière au Québec</h1>
           <p className="mt-5 max-w-3xl text-[18px] leading-relaxed text-fg-muted">
             Agence Sanitas est une agence infirmière basée à Laval qui accompagne les infirmières
@@ -159,28 +158,27 @@ export default function NursingAgencyQuebecPage() {
         </div>
       </section>
 
-      <section className="section py-10">
-        <div className="container-page">
-          <div className="grid gap-4 md:grid-cols-3">
+      <section className="border-b border-border bg-surface">
+        <div className="container-page py-8">
+          <ul className="grid gap-5 md:grid-cols-3">
             {[
               'Mandats infirmiers par région, département, quart et disponibilité.',
               'Profils infirmiers: autorisés, techniciens et cliniciens.',
               'Accompagnement pour candidats et établissements de santé au Québec.',
             ].map((item) => (
-              <div key={item} className="card p-5">
+              <li key={item} className="flex items-start gap-3">
+                <CheckCircleIcon className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
                 <p className="text-[15.5px] font-medium leading-relaxed text-fg">{item}</p>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </section>
 
       <section className="section bg-surface py-12">
         <div className="container-page grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
           <div>
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
-              Agence infirmière Québec
-            </p>
+            <p className="eyebrow">Agence infirmière Québec</p>
             <h2 className="mt-2 text-[28px] font-semibold tracking-tight text-fg">
               Ce que Sanitas fait concrètement
             </h2>
@@ -222,9 +220,7 @@ export default function NursingAgencyQuebecPage() {
       <section className="section py-10">
         <div className="container-page grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
           <div>
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
-              Pour les infirmières et infirmiers
-            </p>
+            <p className="eyebrow">Pour les infirmières et infirmiers</p>
             <h2 className="mt-2 text-[28px] font-semibold tracking-tight text-fg">
               Trouver un mandat infirmier compatible
             </h2>
@@ -261,9 +257,7 @@ export default function NursingAgencyQuebecPage() {
       <section className="section bg-muted/25 py-12">
         <div className="container-page">
           <div className="max-w-3xl">
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
-              Pour les établissements
-            </p>
+            <p className="eyebrow">Pour les établissements</p>
             <h2 className="mt-2 text-[28px] font-semibold tracking-tight text-fg">
               Recherche de personnel infirmier au Québec
             </h2>
@@ -363,12 +357,24 @@ export default function NursingAgencyQuebecPage() {
         <div className="container-page max-w-4xl">
           <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
             <h2 className="text-[24px] font-semibold tracking-tight text-fg">Questions fréquentes</h2>
-            <div className="mt-6 grid gap-5 md:grid-cols-2">
+            <div className="mt-4 divide-y divide-border">
               {FAQ.map((item) => (
-                <article key={item.question}>
-                  <h3 className="text-[16px] font-semibold text-fg">{item.question}</h3>
-                  <p className="mt-2 text-[15px] leading-relaxed text-fg-muted">{item.answer}</p>
-                </article>
+                <details key={item.question} className="group py-4">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[16px] font-semibold leading-snug text-fg transition-colors hover:text-accent [&::-webkit-details-marker]:hidden">
+                    {item.question}
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="h-4 w-4 shrink-0 text-fg-subtle transition-transform group-open:rotate-180"
+                      aria-hidden
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </summary>
+                  <p className="mt-3 max-w-prose text-[15px] leading-relaxed text-fg-muted">{item.answer}</p>
+                </details>
               ))}
             </div>
           </div>
@@ -384,13 +390,13 @@ export default function NursingAgencyQuebecPage() {
               orienté vers les postes qui correspondent à vos choix.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link href={nurseJobsHref} className="btn-primary bg-bg text-fg hover:bg-bg/90">
+              <Link href={nurseJobsHref} className="btn-dark">
                 Voir les mandats infirmiers
               </Link>
-              <Link href={clinicianJobsHref} className="btn-secondary border-bg/25 text-bg hover:bg-bg/10">
+              <Link href={clinicianJobsHref} className="btn border border-bg/30 text-bg hover:bg-bg/10">
                 Mandats infirmiers cliniciens
               </Link>
-              <Link href="/etablissements" className="btn-secondary border-bg/25 text-bg hover:bg-bg/10">
+              <Link href="/etablissements" className="btn border border-bg/30 text-bg hover:bg-bg/10">
                 Demander du personnel
               </Link>
             </div>

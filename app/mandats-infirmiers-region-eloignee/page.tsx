@@ -1,5 +1,6 @@
 import PublicLayout from '@/components/PublicLayout';
 import SeoJsonLd from '@/components/SeoJsonLd';
+import { CheckCircleIcon } from '@/components/Icons';
 import {
   breadcrumbJsonLd,
   faqPageJsonLd,
@@ -152,9 +153,7 @@ export default function RemoteNursingAssignmentsPage() {
       />
       <section className="section pt-16 pb-12 bg-muted/30 border-b border-border">
         <div className="container-page max-w-5xl">
-          <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
-            Régions éloignées
-          </p>
+          <p className="eyebrow">Régions éloignées</p>
           <h1 className="mt-2 text-display-lg text-fg">
             Mandats infirmiers en régions éloignées au Québec
           </h1>
@@ -175,19 +174,20 @@ export default function RemoteNursingAssignmentsPage() {
         </div>
       </section>
 
-      <section className="section pt-10 pb-8">
-        <div className="container-page">
-          <div className="grid gap-4 md:grid-cols-3">
+      <section className="border-b border-border bg-surface">
+        <div className="container-page py-8">
+          <ul className="grid gap-5 md:grid-cols-3">
             {[
               'Régions prioritaires: Baie-James, Grand Nord, Outaouais, Gaspésie, Îles-de-la-Madeleine, Bas-Saint-Laurent, Abitibi et Côte-Nord.',
               'Départements possibles: urgence, bloc opératoire, soins intensifs, CHSLD, obstétrique, SAD, santé mentale et médecine/chirurgie.',
               'Matching par préférences croisées: Sanitas évite de mélanger une région acceptée avec un département ou un quart refusé.',
             ].map((item) => (
-              <div key={item} className="card p-5">
+              <li key={item} className="flex items-start gap-3">
+                <CheckCircleIcon className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
                 <p className="text-[15px] font-medium leading-relaxed text-fg">{item}</p>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </section>
 
@@ -206,12 +206,19 @@ export default function RemoteNursingAssignmentsPage() {
 
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {remoteRegions.map((region) => (
-              <article key={region.name} className="card flex flex-col p-5">
-                <h3 className="text-[19px] font-semibold text-fg">{region.name}</h3>
+              <article key={region.name} className="card-interactive flex flex-col p-5">
+                <h3 className="text-[19px] font-semibold tracking-tight text-fg">{region.name}</h3>
                 <p className="mt-3 text-[14.5px] leading-relaxed text-fg-muted">{region.focus}</p>
                 <p className="mt-3 text-[14.5px] leading-relaxed text-fg-muted">{region.fit}</p>
-                <Link href={region.href} className="mt-5 text-[14px] font-medium text-accent hover:text-fg">
+                <Link
+                  href={region.href}
+                  className="mt-auto pt-5 inline-flex items-center gap-1.5 text-[14px] font-medium text-accent transition-colors hover:text-fg"
+                >
                   Voir la page {region.name}
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5" aria-hidden>
+                    <path d="M4 12h16" />
+                    <path d="m13 5 7 7-7 7" />
+                  </svg>
                 </Link>
               </article>
             ))}
@@ -280,12 +287,24 @@ export default function RemoteNursingAssignmentsPage() {
         <div className="container-page max-w-4xl">
           <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
             <h2 className="text-[22px] font-semibold text-fg">Questions fréquentes</h2>
-            <div className="mt-6 grid gap-5 md:grid-cols-2">
+            <div className="mt-4 divide-y divide-border">
               {FAQ.map((item) => (
-                <article key={item.question}>
-                  <h3 className="text-[16px] font-semibold text-fg">{item.question}</h3>
-                  <p className="mt-2 text-[15px] leading-relaxed text-fg-muted">{item.answer}</p>
-                </article>
+                <details key={item.question} className="group py-4">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[16px] font-semibold leading-snug text-fg transition-colors hover:text-accent [&::-webkit-details-marker]:hidden">
+                    {item.question}
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="h-4 w-4 shrink-0 text-fg-subtle transition-transform group-open:rotate-180"
+                      aria-hidden
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </summary>
+                  <p className="mt-3 max-w-prose text-[15px] leading-relaxed text-fg-muted">{item.answer}</p>
+                </details>
               ))}
             </div>
           </div>

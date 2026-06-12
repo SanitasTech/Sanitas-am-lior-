@@ -3,8 +3,10 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import PublicLayout from '@/components/PublicLayout';
 import SeoJsonLd from '@/components/SeoJsonLd';
+import Badge from '@/components/Badge';
 import UrgencyBadge from '@/components/UrgencyBadge';
-import { DecorativeBlob } from '@/components/Icons';
+import { DecorativeBlob, MapPinIcon } from '@/components/Icons';
+import { isRemoteRegion } from '@/lib/constants';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import {
   breadcrumbJsonLd,
@@ -97,20 +99,20 @@ export default async function JobDetailPage({ params }: { params: { id: string }
           <div className="grid gap-10 lg:grid-cols-[1fr_360px]">
             <article className="min-w-0">
               <div className="flex flex-wrap items-center gap-3">
-                <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
-                  {job.profession}
-                </p>
+                <p className="eyebrow">{job.profession}</p>
                 <UrgencyBadge urgency={job.urgency} />
-                {isInternational && (
-                  <span className="rounded-full border border-accent/30 bg-accent-soft px-3 py-1 text-[12px] font-medium text-accent">
-                    International
-                  </span>
+                {isInternational && <Badge variant="accent">International</Badge>}
+                {!isInternational && isRemoteRegion(job.region) && (
+                  <Badge variant="success">Région éloignée</Badge>
                 )}
               </div>
               <h1 className="mt-3 text-display-lg text-fg">{job.title}</h1>
 
-              <div className="mt-6 text-[15px] text-fg-muted">
-                {[establishment, job.city, job.region, isInternational ? displayValue('fr', country) : null].filter(Boolean).join(' · ')}
+              <div className="mt-5 flex items-start gap-2 text-[15.5px] text-fg-muted">
+                <MapPinIcon className="mt-1 h-4 w-4 shrink-0 text-fg-subtle" />
+                <span>
+                  {[establishment, job.city, job.region, isInternational ? displayValue('fr', country) : null].filter(Boolean).join(' · ')}
+                </span>
               </div>
 
               <section className="mt-8 rounded-2xl border border-border bg-surface p-5 shadow-sm sm:p-6">
@@ -265,6 +267,15 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                   <SidebarItem label="Date de début" value={formatDate(job.start_date)} />
                 </dl>
 
+                {salary && (
+                  <p className="mt-5 rounded-xl bg-accent-soft px-4 py-3 ring-1 ring-inset ring-accent/15">
+                    <span className="block text-[11.5px] font-semibold uppercase tracking-wider text-accent">
+                      Rémunération
+                    </span>
+                    <span className="mt-0.5 block text-[16px] font-semibold text-fg">{salary}</span>
+                  </p>
+                )}
+
                 <div className="mt-6 flex flex-col gap-2">
                   <Link href={interestedHref} className="btn-primary">
                     Je veux ce mandat
@@ -276,6 +287,13 @@ export default async function JobDetailPage({ params }: { params: { id: string }
               </div>
             </aside>
           </div>
+        </div>
+
+        {/* CTA collant mobile : reste visible pendant la lecture du mandat */}
+        <div className="lg:hidden sticky bottom-0 z-30 mt-8 border-t border-border bg-bg/95 backdrop-blur px-5 py-3">
+          <Link href={interestedHref} className="btn-primary w-full">
+            Je veux ce mandat
+          </Link>
         </div>
       </section>
     </PublicLayout>

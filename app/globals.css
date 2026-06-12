@@ -19,17 +19,18 @@
   --fg-muted: 0.42 0.008 240;
   --fg-subtle: 0.58 0.006 240;
 
-  /* Accent santé (bleu calme) */
-  --accent: 0.52 0.115 230;
+  /* Accent santé (bleu calme) — légèrement approfondi pour porter les CTA
+     et garantir le contraste AA en texte sur fond clair. */
+  --accent: 0.5 0.12 230;
   --accent-fg: 0.985 0.005 230;
   --accent-soft: 0.955 0.022 230;
   /* Bleu lumineux pour mots emphatiques sur fond sombre (hero) */
   --accent-bright: 0.82 0.14 220;
 
-  /* Sémantiques */
-  --success: 0.55 0.095 155;
+  /* Sémantiques — warning assombri pour rester lisible en texte sur soft. */
+  --success: 0.52 0.095 155;
   --success-soft: 0.965 0.018 155;
-  --warning: 0.72 0.135 75;
+  --warning: 0.6 0.125 70;
   --warning-soft: 0.965 0.024 75;
   --danger: 0.55 0.155 25;
   --danger-soft: 0.965 0.025 25;
@@ -96,14 +97,19 @@ body {
   @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-[16px] font-medium transition-all duration-200 ease-out-quart;
   @apply disabled:opacity-50 disabled:cursor-not-allowed;
 }
+/* Primaire = accent santé : c'est la couleur d'action du site. */
 .btn-primary {
-  @apply btn bg-fg text-bg hover:bg-fg/90;
+  @apply btn bg-accent text-accent-fg shadow-soft hover:bg-accent/90 active:bg-accent;
 }
 .btn-secondary {
-  @apply btn bg-surface text-fg border border-border hover:bg-muted;
+  @apply btn bg-surface text-fg border border-border hover:border-accent/40 hover:text-accent hover:bg-accent-soft/40;
 }
 .btn-accent {
-  @apply btn bg-accent text-accent-fg hover:opacity-90;
+  @apply btn bg-accent text-accent-fg hover:bg-accent/90;
+}
+/* Variante sombre (bandeaux foncés, hero) : pilule claire. */
+.btn-dark {
+  @apply btn bg-bg text-fg hover:bg-bg/90;
 }
 .btn-ghost {
   @apply btn text-fg hover:bg-muted;
@@ -118,6 +124,42 @@ body {
 /* Cards */
 .card {
   @apply rounded-2xl border border-border bg-surface;
+}
+/* Carte cliquable / mise en avant : élévation douce au survol. */
+.card-interactive {
+  @apply card transition-all duration-200 ease-out-quart hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-card;
+}
+
+/* Badges : pastilles informatives harmonisées (urgence, international,
+   région éloignée, quart…). Jamais cliquables. */
+.badge {
+  @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold leading-none whitespace-nowrap;
+}
+.badge-dot {
+  @apply h-1.5 w-1.5 rounded-full bg-current;
+}
+.badge-urgent {
+  @apply bg-danger-soft text-danger ring-1 ring-inset ring-danger/15;
+}
+.badge-priority {
+  @apply bg-warning-soft text-warning ring-1 ring-inset ring-warning/20;
+}
+.badge-accent {
+  @apply bg-accent-soft text-accent ring-1 ring-inset ring-accent/15;
+}
+.badge-success {
+  @apply bg-success-soft text-success ring-1 ring-inset ring-success/15;
+}
+.badge-neutral {
+  @apply bg-muted text-fg-muted ring-1 ring-inset ring-border;
+}
+
+/* Eyebrow : surtitre de section, uniforme sur tout le site. */
+.eyebrow {
+  @apply text-[12.5px] font-semibold uppercase tracking-[0.16em] text-accent;
+}
+.eyebrow-subtle {
+  @apply text-[12.5px] font-semibold uppercase tracking-[0.16em] text-fg-subtle;
 }
 
 /* Chips (pastilles cliquables) */
@@ -136,7 +178,7 @@ body {
 
 /* Chip-link : pastille cliquable qui mène à une vraie destination (Link) */
 .chip-link {
-  @apply inline-flex items-center rounded-full border border-border bg-surface px-4 py-2 text-[14.5px] text-fg transition-colors hover:bg-fg hover:text-bg hover:border-fg;
+  @apply inline-flex items-center rounded-full border border-border bg-surface px-4 py-2 text-[14.5px] text-fg transition-colors hover:border-accent/40 hover:bg-accent-soft hover:text-accent;
 }
 
 /* Tag : élément purement informatif, jamais cliquable */
@@ -149,9 +191,9 @@ body {
   @apply mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8;
 }
 
-/* Section spacing */
+/* Section spacing : rythme vertical unifié, plus généreux. */
 .section {
-  @apply py-12 sm:py-14 lg:py-16;
+  @apply py-14 sm:py-16 lg:py-20;
 }
 
 /* Subtle separator */

@@ -139,63 +139,53 @@ export default async function EnglishHomePage() {
         }}
       />
       <section className="relative isolate overflow-hidden bg-fg">
-        <div className="absolute inset-0 -z-10 opacity-90">
+        <div className="absolute inset-0 -z-10">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={HERO_BG} alt="" className="h-full w-full object-cover" aria-hidden />
         </div>
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-accent/35 via-accent/15 to-fg/40" aria-hidden />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-fg/55 via-fg/15 to-transparent" aria-hidden />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-fg/80 via-fg/55 to-fg/15" aria-hidden />
 
-        <div className="container-page relative pt-24 pb-32 sm:pt-28 sm:pb-36 lg:pt-32 lg:pb-44">
+        <div className="container-page relative pt-20 pb-20 sm:pt-24 sm:pb-24 lg:pt-28 lg:pb-28">
           <div className="max-w-3xl">
-            <p className="inline-flex items-center gap-2 rounded-full bg-bg/15 backdrop-blur px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.15em] text-bg ring-1 ring-bg/20">
-              <span className="h-1.5 w-1.5 rounded-full bg-bg" aria-hidden />
+            <p className="inline-flex items-center gap-2 rounded-full bg-bg/10 backdrop-blur px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.15em] text-bg ring-1 ring-bg/25">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent-bright" aria-hidden />
               Healthcare staffing agency · Laval, Quebec
             </p>
-            <h1 className="mt-6 text-[clamp(2.75rem,6vw,5rem)] leading-[1.02] tracking-[-0.025em] font-semibold text-bg">
-              Healthcare assignments
-              <br />
-              <span className="font-serif italic font-normal text-bg tracking-[-0.08em]">
-                built around <span className="text-[oklch(0.72_0.09_220)]">your</span> reality.
+            <h1 className="mt-6 text-[clamp(2.5rem,5.5vw,4.25rem)] leading-[1.06] tracking-[-0.025em] font-semibold text-bg">
+              Healthcare assignments{' '}
+              <span className="font-serif italic font-medium tracking-[-0.01em] text-[oklch(0.85_0.09_220)]">
+                built around your reality.
               </span>
             </h1>
-            <p className="mt-8 max-w-2xl text-[18.5px] sm:text-[20px] leading-relaxed text-bg/85">
+            <p className="mt-6 max-w-2xl text-[17.5px] sm:text-[19px] leading-relaxed text-bg/85">
               Choose your regions, facilities, departments and preferred shifts. Sanitas helps you
               find opportunities that truly match what you are looking for.
             </p>
-            <div className="mt-10 grid gap-6 sm:gap-8 sm:grid-cols-[auto_1px_auto] sm:items-start">
+            <div className="mt-10 grid gap-6 sm:gap-10 sm:grid-cols-[auto_1px_auto] sm:items-start">
               <div>
-                <p className="text-[16px] font-serif italic tracking-[-0.05em] text-bg mb-3">
-                  You are a <span className="font-semibold not-italic font-sans tracking-normal">healthcare professional</span>
+                <p className="text-[12px] font-semibold uppercase tracking-[0.15em] text-bg/70 mb-3">
+                  Healthcare professionals
                 </p>
                 <div className="flex flex-wrap gap-2.5">
-                  <Link href={localizedPath('en', 'jobs')} className="inline-flex items-center justify-center rounded-full bg-bg px-5 py-2.5 text-[15px] font-medium text-fg transition-all hover:opacity-90">
+                  <Link href={localizedPath('en', 'jobs')} className="inline-flex items-center justify-center rounded-full bg-bg px-6 py-3 text-[15.5px] font-semibold text-fg shadow-soft transition-all hover:bg-bg/90">
                     View open jobs
                   </Link>
-                  <Link href={localizedPath('en', 'apply')} className="inline-flex items-center justify-center rounded-full border border-bg/35 bg-bg/10 backdrop-blur px-5 py-2.5 text-[15px] font-medium text-bg transition-colors hover:bg-bg/20">
+                  <Link href={localizedPath('en', 'apply')} className="inline-flex items-center justify-center rounded-full border border-bg/40 bg-bg/10 backdrop-blur px-6 py-3 text-[15.5px] font-medium text-bg transition-colors hover:bg-bg/20">
                     Submit my profile
                   </Link>
                 </div>
               </div>
               <div className="hidden sm:block w-px self-stretch bg-bg/25" aria-hidden />
               <div>
-                <p className="text-[16px] font-serif italic tracking-[-0.05em] text-bg mb-3">
-                  You represent a <span className="font-semibold not-italic font-sans tracking-normal">facility</span>
+                <p className="text-[12px] font-semibold uppercase tracking-[0.15em] text-bg/70 mb-3">
+                  Healthcare facilities
                 </p>
-                <Link href={localizedPath('en', 'facilities')} className="inline-flex items-center justify-center rounded-full bg-bg px-5 py-2.5 text-[15px] font-medium text-fg transition-all hover:opacity-90">
+                <Link href={localizedPath('en', 'facilities')} className="inline-flex items-center justify-center rounded-full border border-bg/40 bg-bg/10 backdrop-blur px-6 py-3 text-[15.5px] font-medium text-bg transition-colors hover:bg-bg/20">
                   Request staff
                 </Link>
               </div>
             </div>
           </div>
-
-          <p className="mt-12 inline-flex flex-wrap items-center gap-2.5 text-[15px] text-bg/90">
-            <span className="font-serif italic tracking-[-0.05em]">17 regions</span>
-            <span className="text-bg/50">·</span>
-            <span className="font-serif italic tracking-[-0.05em]">14+ professions</span>
-            <span className="text-bg/50">·</span>
-            <span className="font-serif italic tracking-[-0.05em]">24h response</span>
-          </p>
 
           <div className="mt-14">
             <p className="text-[12.5px] font-semibold uppercase tracking-[0.18em] text-bg/65 mb-3">
@@ -203,6 +193,23 @@ export default async function EnglishHomePage() {
             </p>
             <HomeSearch locale="en" />
           </div>
+        </div>
+      </section>
+
+      {/* Reassurance band: structured stats + CNESST permit */}
+      <section className="border-b border-border bg-surface">
+        <div className="container-page py-6">
+          <dl className="grid grid-cols-2 gap-6 sm:grid-cols-4 sm:gap-4">
+            <EnHeroStat value="17" label="regions covered in Quebec" />
+            <EnHeroStat value="14+" label="healthcare professions" />
+            <EnHeroStat value="24h" label="average response time" />
+            <div className="flex flex-col justify-center">
+              <dt className="text-[12.5px] text-fg-subtle">CNESST permit</dt>
+              <dd className="mt-0.5 text-[17px] font-semibold tracking-tight text-fg tabular-nums">
+                AP-2000952
+              </dd>
+            </div>
+          </dl>
         </div>
       </section>
 
@@ -389,6 +396,17 @@ export default async function EnglishHomePage() {
         </div>
       </section>
     </PublicLayout>
+  );
+}
+
+function EnHeroStat({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="flex flex-col justify-center">
+      <dt className="order-2 mt-0.5 text-[13px] leading-snug text-fg-muted">{label}</dt>
+      <dd className="order-1 text-[24px] font-semibold tracking-tight text-fg tabular-nums">
+        {value}
+      </dd>
+    </div>
   );
 }
 

@@ -60,9 +60,7 @@ export default async function MonProfilPage() {
         <section className="section pt-16 pb-24">
           <div className="container-page max-w-2xl">
             <div className="card p-6">
-              <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
-                Configuration requise
-              </p>
+              <p className="eyebrow">Configuration requise</p>
               <h1 className="mt-2 text-display-sm text-fg">Le portail candidat attend le schema ATS V2.</h1>
               <p className="mt-3 text-fg-muted">
                 Votre connexion fonctionne, mais la base Supabase n'a pas encore toutes les tables
@@ -110,9 +108,7 @@ export default async function MonProfilPage() {
       <section className="relative pt-12 pb-10 overflow-hidden bg-muted/30 border-b border-border">
         <DecorativeBlob className="absolute -top-32 -right-40 h-[500px] w-[500px] text-accent pointer-events-none" />
         <div className="container-page relative">
-          <p className="text-[13px] font-semibold uppercase tracking-wider text-accent">
-            Mon espace candidat
-          </p>
+          <p className="eyebrow">Mon espace candidat</p>
           <h1 className="mt-2 text-display-md text-fg">
             {hasFirstName ? (
               <>
@@ -147,7 +143,7 @@ export default async function MonProfilPage() {
             </div>
 
             <div className="card p-5">
-              <h2 className="text-[17px] font-semibold text-fg">Readiness ATS</h2>
+              <h2 className="text-[17px] font-semibold text-fg">État du dossier</h2>
               <div className="mt-4 space-y-2">
                 {readiness.every((block) => block.ready) ? (
                   <p className="text-[14.5px] text-fg-muted">
@@ -294,7 +290,7 @@ function ActionCard({
   return (
     <Link
       href={href}
-      className="card p-6 flex flex-col gap-3 transition-shadow hover:shadow-card group"
+      className="card-interactive p-6 flex flex-col gap-3 group"
     >
       <div className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-accent-soft text-accent">
         {icon}
