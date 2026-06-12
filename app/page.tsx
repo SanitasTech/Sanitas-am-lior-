@@ -42,9 +42,8 @@ export const revalidate = 60;
 // commençant par "/" (servi automatiquement par Next.js).
 const HERO_BG = '/images/sanitas-hero.png';
 const PHOTOS = {
-  trust: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=1200&q=80&auto=format&fit=crop',
   candidates: '/images/sanitas-candidats.png',
-  establishments: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=1200&q=80&auto=format&fit=crop',
+  establishments: '/images/sanitas-equipe-soins.jpg',
 } as const;
 
 // Liens rapides vers /postes filtrés par profession (section candidat home).

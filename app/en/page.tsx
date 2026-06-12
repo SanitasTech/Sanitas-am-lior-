@@ -39,7 +39,7 @@ export const revalidate = 60;
 const HERO_BG = '/images/sanitas-hero.png';
 const PHOTOS = {
   candidates: '/images/sanitas-candidats.png',
-  establishments: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=1200&q=80&auto=format&fit=crop',
+  establishments: '/images/sanitas-equipe-soins.jpg',
 } as const;
 
 const QUICK_PROFESSIONS = [

@@ -35,8 +35,7 @@ const PROFESSIONS = [
   'Personnel clinique et de soutien',
 ];
 
-const HERO_PHOTO =
-  'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200&q=80&auto=format&fit=crop';
+const HERO_PHOTO = '/images/sanitas-etablissements.jpg';
 
 export default function EtablissementsPage() {
   return (

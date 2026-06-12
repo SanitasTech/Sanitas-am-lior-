@@ -13,10 +13,8 @@ export const metadata = publicPageMetadata({
   enPath: '/en/about',
 });
 
-const HERO_PHOTO =
-  'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1200&q=80&auto=format&fit=crop';
-const MISSION_PHOTO =
-  'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=1200&q=80&auto=format&fit=crop';
+const HERO_PHOTO = '/images/sanitas-partenariat.jpg';
+const MISSION_PHOTO = '/images/sanitas-mission.jpg';
 
 export default function AboutPage() {
   return (
