@@ -242,7 +242,15 @@ export default async function JobDetailPage({ params }: { params: { id: string }
               </section>
 
               <div className="mt-12 flex flex-wrap gap-3">
-                <Link href={interestedHref} className="btn-primary">
+                <Link
+                  href={interestedHref}
+                  className="btn-primary"
+                  data-analytics-event="job_apply_click"
+                  data-analytics-label="job_detail_inline_cta"
+                  data-analytics-job-id={job.id}
+                  data-analytics-job-title={job.title}
+                  data-analytics-location={job.region || job.city || country}
+                >
                   Je veux ce mandat
                 </Link>
                 <Link href="/contact" className="btn-secondary">
@@ -277,7 +285,15 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                 )}
 
                 <div className="mt-6 flex flex-col gap-2">
-                  <Link href={interestedHref} className="btn-primary">
+                  <Link
+                    href={interestedHref}
+                    className="btn-primary"
+                    data-analytics-event="job_apply_click"
+                    data-analytics-label="job_detail_sidebar_cta"
+                    data-analytics-job-id={job.id}
+                    data-analytics-job-title={job.title}
+                    data-analytics-location={job.region || job.city || country}
+                  >
                     Je veux ce mandat
                   </Link>
                   <Link href="/contact" className="btn-secondary">
@@ -291,7 +307,15 @@ export default async function JobDetailPage({ params }: { params: { id: string }
 
         {/* CTA collant mobile : reste visible pendant la lecture du mandat */}
         <div className="lg:hidden sticky bottom-0 z-30 mt-8 border-t border-border bg-bg/95 backdrop-blur px-5 py-3">
-          <Link href={interestedHref} className="btn-primary w-full">
+          <Link
+            href={interestedHref}
+            className="btn-primary w-full"
+            data-analytics-event="job_apply_click"
+            data-analytics-label="job_detail_mobile_sticky_cta"
+            data-analytics-job-id={job.id}
+            data-analytics-job-title={job.title}
+            data-analytics-location={job.region || job.city || country}
+          >
             Je veux ce mandat
           </Link>
         </div>

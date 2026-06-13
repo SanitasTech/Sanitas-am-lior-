@@ -242,7 +242,17 @@ export default async function EnglishJobDetailPage({ params }: { params: { id: s
               </section>
 
               <div className="mt-12 flex flex-wrap gap-3">
-                <Link href={interestedHref} className="btn-primary">I want this assignment</Link>
+                <Link
+                  href={interestedHref}
+                  className="btn-primary"
+                  data-analytics-event="job_apply_click"
+                  data-analytics-label="job_detail_inline_cta_en"
+                  data-analytics-job-id={job.id}
+                  data-analytics-job-title={jobTitle(job, 'en')}
+                  data-analytics-location={job.region || job.city || country}
+                >
+                  I want this assignment
+                </Link>
                 <Link href="/en/contact" className="btn-secondary">Ask a question</Link>
               </div>
             </article>
@@ -262,7 +272,17 @@ export default async function EnglishJobDetailPage({ params }: { params: { id: s
                 </dl>
 
                 <div className="mt-6 flex flex-col gap-2">
-                  <Link href={interestedHref} className="btn-primary">I want this assignment</Link>
+                  <Link
+                    href={interestedHref}
+                    className="btn-primary"
+                    data-analytics-event="job_apply_click"
+                    data-analytics-label="job_detail_sidebar_cta_en"
+                    data-analytics-job-id={job.id}
+                    data-analytics-job-title={jobTitle(job, 'en')}
+                    data-analytics-location={job.region || job.city || country}
+                  >
+                    I want this assignment
+                  </Link>
                   <Link href="/en/contact" className="btn-secondary">Ask a question</Link>
                 </div>
               </div>

@@ -109,12 +109,22 @@ export default function JobCard({ job, variant = 'default', locale = 'fr' }: Job
         <Link
           href={`${localizedPath(locale, 'apply')}?mandat_id=${job.id}`}
           className="btn-primary btn-sm"
+          data-analytics-event="job_apply_click"
+          data-analytics-label="job_card_primary_cta"
+          data-analytics-job-id={job.id}
+          data-analytics-job-title={jobTitle(job, locale)}
+          data-analytics-location={job.region || job.city || country}
         >
           {copy.interested}
         </Link>
         <Link
           href={localizedJobPath(locale, job.id)}
           className="inline-flex items-center gap-1.5 text-[14.5px] font-medium text-fg-muted transition-colors hover:text-accent"
+          data-analytics-event="job_view_click"
+          data-analytics-label="job_card_secondary_link"
+          data-analytics-job-id={job.id}
+          data-analytics-job-title={jobTitle(job, locale)}
+          data-analytics-location={job.region || job.city || country}
         >
           {copy.viewJob}
           <ArrowRightIcon className="h-4 w-4" />

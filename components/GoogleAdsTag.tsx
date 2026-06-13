@@ -1,8 +1,12 @@
+'use client';
+
 import Script from 'next/script';
+import { usePathname } from 'next/navigation';
 
 interface GoogleAdsTagProps {
   tagId?: string;
   analyticsId?: string;
+  excludedPathPrefixes?: string[];
 }
 
 function normalizeAdsId(tagId?: string) {
@@ -15,11 +19,20 @@ function normalizeAnalyticsId(analyticsId?: string) {
   return analyticsId?.trim() || null;
 }
 
-export default function GoogleAdsTag({ tagId, analyticsId }: GoogleAdsTagProps) {
+export default function GoogleAdsTag({
+  tagId,
+  analyticsId,
+  excludedPathPrefixes = ['/admin'],
+}: GoogleAdsTagProps) {
+  const pathname = usePathname();
   const normalizedAdsId = normalizeAdsId(tagId);
   const normalizedAnalyticsId = normalizeAnalyticsId(analyticsId);
   const configIds = Array.from(new Set([normalizedAdsId, normalizedAnalyticsId].filter(Boolean)));
   const primaryTagId = configIds[0];
+
+  if (excludedPathPrefixes.some((prefix) => pathname?.startsWith(prefix))) {
+    return null;
+  }
 
   if (!primaryTagId) {
     return null;

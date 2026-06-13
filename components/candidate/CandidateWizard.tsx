@@ -9,6 +9,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { trackAnalyticsEvent } from '@/lib/analytics';
 import { localizedPath, type Locale } from '@/lib/i18n';
 import {
   DEFAULT_JOB_COUNTRY,
@@ -108,6 +109,8 @@ export default function CandidateWizard({
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
+  const flowStartedRef = useRef(false);
+  const cvReadyTrackedRef = useRef(false);
 
   // -----------------------------------------------------------------
   // Source tracking (UTM + referrer + landing URL)
@@ -129,6 +132,36 @@ export default function CandidateWizard({
       landing_url: window.location.href,
     };
   }, []);
+
+  useEffect(() => {
+    if (flowStartedRef.current) return;
+    flowStartedRef.current = true;
+    trackAnalyticsEvent('candidate_application_start', {
+      mode,
+      job_id: job?.id,
+      job_title: job?.title,
+      locale,
+    });
+  }, [job?.id, job?.title, locale, mode]);
+
+  useEffect(() => {
+    if (cvReadyTrackedRef.current) return;
+    if (form.documents.CV?.status !== 'Reçu' || !form.documents.CV?.file_path) return;
+    cvReadyTrackedRef.current = true;
+    trackAnalyticsEvent('candidate_cv_ready', {
+      mode,
+      job_id: job?.id,
+      job_title: job?.title,
+      reused_document: reusedDocTypes.has('CV'),
+    });
+  }, [
+    form.documents.CV?.file_path,
+    form.documents.CV?.status,
+    job?.id,
+    job?.title,
+    mode,
+    reusedDocTypes,
+  ]);
 
   // -----------------------------------------------------------------
   // Sauvegarde automatique (localStorage, debounced)
@@ -250,6 +283,13 @@ export default function CandidateWizard({
     const stepErrors = runStepValidation(step);
     setErrors(stepErrors);
     if (Object.keys(stepErrors).length > 0) {
+      trackAnalyticsEvent('candidate_application_step_error', {
+        mode,
+        job_id: job?.id,
+        job_title: job?.title,
+        step,
+        error_count: Object.keys(stepErrors).length,
+      });
       // focus sur le premier champ en erreur
       requestAnimationFrame(() => {
         const el = document.querySelector('[data-error="true"]') as HTMLElement | null;
@@ -262,6 +302,13 @@ export default function CandidateWizard({
       return;
     }
     if (idx < stepOrder.length - 1) {
+      trackAnalyticsEvent('candidate_application_step_complete', {
+        mode,
+        job_id: job?.id,
+        job_title: job?.title,
+        step,
+        next_step: stepOrder[idx + 1],
+      });
       setStep(stepOrder[idx + 1]);
       scrollToTop();
     }
@@ -383,6 +430,13 @@ export default function CandidateWizard({
               : "Impossible d'enregistrer la candidature.")
         );
       }
+      trackAnalyticsEvent('candidate_application_submit_success', {
+        mode,
+        job_id: job?.id,
+        job_title: job?.title,
+        application_id: json.application_id,
+        completion_score: computeQuickCompletionScore(form),
+      });
       clearDraft(storageKey);
       const thanksParams = new URLSearchParams({ type: mode });
       if (json.application_id) thanksParams.set('application_id', String(json.application_id));
@@ -418,6 +472,11 @@ export default function CandidateWizard({
 
   function jumpToReview() {
     setErrors({});
+    trackAnalyticsEvent('candidate_application_jump_to_review', {
+      mode,
+      job_id: job?.id,
+      job_title: job?.title,
+    });
     setStep('review');
     scrollToTop();
   }

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import AnalyticsClickTracker from '@/components/AnalyticsClickTracker';
 import GoogleAdsTag from '@/components/GoogleAdsTag';
 import { Playfair_Display } from 'next/font/google';
 import SeoJsonLd from '@/components/SeoJsonLd';
@@ -93,6 +94,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="fr-CA" className={playfair.variable}>
       <body className="min-h-screen antialiased">
         <GoogleAdsTag tagId={googleAdsId} analyticsId={googleAnalyticsId} />
+        <AnalyticsClickTracker />
         <SeoJsonLd
           id="sanitas-global-schema"
           data={{

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { trackAnalyticsEvent } from '@/lib/analytics';
 
 const DEFAULT_EVENT_NAME = 'ads_conversion_Envoi_de_formulaire_pou_1';
 const SANITAS_GOOGLE_ADS_ID = 'AW-16550539966';
@@ -27,6 +28,12 @@ export default function GoogleAdsConversionEvent({
   transactionId?: string | null;
 }) {
   useEffect(() => {
+    const dedupeKey = `sanitas-conversion:${eventName}:${transactionId || window.location.href}`;
+    if (window.sessionStorage.getItem(dedupeKey)) {
+      return;
+    }
+    window.sessionStorage.setItem(dedupeKey, '1');
+
     const win = window as typeof window & {
       dataLayer?: unknown[][];
       gtag?: (...args: unknown[]) => void;
@@ -60,6 +67,10 @@ export default function GoogleAdsConversionEvent({
     }
 
     win.gtag('event', eventName, eventParams);
+    trackAnalyticsEvent('candidate_application_thank_you', {
+      application_id: transactionId || undefined,
+      source_event: eventName,
+    });
   }, [conversionId, conversionLabel, eventName, transactionId]);
 
   return null;
