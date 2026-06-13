@@ -21,9 +21,9 @@ interface Props {
 
 export default function EnglishThankYouPage({ searchParams }: Props) {
   const isPosting = searchParams.type === 'posting';
-  const shouldTrackCandidateLead =
-    searchParams.type === 'posting' || searchParams.type === 'spontaneous';
   const transactionId = searchParams.application_id || searchParams.app || null;
+  const shouldTrackCandidateLead =
+    !!transactionId && (searchParams.type === 'posting' || searchParams.type === 'spontaneous');
 
   return (
     <PublicLayout locale="en">

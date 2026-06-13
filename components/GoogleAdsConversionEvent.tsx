@@ -28,11 +28,26 @@ export default function GoogleAdsConversionEvent({
   transactionId?: string | null;
 }) {
   useEffect(() => {
-    const dedupeKey = `sanitas-conversion:${eventName}:${transactionId || window.location.href}`;
-    if (window.sessionStorage.getItem(dedupeKey)) {
+    if (!transactionId) {
+      trackAnalyticsEvent('candidate_application_thank_you_missing_transaction', {
+        source_event: eventName,
+      });
       return;
     }
-    window.sessionStorage.setItem(dedupeKey, '1');
+
+    const dedupeKey = `sanitas-conversion:${eventName}:${transactionId}`;
+    try {
+      if (
+        window.sessionStorage.getItem(dedupeKey) ||
+        window.localStorage.getItem(dedupeKey)
+      ) {
+        return;
+      }
+      window.sessionStorage.setItem(dedupeKey, '1');
+      window.localStorage.setItem(dedupeKey, '1');
+    } catch {
+      // Some privacy modes block storage. In that case, still fire once for this render.
+    }
 
     const win = window as typeof window & {
       dataLayer?: unknown[][];
@@ -68,7 +83,8 @@ export default function GoogleAdsConversionEvent({
 
     win.gtag('event', eventName, eventParams);
     trackAnalyticsEvent('candidate_application_thank_you', {
-      application_id: transactionId || undefined,
+      application_id: transactionId,
+      transaction_id: transactionId,
       source_event: eventName,
     });
   }, [conversionId, conversionLabel, eventName, transactionId]);
