@@ -177,8 +177,22 @@ export default async function PostesPage({ searchParams }: Props) {
                 lorsqu'un mandat compatible sera disponible.
               </p>
               <div className="mt-6 flex justify-center gap-3 flex-wrap">
-                <a href="/postuler" className="btn-primary">Envoyer mon profil</a>
-                <a href="/postes" className="btn-secondary">Réinitialiser</a>
+                <a
+                  href="/postuler"
+                  className="btn-primary"
+                  data-analytics-event="jobs_empty_state_click"
+                  data-analytics-label="apply"
+                >
+                  Envoyer mon profil
+                </a>
+                <a
+                  href="/postes"
+                  className="btn-secondary"
+                  data-analytics-event="jobs_empty_state_click"
+                  data-analytics-label="reset"
+                >
+                  Réinitialiser
+                </a>
               </div>
             </div>
           ) : (
@@ -211,7 +225,12 @@ function PriorityLink({
   body: string;
 }) {
   return (
-    <Link href={href} className="card-interactive group p-5 flex flex-col">
+    <Link
+      href={href}
+      className="card-interactive group p-5 flex flex-col"
+      data-analytics-event="jobs_priority_link_click"
+      data-analytics-label={title}
+    >
       <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-accent">{eyebrow}</p>
       <h2 className="mt-2 text-[18px] font-semibold leading-snug text-fg transition-colors group-hover:text-accent">
         {title}

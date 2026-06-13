@@ -35,11 +35,21 @@ export default function SeoLandingPage({
           <h1 className="mt-3 text-display-lg text-fg">{title}</h1>
           <p className="mt-5 max-w-2xl text-[17.5px] leading-relaxed text-fg-muted">{intro}</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href={primaryCta.href} className="btn-primary">
+            <Link
+              href={primaryCta.href}
+              className="btn-primary"
+              data-analytics-event="seo_cta_click"
+              data-analytics-label="hero_primary"
+            >
               {primaryCta.label}
             </Link>
             {secondaryCta ? (
-              <Link href={secondaryCta.href} className="btn-secondary">
+              <Link
+                href={secondaryCta.href}
+                className="btn-secondary"
+                data-analytics-event="seo_cta_click"
+                data-analytics-label="hero_secondary"
+              >
                 {secondaryCta.label}
               </Link>
             ) : null}
@@ -114,7 +124,13 @@ export default function SeoLandingPage({
             <p className="eyebrow-subtle">{relatedTitle}</p>
             <div className="mt-4 flex flex-wrap gap-2">
               {relatedLinks.map((link) => (
-                <Link key={link.href} href={link.href} className="chip-link">
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="chip-link"
+                  data-analytics-event="seo_related_link_click"
+                  data-analytics-label={link.label}
+                >
                   {link.label}
                 </Link>
               ))}
@@ -134,11 +150,21 @@ export default function SeoLandingPage({
               : 'Notre équipe vous répond rapidement pendant les heures de bureau.'}
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <Link href={primaryCta.href} className="btn-dark">
+            <Link
+              href={primaryCta.href}
+              className="btn-dark"
+              data-analytics-event="seo_cta_click"
+              data-analytics-label="footer_primary"
+            >
               {primaryCta.label}
             </Link>
             {secondaryCta ? (
-              <Link href={secondaryCta.href} className="btn border border-bg/30 text-bg hover:bg-bg/10">
+              <Link
+                href={secondaryCta.href}
+                className="btn border border-bg/30 text-bg hover:bg-bg/10"
+                data-analytics-event="seo_cta_click"
+                data-analytics-label="footer_secondary"
+              >
                 {secondaryCta.label}
               </Link>
             ) : null}

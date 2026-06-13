@@ -434,14 +434,36 @@ export default function CandidateWizard({
         mode,
         job_id: job?.id,
         job_title: job?.title,
+        job_country: job?.country,
+        job_region: job?.region,
+        job_department: job?.department,
+        job_profession: job?.profession,
         application_id: json.application_id,
         completion_score: computeQuickCompletionScore(form),
+        has_cv: form.documents.CV?.status === 'Reçu' && !!form.documents.CV?.file_path,
+        qualified_professions: form.qualified_professions.join(', '),
+        years_experience: form.years_experience,
+        candidate_region: form.region_residence,
+        preferred_regions: form.region_choices.map((choice) => choice.region).filter(Boolean).join(', '),
+        shifts: form.shifts_accepted.join(', '),
       });
       clearDraft(storageKey);
       const thanksParams = new URLSearchParams({ type: mode });
       if (json.application_id) thanksParams.set('application_id', String(json.application_id));
       router.push(`${localizedPath(locale, 'thanks')}?${thanksParams.toString()}`);
     } catch (e: unknown) {
+      trackAnalyticsEvent('candidate_application_submit_error', {
+        mode,
+        job_id: job?.id,
+        job_title: job?.title,
+        step,
+        error_message:
+          e instanceof Error
+            ? e.message.slice(0, 120)
+            : locale === 'en'
+              ? 'Unknown error.'
+              : 'Erreur inconnue.',
+      });
       setSubmitError(
         e instanceof Error
           ? e.message

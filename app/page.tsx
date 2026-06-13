@@ -204,12 +204,16 @@ export default async function HomePage() {
                   <Link
                     href="/emplois-infirmieres-quebec"
                     className="inline-flex items-center justify-center rounded-full bg-bg px-6 py-3 text-[15.5px] font-semibold text-fg shadow-soft transition-all hover:bg-bg/90"
+                    data-analytics-event="home_cta_click"
+                    data-analytics-label="hero_jobs"
                   >
                     Voir les mandats infirmiers
                   </Link>
                   <Link
                     href="/postuler"
                     className="inline-flex items-center justify-center rounded-full border border-bg/40 bg-bg/10 backdrop-blur px-6 py-3 text-[15.5px] font-medium text-bg transition-colors hover:bg-bg/20"
+                    data-analytics-event="home_cta_click"
+                    data-analytics-label="hero_apply"
                   >
                     Envoyer mon profil
                   </Link>
@@ -223,6 +227,8 @@ export default async function HomePage() {
                 <Link
                   href="/etablissements"
                   className="inline-flex items-center justify-center rounded-full border border-bg/40 bg-bg/10 backdrop-blur px-6 py-3 text-[15.5px] font-medium text-bg transition-colors hover:bg-bg/20"
+                  data-analytics-event="home_cta_click"
+                  data-analytics-label="hero_facilities"
                 >
                   Demander du personnel
                 </Link>
@@ -267,19 +273,19 @@ export default async function HomePage() {
               </h2>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Link href="/agence-infirmiere-quebec" className="chip-link">
+              <Link href="/agence-infirmiere-quebec" className="chip-link" data-analytics-event="home_quick_link_click" data-analytics-label="agence_infirmiere_quebec">
                 Agence infirmière Québec
               </Link>
-              <Link href="/emplois-infirmieres-quebec" className="chip-link">
+              <Link href="/emplois-infirmieres-quebec" className="chip-link" data-analytics-event="home_quick_link_click" data-analytics-label="emplois_infirmieres_quebec">
                 Emplois infirmières Québec
               </Link>
-              <Link href="/mandats-infirmiers-region-eloignee" className="chip-link">
+              <Link href="/mandats-infirmiers-region-eloignee" className="chip-link" data-analytics-event="home_quick_link_click" data-analytics-label="mandats_region_eloignee">
                 Mandats en régions éloignées
               </Link>
-              <Link href="/agence-placement-sante-laval" className="chip-link">
+              <Link href="/agence-placement-sante-laval" className="chip-link" data-analytics-event="home_quick_link_click" data-analytics-label="placement_sante_laval">
                 Agence placement santé Laval
               </Link>
-              <Link href="/recrutement-personnel-sante-quebec" className="chip-link">
+              <Link href="/recrutement-personnel-sante-quebec" className="chip-link" data-analytics-event="home_quick_link_click" data-analytics-label="recrutement_personnel_sante">
                 Recrutement personnel santé
               </Link>
             </div>
@@ -297,7 +303,7 @@ export default async function HomePage() {
               <p className="eyebrow">Mandats urgents</p>
               <h2 className="mt-2 text-display-lg text-fg">À combler rapidement</h2>
             </div>
-            <Link href="/postes" className="btn-secondary btn-sm self-start">
+            <Link href="/postes" className="btn-secondary btn-sm self-start" data-analytics-event="home_cta_click" data-analytics-label="urgent_jobs_all">
               Tous les postes
             </Link>
           </div>
@@ -307,7 +313,7 @@ export default async function HomePage() {
               <p className="text-fg-muted leading-relaxed max-w-prose mx-auto">
                 Aucun mandat urgent pour le moment. Vous pouvez quand même envoyer votre profil.
               </p>
-              <Link href="/postuler" className="btn-primary mt-5 inline-flex">
+              <Link href="/postuler" className="btn-primary mt-5 inline-flex" data-analytics-event="home_cta_click" data-analytics-label="urgent_empty_apply">
                 Envoyer mon profil
               </Link>
             </div>
@@ -399,8 +405,8 @@ export default async function HomePage() {
               </ul>
 
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="/emplois-infirmieres-quebec" className="btn-primary">Mandats infirmiers</Link>
-                <Link href="/postuler" className="btn-secondary">Créer mon profil</Link>
+                <Link href="/emplois-infirmieres-quebec" className="btn-primary" data-analytics-event="home_cta_click" data-analytics-label="candidate_jobs">Mandats infirmiers</Link>
+                <Link href="/postuler" className="btn-secondary" data-analytics-event="home_cta_click" data-analytics-label="candidate_profile">Créer mon profil</Link>
               </div>
             </div>
           </div>
@@ -421,8 +427,8 @@ export default async function HomePage() {
                 Besoins ponctuels, urgents, récurrents ou planifiés.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Link href="/etablissements" className="btn-primary">Demander du personnel</Link>
-                <Link href="/contact" className="btn-secondary">Nous contacter</Link>
+                <Link href="/etablissements" className="btn-primary" data-analytics-event="home_cta_click" data-analytics-label="facilities_request_staff">Demander du personnel</Link>
+                <Link href="/contact" className="btn-secondary" data-analytics-event="home_cta_click" data-analytics-label="facilities_contact">Nous contacter</Link>
               </div>
 
               <dl className="mt-10 grid grid-cols-3 gap-6 max-w-md">

@@ -17,8 +17,16 @@ export function trackAnalyticsEvent(eventName: string, params: AnalyticsParams =
       window.dataLayer?.push(args);
     });
 
+  const defaultParams: AnalyticsParams = {
+    page_path: window.location.pathname,
+    page_location: window.location.href,
+    page_title: document.title,
+  };
+
   const cleanedParams = Object.fromEntries(
-    Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== '')
+    Object.entries({ ...defaultParams, ...params }).filter(
+      ([, value]) => value !== undefined && value !== null && value !== ''
+    )
   );
 
   window.gtag('event', eventName, cleanedParams);

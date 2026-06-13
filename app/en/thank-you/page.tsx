@@ -90,15 +90,30 @@ export default function EnglishThankYouPage({ searchParams }: Props) {
           )}
 
           <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <Link href="/en/my-applications" className="btn-primary">
+            <Link
+              href="/en/my-applications"
+              className="btn-primary"
+              data-analytics-event="thank_you_cta_click"
+              data-analytics-label={isPosting ? 'view_application_en' : 'view_applications_en'}
+            >
               {isPosting ? 'View my application' : 'View my applications'}
             </Link>
             {isPosting && (
-              <Link href="/en/my-profile" className="btn-secondary">
+              <Link
+                href="/en/my-profile"
+                className="btn-secondary"
+                data-analytics-event="thank_you_cta_click"
+                data-analytics-label="complete_preferences_en"
+              >
                 Complete my preferences
               </Link>
             )}
-            <Link href="/en/jobs" className="btn-secondary">
+            <Link
+              href="/en/jobs"
+              className="btn-secondary"
+              data-analytics-event="thank_you_cta_click"
+              data-analytics-label="browse_more_jobs_en"
+            >
               Browse more assignments
             </Link>
           </div>
@@ -110,6 +125,8 @@ export default function EnglishThankYouPage({ searchParams }: Props) {
             <a
               href="tel:+14509739696"
               className="mt-1 inline-block text-[15.5px] font-semibold text-fg hover:underline"
+              data-analytics-event="thank_you_cta_click"
+              data-analytics-label="phone_en"
             >
               450 973-9696
             </a>

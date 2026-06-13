@@ -90,15 +90,30 @@ export default function MerciPage({ searchParams }: Props) {
           )}
 
           <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <Link href="/mes-candidatures" className="btn-primary">
+            <Link
+              href="/mes-candidatures"
+              className="btn-primary"
+              data-analytics-event="thank_you_cta_click"
+              data-analytics-label={isPosting ? 'view_application' : 'view_applications'}
+            >
               {isPosting ? 'Voir ma candidature' : 'Voir mes candidatures'}
             </Link>
             {isPosting && (
-              <Link href="/mon-profil" className="btn-secondary">
+              <Link
+                href="/mon-profil"
+                className="btn-secondary"
+                data-analytics-event="thank_you_cta_click"
+                data-analytics-label="complete_preferences"
+              >
                 Compléter mes préférences
               </Link>
             )}
-            <Link href="/postes" className="btn-secondary">
+            <Link
+              href="/postes"
+              className="btn-secondary"
+              data-analytics-event="thank_you_cta_click"
+              data-analytics-label="browse_more_jobs"
+            >
               Voir d’autres mandats
             </Link>
           </div>
@@ -110,6 +125,8 @@ export default function MerciPage({ searchParams }: Props) {
             <a
               href="tel:+14509739696"
               className="mt-1 inline-block text-[15.5px] font-semibold text-fg hover:underline"
+              data-analytics-event="thank_you_cta_click"
+              data-analytics-label="phone"
             >
               450 973-9696
             </a>
